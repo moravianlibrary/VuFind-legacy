@@ -1,0 +1,178 @@
+!
+! NOTE - 1) do not edit this header section
+!      - 2) this header is created from the template located
+!        in $aleph_headers (sub-folders)
+!      - 3) to add remarks within the table,
+!        start the line with !rem or !*
+!      - 4) to mark a line as non-used (but restorable)
+!        add ! at start of line, retaining column structure
+!        displaced by one position to the right
+!      - 5) all internal codes must be Latin characters A-Z,0-9
+!
+!====================================
+!       tab40 - collection definition
+!====================================
+! Last header change: 04/03/2003
+!
+! HELP
+! This table defines the expansion of the collection code as entered in
+! the Z30-COLLECTION FIELD in items, to the expanded form to be displayed
+! in the OPAC.
+! END_HELP
+!
+! TABLE_KEY 1,2,3 
+!
+! COL 1. 5; ALPHA_NUM, UPPER; ;
+!        Code;
+!        Collection code;
+! COL 2. 5; ALPHA_NUM, UPPER; #;
+!          Sublibrary;
+!          Sublibrary;
+! COL 3. 1; ALPHA, UPPER {L}; ;
+!          Alpha;
+!          Character set;
+! COL 4. 80; TEXT; ;
+!          Name;
+!          Collection name
+!          up to 80 characters;
+!
+! 1     2   3     4
+!!!!!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!>
+SKL   ##### L Sklad / do 1 hodiny
+VV    ##### L VV
+DEN   ##### L Sklad / do 24 hodin
+VVB   ##### L VV beletrie
+HSS   ##### L HSS
+STM   ##### L STM
+SNP   ##### L SNP
+PST   ##### L PST
+!PAK   ##### L Pøíruèka AK
+!PNK   ##### L Pøíruèka NK
+!PRK   ##### L Pøíruèka RK
+MVS   ##### L MVS
+POP   ##### L POP 
+INF   ##### L INF
+!SHP   ##### L SHP
+AUT   ##### L AUT
+!AVM   ##### L AVM
+KN    ##### L KN 
+DEP   ##### L DEP / do 10 dnù
+ZHR   ##### L ZHR
+SNC   ##### L SNC
+SNC1  ##### L SNC
+SNC2  ##### L SNC
+!ŽER   ##### L ŽER / do 10 dnù
+!HOS   ##### L HOS / Za mìsíc
+TR1   ##### L TR1
+TR2   ##### L TR2
+TR3   ##### L TR3
+TR4   ##### L TR4
+TR5   ##### L TR5
+TR6   ##### L TR6
+VYS   ##### L VYS
+
+ILL   MVS## L ILL
+
+!*
+AREA  NARCV L Area
+GEN   NARCV L General
+MAP   NARCV L Maps
+RARE  NARCV L Rare Collection
+REF   NARCV L Reference
+THES  NARCV L Theses
+!*
+!* Education Library
+!*
+CHILD NEDUC L Children's Collection 
+CRLAB NEDUC L Curriculum Lab
+ETC   NEDUC L Educ Teaching Center
+GEN   NEDUC L General
+REF   NEDUC L Reference
+RESV  NEDUC L Reserves
+MUS   NEDUC L Music Collection
+!*
+!* Electronic Resources
+!*
+gen   NELEC L General
+!*
+!* Government Documents
+!*
+AV    NGDOC L Audio-Visual
+GEN   NGDOC L General
+REF   NGDOC L Reference
+RESV  NGDOC L Reserves
+STAFF NGDOC L Staff Workroom
+STOR  NGDOC L Storage
+VERT  NGDOC L Verical File
+!*
+!* Health Library
+!*
+AV    NHLTH L Audio-Visual
+GEN   NHLTH L General
+OVER  NHLTH L Oversize
+PER   NHLTH L Periodicals
+REF   NHLTH L Reference
+RESV  NHLTH L Reserves
+!*
+!* Law Library
+!*
+AV    NLAW  L Audio-Visual
+CASEB NLAW  L Casebooks
+GEN   NLAW  L General
+PER   NLAW  L Periodicals
+REF   ULAW  L Reference
+RESV  NLAW  L Reserves
+STAFF NLAW  L Staff Workroom
+!*
+!* Lincoln Library  
+!*
+ABST  NLINC L Abstracts
+ASIAN NLINC L Asian Collection
+AV    NLINC L Audio-Visual
+GEN   NLINC L General
+GRANT NLINC L Grant Collection
+LEE   NLINC L Lee Collection
+SER   NLINC L Serials/Microforms
+MICR  NLINC L Microforms
+REF   NLINC L Reference
+RESV  NLINC L Reserves
+STAFF NLINC L Staff Workroom
+STOR  NLINC L Storage
+VERT  NLINC L Vertical File
+!*
+!* Lincoln Library Reading Room
+!*
+GEN   NRLIN L General
+REF   NRLIN L Reference
+!*
+!* Music Library
+!*
+AV    NMUSI L Audio-Visual
+GEN   NMUSI L General
+PER   NMUSI L Periodicals
+OVER  NMUSI L Oversize
+RARE  NMUSI L Rare Books
+REF   NMUSI L Reference
+RESV  NMUSI L Reserves
+STAFF NMUSI L Staff Workroom
+STOR  NMUSI L Storage
+!*
+!* Science Library
+!*
+ATLAS NSCI  L Atlases
+GEN   NSCI  L General
+MAP   NSCI  L Maps
+OVER  NSCI  L Oversize
+RARE  NSCI  L Rare Collection
+REF   NSCI  L Reference
+RESV  NSCI  L Reserves
+VERT  NSCI  L Vertical File
+!*
+!* Uptown Branch
+!*
+CHILD NUPTN L Children Books
+FICT  NUPTN L Fiction
+GEN   NUPTN L General
+OVER  NUPTN L Oversize
+REF   NUPTN L Reference
+STOR  NUPTN L Storage

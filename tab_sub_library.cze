@@ -1,0 +1,289 @@
+!
+! NOTE - 1) do not edit this header section
+!      - 2) this header is created from the template located
+!        in $aleph_headers (sub-folders)
+!      - 3) to add remarks within the table,
+!        start the line with !rem or !*
+!      - 4) to mark a line as non-used (but restorable)
+!        add ! at start of line, retaining column structure
+!        displaced by one position to the right
+!      - 5) all internal codes must be Latin characters A-Z,0-9
+!
+!=============================================================================
+!                       tab_sub_library.eng
+!             List of libraries and their sublibraries
+!=============================================================================
+! Last header change: 29/02/2004
+!
+! HELP
+! .
+! This table defines the sublibraries of all the ADM libraries 
+! on the server. In the list of items display in the ALEPH WEB 
+! OPAC, it is possible to "gather together" all the sublibraries
+! in one list, regardless of the connection to separate ADM libraries.
+! For all other ALEPH functions (USER, CIRC, ITEMS, SERIALS, ILL, 
+! ACQ) it is required that the operater "connects" to a specific ADM 
+! library (e.g. USM50).
+! The number of sublibraries in the table is not limited. However,
+! there are places in the system where the total number of
+! sublibraries relevant to the situation cannot surpass 200.
+! For example, when sorting a list of items or list holding
+! libraries for a single bibliographic record.
+! "Connect" in GUI updating modules is to an ADM library (which is  
+! a group of sublibraries). This is a physical group, and one 
+! sublibrary can be assigned to one ADM library ONLY. Each 
+! sublibrary code must be unique in this table (unless a special
+! setup for testing conversions has been installed by Ex Libris).
+! .
+! Library names (col.5):
+! Names of the sub_libraries display in WEB OPAC and GUI modules.
+! For libraries who use more than one language interface, each
+! language is a separate tab_sub_library.<lng> table. All rows
+! and columns should be exactly the same, except for column 5
+! (library name). 
+! Note! In order to define library names for the WEB Opac use table
+! tab_www_item_desc.eng.
+! .
+! Library types (col.2):
+! In addition to actual sub_libraries (library type 1), some of
+! the sub_libraries are defined for local patron records (type 2,
+! in which case the code can be ALEPH or the ADM library code),
+! for delivery of requested material (type 3, must be coordinated
+! with tab27, tab37 and tab38), and for transfer of material to a reading
+! room (type 4, must be coordinated with tab27). You may define
+! administrative units for acquisitions orders activities (type 5 -
+! Ordering Unit).
+! .
+! link to tab15 (col.6):
+! The code registered in this column identifies the lines in 
+! tab15 (Item statuses) that are relevant for this sublibrary.  
+! The code here must match the code in column 1 of tab15.
+! This allows you to define statuses in tab15 that are used 
+! in common by a number of sublibraries.
+! .
+! link to tab16 (col.7):
+! The code registered in this column identifies the lines in
+! tab16 (Fines, due dates and loan limits) that are relevant 
+! for this sublibrary.
+! The code here must match the code in column 1 of tab16.
+! This allows you to define lines in tab16 that are used
+! in common by a number of sublibraries.
+! .
+! link to tab17 (col.8):
+! The code registered in this column identifies the lines in
+! tab17 (Library hours) that are relevant for this sublibrary.
+! The code here must match the code in column 1 of tab17.
+! This allows you to define lines in tab17 that are used
+! in common by a number of sublibraries that share a set of
+! open/close hours.
+! .
+! link to patron record (col.9-13):
+! Columns 9 through 13 are used to define the preferred 
+! local patron record, when matching the patron and the 
+! item to a line in tab16 (loan due dates, loan, request and
+! renew limits, etc.). The five columns are alternatives, and
+! the system checks one after the other, in an attempt to
+! find a matching local patron record. For example, if the
+! first of these 5 columns has sublibrary XYZAB, but
+! the patron does not have an XYZAB local patron record, the
+! next of the 5 columns will be consulted, and so on.
+! If, in the end, no matching local patron record is found
+! the patron does not have privileges for this item, and he
+! cannot take it on loan.
+! Therefore, at least one sublibrary code is mandatory for 
+! sublibraries type 1, and sublibrary type 2 must have one
+! sublibrary code.
+!  For example, for library type 1:
+!  ULINC USM50 ALEPH 
+!   - checks for ULINC local patron record, if not found checks for
+!     USM50 (general library patron) and lastly checks for
+!     ALEPH (general ALEPH patron)
+!  UHLTH 
+!   - patron can loan items from UHLTH library only
+!  For example, for library type 2:
+!  ALEPH
+!   - the system uses the patron status in the ALEPH 
+!     local patron record in order to find the matching line in 
+!     tab16 for global loan and hold limits. 
+! END_HELP
+! COL  1.  5; ALPHA_NUM, UPPER; ;
+!            Sublibrary;
+!            Sublibrary;
+! COL  2.  1; NUM {1,2,3,4,5}; ;
+!            Type;
+!            Sublibrary Type:
+!            1 - full sublibrary (patron and items)
+!            2 - patron sublibrary only (no items)
+!            3 - pickup location that is not a library
+!            4 - reading room sublibrary (1 + special request handling)
+!            5 - Ordering unit
+! COL  3.  5; ALPHA_NUM, UPPER; ;
+!            ADM code;
+!            ADM library code;
+! COL  4.  1; ALPHA {L,H,A,R,S}, UPPER; ;
+!            Alpha;
+!            Alpha;
+! COL  5.  30; TEXT; ;
+!             Name;
+!             Sublibrary name;
+! COL  6.  5; ALPHA_NUM, UPPER; ;
+!            tab15;
+!            Group ID for tab15:
+!            Only for Item sublibraries;
+! COL  7.  5; ALPHA_NUM, UPPER; ;
+!            tab16;
+!            Group ID for tab16; 
+! COL  8.  5; ALPHA_NUM, UPPER; ;
+!            tab17;
+!            Group ID for tab17:
+!            Only for Item sublibraries;
+! COL  9.  5; ALPHA_NUM, UPPER; ;
+!            Local patron record;
+!            First choice for local patron privileges record;
+! COL  10.  5; ALPHA_NUM, UPPER; ;
+!            Local patron record;
+!            Second choice for local patron privileges record;
+! COL  11.  5; ALPHA_NUM, UPPER; ;
+!            Local patron record;
+!            Third choice for local patron privileges record;
+! COL  12.  5; ALPHA_NUM, UPPER; ;
+!            Local patron record;
+!            Fourth choice for local patron privileges record;
+! COL  13.  5; ALPHA_NUM, UPPER; ;
+!            Local patron record;
+!            Fifth choice for local patron privileges record;
+!
+!  NOTE!!!!!!
+!
+!  Add demo sublibraries here
+!  Add customer sublibraries below
+!
+! 1   2   3   4             5                    6     7     8     9    10   11 !    12   13            
+!!!!!-!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!!!
+ALEPH 2       L ALEPH                                ALEPH       ALEPH
+!
+HOME  3       L Home address
+ILLDT 3       L ILL Department
+!
+BOX1  3 USM50 L Pickup in Forum
+!
+!===========================================================================
+! USM Demo Libraries
+!===========================================================================
+USM50 2 USM50 L Exlibris Demo Libraries              USM50       USM50 ALEPH
+UARCV 4 USM50 L Archives Library               15A   UARCV UARCV UARCV
+UELEC 1 USM50 L Electronic Resources           15A   UELEC UELEC UELEC
+URLEC 4 USM50 L UELEC Reading Room             15A   UELEC UELEC UELEC
+UGDOC 1 USM50 L Government Documents           15A   UGDOC 17A   UGDOC
+URDOC 4 USM50 L UGDOC Reading Room             15A   UGDOC 17A   UGDOC
+UEDUC 1 USM50 L Education Library              15A   16A   17A   UEDUC ALEPH
+UHLTH 1 USM50 L Health Library                 15A   16A   17A   UHLTH ALEPH
+ULAW  1 USM50 L Law Library                    15A   16A   17A   ULAW  ALEPH
+ULINC 1 USM50 L Lincoln Library                15A   16A   17A   ULINC ALEPH
+RLINC 4 USM50 L ULINC Reading Room             15A   16A   17A   ULINC ALEPH
+UMUSI 1 USM50 L Music Library                  15A   16A   17A   UMUSI ALEPH
+USCI  1 USM50 L Science Library                15A   16A   17A   USCI  ALEPH
+UUPTN 1 USM50 L Uptown Branch                  15B   UUPTN UUPTN UUPTN ALEPH
+URPTN 4 USM50 L UUPTN Reading Room             15B   UUPTN UUPTN UUPTN ALEPH
+!===========================================================================
+! UNI Demo Libraries
+!===========================================================================
+UNI50 2 UNI50 L Exlibris UNIMARC Libraries           UNI50       UNI50 ALEPH
+NARCV 4 UNI50 L Archives Library               15A   NARCV UARCV UARCV
+NELEC 1 UNI50 L Electronic ResoNrces           15A   NELEC NELEC NELEC
+NRLEC 4 UNI50 L NELEC Reading Room             15A   NELEC NELEC NELEC
+NGDOC 1 UNI50 L Government DocNments           15A   NGDOC 17A   NGDOC
+NRDOC 4 UNI50 L NGDOC Reading Room             15A   NGDOC 17A   NGDOC
+NEDUC 1 UNI50 L Education Library              15A   16A   17A   NEDUC ALEPH
+NHLTH 1 UNI50 L Health Library                 15A   16A   17A   NHLTH ALEPH
+NLAW  1 UNI50 L Law Library                    15A   16A   17A   NLAW  ALEPH
+NLINC 1 UNI50 L Lincoln Library                15A   16A   17A   NLINC ALEPH
+NRLIN 4 UNI50 L NLINC Reading Room             15A   16A   17A   NLINC ALEPH
+NMUSI 1 UNI50 L Music Library                  15A   16A   17A   NMUSI ALEPH
+NSCI  1 UNI50 L Science Library                15A   16AI  17A   NSCI  ALEPH
+NUPTN 1 UNI50 L Uptown Branch                  15B   NUPTN NUPTN NUPTN ALEPH
+NRPTN 4 UNI50 L NUPTN Reading Room             15B   NUPTN NUPTN NUPTN ALEPH
+!*============================================================================
+!* USM51 Demo Libraries
+!*============================================================================
+USM51 2       L USM51 Demo Libraries                 USM51       USM51 ALEPH
+ELEC5 1 USM51 L Electronic Resources           15A   16A   17A   ELEC5 ALEPH
+GDOC5 1 USM51 L Government Documents           15A   16A   17A   GDOC5 ALEPH
+EDUC5 1 USM51 L Education Library              15A   16A   17A   EDUC5 ALEPH
+LINC5 1 USM51 L Lincoln Library                15A   16A   17A   LINC5 ALEPH
+!*============================================================================
+!MZK50 libraries
+!*============================================================================
+!     2       4 5                              6     7     8     9     10
+!!!!!-!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!
+MZK50 2 MZK50 L MZK50                                MZK50       MZK50
+! UK1 zmeneno kvuli ereaderum - je mozno objednavat status 07, jine pokuty
+!UK1   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+UK1   1 MZK50 L MZK                            MZK15 UK116 MZK17 MZK50
+
+PK1   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+TK1   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+VV    1 MZK50 L Vol.výbìr                      VV15  VV16  MZK17 MZK50
+HP1   1 MZK50 L Sklad H1                       MZK15 MZK16 MZK17 MZK50
+MZK   1 MZK50 L pùjè. MZK                      MZK15 MZK16 MZK17 MZK50
+SK0   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK1   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK3   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK4   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK5   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK6   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK7   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SK8   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+MVS   1 MZK50 L MVS                            MVS15 MVS16 MVS17 MZK50 ALEPH
+PP1   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+PP2   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
+SKSNP 1 MZK50 L SNP-sklad                      MZK15 SNP16 MZK17 MZK50
+STT   4 MZK50 L stud. ST                       MZK15 STU16 MZK17 MZK50
+STUD  4 MZK50 L Stud. humanitních vìd/4.patr   HSS15 HSS16 STU17 MZK50
+SNC   4 MZK50 L Stud. novin a èasop./2.patro   MZK15 STU16 MZK17 MZK50
+!SVN   4 MZK50 L Stud. novin a èasop./2.patro   MZK15 STU16 MZK17 MZK50
+HAMST 4 MZK50 L Hud. a multim. stud./4.patro   ZHR15 STU16 MZK17 MZK50
+AVM   1 MZK50 L AVM                            AVM15 AVM16 MZK17 MZK50
+AU1   1 MZK50 L Rakouská knihovna              ZHR15 AUS16 AUS17 MZK50
+GE1   1 MZK50 L Nìmecká knihovna               ZHR15 AUS16 AUS17 MZK50
+BC1   1 MZK50 L Anglická knihovna              ZHR15 BC116 AUS17 MZK50
+USA   1 MZK50 L Info USA                       ZHR15 BC116 AUS17 MZK50
+!AKVIZ 5 MZK50 L Akvizice                       MZK15 MZK16 MZK17 MZK50
+!AVM   1 MZK50 L AVM                            AVM15 AVM16 MZK17 AVM
+
+!*============================================================================
+!BZK50 libraries
+!*============================================================================
+!     2       4 5                              6     7     8     9     10
+!!!!!-!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!!!-!!!
+BZK50 2 BZK50 L MZK50                                BZK50       BZK50 ALEPH
+UK1X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+PK1X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+HK1X  1 BZK50 L HK                             BZK15 BZK16 BZK17 BZK50 ALEPH
+TK1X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+MZKX  1 BZK50 L pùjè. MZK                      BZK15 BZK16 BZK17 BZK50 ALEPH
+SK0X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK1X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK3X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK4X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK5X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK6X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK7X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SK8X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+MVSX  3 BZK50 L MVS                            MVS15 MVS16 BZK17 BZK50 ALEPH
+PP1X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+PP2X  1 BZK50 L MZK                            BZK15 BZK16 BZK17 BZK50 ALEPH
+SSNPX 1 BZK50 L SNP                            BZK15 BZK16 BZK17 BZK50 ALEPH
+STTX  4 BZK50 L stud. ST                       BZK15 STU16 BZK17 BZK50 ALEPH
+STUDX 4 BZK50 L Studovna                       BZK15 STU16 BZK17 BZK50 STUDX ALEPH
+SNCX  4 BZK50 L Stud.váz. novin                BZK15 STU16 BZK17 BZK50 ALEPH
+AVMX  1 BZK50 L AVM                            AVM15 AVM16 BZK17 AVMX
+
+
+
+TST50 2 TST50 L TST50                                TST16       TST50 ALEPH
+TS1   1 TST50 L TS1                            MZK15 MZK16 MZK17 MZK50
+TS2   1 TST50 L TS2                            MZK15 MZK16 MZK17 MZK50
+MVS1  3 TST50 L MVS1                           MVS15 MVS16 MZK17 MZK50
+TSSTU 4 TST50 L TST studovna                   MZK15 MZK16 MZK17 MZK50
+AVM1  1 TST50 L AVM1                           AVM15 AVM16 MZK17 AVM1  ALEPH
