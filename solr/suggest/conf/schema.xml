@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<schema name="VuFind Suggest Index" version="1.2">
+  
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="int" class="solr.IntField" omitNorms="true"/>
+    <fieldType name="edgytext" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+	<tokenizer class="solr.ICUTokenizerFactory"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
+        <filter class="solr.ICUFoldingFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+        <filter class="solr.EdgeNGramFilterFactory" minGramSize="1" maxGramSize="25" />
+      </analyzer>
+      <analyzer type="query">
+	<tokenizer class="solr.ICUTokenizerFactory"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
+        <filter class="solr.ICUFoldingFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldType>
+  </types>
+  
+  <fields>
+    <field name="key" type="edgytext" indexed="true" stored="true" omitNorms="true" omitTermFreqAndPositions="true" />
+    <field name="field" type="string" indexed="true" stored="true" omitNorms="true" omitTermFreqAndPositions="true" />
+    <field name="count" type="int" indexed="true" stored="true" omitNorms="true" omitTermFreqAndPositions="true" />
+  </fields>
+ 
+ <defaultSearchField>key</defaultSearchField>
+ <solrQueryParser defaultOperator="AND"/>
+</schema>

@@ -1,0 +1,12 @@
+<dataConfig>
+  <dataSource type="HttpDataSource"/>
+  <document>
+    <entity name="slashdot" pk="link"
+    url="http://localhost:5080/solr/biblio/select/?fl=id,name&amp;rows=0&amp;q=*:*&amp;facet=true&amp;facet.field=authorStr&amp;facet.mincount=1&amp;facet.limit=100&amp;wt=xml&amp;indent=on"
+    processor="XPathEntityProcessor" forEach="/response/lst[@name='facet_counts']/lst[@name='facet_fields']/lst/int" transformer="DateFormatTransformer">
+      <field column="field" xpath="/response/lst[@name='facet_counts']/lst[@name='facet_fields']/lst/@name" commonField="true"/>
+      <!--<field column="key" xpath="/@name" />
+      <field column="count" xpath="/text()" />-->
+    </entity>
+  </document>
+</dataConfig>

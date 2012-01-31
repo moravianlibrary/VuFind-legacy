@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- 
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+
+<!-- 
+  Simple transform of Solr query results to RSS
+ -->
+
+<xsl:stylesheet version='1.0'
+    xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
+
+  <xsl:variable name="search" select="/response/lst[@name='facet_counts']/lst[@name='facet_fields']/lst/@name"/>
+
+  <xsl:output method="xml" encoding="utf-8" />
+  <xsl:template match='/'>
+    <add>
+      <xsl:apply-templates select="/response/lst[@name='facet_counts']/lst[@name='facet_fields']/lst/int"/>
+    </add>
+  </xsl:template>
+  
+  <!-- search results xslt -->
+  <xsl:template match="int">
+    <xsl:variable name="count" select="text()"/>
+    <xsl:variable name="key" select="/@name"/>
+    <doc>
+      <field name='key'><xsl:value-of select="$key"/></field>
+      <field name='count'><xsl:value-of select="$count"/></field>
+      <field name='field'><xsl:value-of select="$search"/></field>
+    </doc>
+  </xsl:template>
+</xsl:stylesheet>
+
