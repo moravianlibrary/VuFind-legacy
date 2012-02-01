@@ -356,6 +356,10 @@ class Aleph implements DriverInterface
         return $holding;
     }
 
+    public function getMyHistory($user) {
+        return $this->getMyTransactions($user, true);
+    }
+
     /**
      * Get Patron Transactions
      *
@@ -368,11 +372,16 @@ class Aleph implements DriverInterface
      * PEAR_Error otherwise.
      * @access public
      */
-    public function getMyTransactions($user)
+    public function getMyTransactions($user, $history=false)
     {
         $userId = $user['id'];
         $transList = array();
-        $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'loans'), array("view" => "full"));
+        $params = array("view" => "full");
+        if ($history) {
+           $params["type"] = "history";
+        }
+        $count = 0;
+        $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'loans'), $params);
         foreach ($xml->xpath('//loan') as $item) {
            $z36 = $item->z36;
            $z13 = $item->z13;
@@ -386,14 +395,20 @@ class Aleph implements DriverInterface
            $location = (string) $z36->{'z36_pickup_location'};
            $reqnum = (string) $z36->{'z36-doc-number'} .
               (string) $z36->{'z36-item-sequence'} . (string) $z36->{'z36-sequence'};
-           $due = (string) $z36->{'z36-due-date'};
+           $due = $returned = null;
+           if ($history) {
+               $due = $item->z36h->{'z36h-due-date'};
+               $returned = $item->z36h->{'z36h-returned-date'};
+           } else {
+               $due = (string) $z36->{'z36-due-date'};
+           }
            $loaned = (string) $z36->{'z36-loan-date'};
            $title = (string) $z13->{'z13-title'};
            $author = (string) $z13->{'z13-author'};
            $isbn = (string) $z13->{'z13-isbn-issn'};
            $barcode = (string) $z30->{'z30-barcode'};
            $transList[] = array('type' => $type,
-			       'id' => $this->barcodeToID($barcode),
+			       'id' => ($history)?null:$this->barcodeToID($barcode),
                                'item_id' => $group,
                                'location' => $location,
                                'title' => $title,
@@ -402,6 +417,7 @@ class Aleph implements DriverInterface
                                'reqnum' => $reqnum,
                                'barcode' => $barcode,
                                'duedate' => $this->parseDate($due),
+                               'returned' => $this->parseDate($returned),
                                'holddate' => $holddate,
                                'delete' => $delete,
                                'renewable' => true,
