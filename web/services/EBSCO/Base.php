@@ -1,6 +1,6 @@
 <?php
 /**
- * Base class for most Summon module actions.
+ * Base class for most EBSCO module actions.
  *
  * PHP version 5
  *
@@ -20,19 +20,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @category VuFind
- * @package  Controller_Summon
+ * @package  Controller_EBSCO
  * @author   Andrew Nagy <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_module Wiki
  */
 require_once 'Action.php';
-require_once 'sys/EBSCO.php';
 
 /**
- * Base class for most Summon module actions.
+ * Base class for most EBSCO module actions.
  *
  * @category VuFind
- * @package  Controller_Summon
+ * @package  Controller_EBSCO
  * @author   Andrew Nagy <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_module Wiki

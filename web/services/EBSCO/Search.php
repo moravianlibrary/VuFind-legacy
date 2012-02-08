@@ -26,15 +26,13 @@
  * @link     http://vufind.org/wiki/building_a_module Wiki
  */
 require_once 'Base.php';
-
 require_once 'sys/Pager.php';
-require_once 'sys/EBSCO.php';
 
 /**
- * Search action for Summon module
+ * Search action for EBSCO module
  *
  * @category VuFind
- * @package  Controller_Summon
+ * @package  Controller_EBSCO
  * @author   Andrew Nagy <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_module Wiki
@@ -65,7 +63,7 @@ class Search extends Base
         $interface->assign('searchIndex', $this->searchObject->getSearchIndex());
         $interface->assign('searchType', $this->searchObject->getSearchType());
 
-        // Search Summon
+        // Search EBSCO
         $result = $this->searchObject->processSearch(true, true);
 
         // We'll need recommendations no matter how many results we found:
@@ -95,9 +93,9 @@ class Search extends Base
             $interface->assign('sortList',   $this->searchObject->getSortList());
 
             // If our result set is larger than the number of records that
-            // Summon will let us page through, we should cut off the number
+            // EDS will let us page through, we should cut off the number
             // before passing it to our paging mechanism:
-            $config = getExtraConfigArray('Summon');
+            $config = getExtraConfigArray('EBSCO');
             $pageLimit = isset($config['General']['result_limit']) ?
                 $config['General']['result_limit'] : 2000;
             $totalPagerItems = $summary['resultTotal'] < $pageLimit ?

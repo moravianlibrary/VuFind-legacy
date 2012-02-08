@@ -264,8 +264,12 @@ class Aleph implements DriverInterface
         $holding = array();
         list($bib, $sys_no) = $this->parseId($id);
         $resource = $bib . $sys_no;
+        $params = array('view' => 'full');
+        if ($patron) {
+            $params['patron'] = $patron['id'];
+        }
         try {
-            $xml = $this->doRestDLFRequest(array('record', $resource, 'items'), array('view' => 'full'));
+            $xml = $this->doRestDLFRequest(array('record', $resource, 'items'), $params);
         } catch (Exception $ex) {
             return array();
         }
