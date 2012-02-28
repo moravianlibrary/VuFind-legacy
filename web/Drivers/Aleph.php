@@ -59,6 +59,7 @@ class Aleph implements DriverInterface
         $this->admlib = $configArray['Catalog']['admlib'];
         $this->wwwuser = $configArray['Catalog']['wwwuser'];
         $this->wwwpasswd = $configArray['Catalog']['wwwpasswd'];
+        $this->xserver_enabled = ($this->wwwuser && $this->wwwpasswd);
         $this->dlfport = $configArray['Catalog']['dlfport'];
         $this->sublibadm = $configArray['sublibadm'];
         $this->duedates = $configArray['duedates'];
@@ -87,6 +88,7 @@ class Aleph implements DriverInterface
         }
         $url = "http://$this->host:$this->dlfport/rest-dlf/" . $path;
         $url = $this->appendQueryString($url, $params);
+        // print "$url<BR>";
         return $this->doHTTPRequest($url, $method, $body);
     }
 
@@ -230,6 +232,9 @@ class Aleph implements DriverInterface
      */
     public function getStatuses($idList)
     {   
+        if (!$this->xserver_enabled) {
+            return array();
+        }
         $ids = array();
         $holdings = array();
         foreach ($idList as $id) {
@@ -626,11 +631,17 @@ class Aleph implements DriverInterface
      * @return mixed      Array of the patron's profile data on success, PEAR_Error otherwise.
      * @access public
      */
-    function getMyProfile($user)
+    function getMyProfile($user) {
+        if ($this->xserver_enabled) {
+           return $this->getMyProfileX($user);
+        } else {
+           return $this->getMyProfileDLF($user);
+        }
+    }
+
+    function getMyProfileX($user)
     {   
         $recordList=array();
-        //$xml = $this->doXRequest("bor-info", array('loans' => 'N', 'cash' => 'N', 'hold' => 'N', 'library' => $user['college'],
-        //  'bor_id' => $user['cat_username']), true);
         if (!$user['college']) {
            $user['college'] = $this->useradm;
         }
@@ -650,9 +661,7 @@ class Aleph implements DriverInterface
         list($lastname, $firstname) = split(",", $name);
         if ($credit_sing == null) {
            $credit_sign = "C";
-        }        
-        //$recordList['firstname'] = $user['firstname'];
-        //$recordList['lastname'] = $user['lastname'];
+        }
         $recordList['firstname'] = $firstname;
         $recordList['lastname'] = $lastname;
         $recordList['email'] = $user['email'];
@@ -668,7 +677,10 @@ class Aleph implements DriverInterface
         $recordList['credit_sign'] = $credit_sign;
         $recordList['id'] = $id;
         return $recordList;
-        /*
+    }
+
+    public function getMyProfileDLF($user)
+    {
         $xml = $this->doRestDLFRequest(array('patron', $user['id'], 'patronInformation', 'address'));
         $address = $xml->xpath('//address-information');
         $address = $address[0];
@@ -682,20 +694,23 @@ class Aleph implements DriverInterface
         $email = (string)$address->{'z404-email-address'};
         $dateFrom = (string)$address->{'z304-date-from'};
         $dateTo = (string)$address->{'z304-date-to'};
-        $recordList['firstname'] = $user['firstname'];
-        $recordList['lastname'] = $user['lastname'];
-        $recordList['address1'] = $address1;
-        $recordList['address2'] = $address2;
-        $recordList['address3'] = $address3;
-        $recordList['address4'] = $address4;
-        $recordList['address5'] = $address5;
+        $recordList['firstname'] = $firstname;
+        $recordList['lastname'] = $lastname;
+        $recordList['address1'] = $address2;
+        $recordList['address2'] = $address3;
+        $recordList['barcode'] = $address1;
         $recordList['zip'] = $zip;
         $recordList['phone'] = $phone;
         $recordList['email'] = $email;
         $recordList['dateFrom'] = $dateFrom;
         $recordList['dateTo'] = $dateTo;
+        $recordList['id'] = $user['id'];
+        $xml = $this->doRestDLFRequest(array('patron', $user['id'], 'patronStatus', 'registration'));
+        $status = $xml->xpath("//institution/z305-bor-status");
+        $expiry = $xml->xpath("//institution/z305-expiry-date");
+        $recordList['expire'] = $this->parseDate($expiry[0]);
+        $recordList['group'] = $status[0];
         return $recordList;
-        */
     }
 
     /**
