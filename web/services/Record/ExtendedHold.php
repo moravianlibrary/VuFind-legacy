@@ -22,7 +22,7 @@ require_once 'CatalogConnection.php';
 require_once 'Record.php';
 require_once 'Drivers/Aleph.php';
 
-class PutHold extends Record
+class ExtendedHold extends Record
 {
     private $userInfo;
 
@@ -48,24 +48,16 @@ class PutHold extends Record
                 $interface->assign('message', 'You must be logged in first');
                 $interface->assign('followup', true);
                 $interface->assign('followupModule', 'Record');
-                $interface->assign('followupAction', "PutHold");
+                $interface->assign('followupAction', "ExtendedHold");
                 return $interface->fetch('AJAX/login.tpl');
             } else {
-                /*
-                $interface->assign('followup', true);
-                $interface->assign('followupModule', 'Record');
-                $interface->assign('followupAction', 'PutHold');
-                $interface->setPageTitle('You must be logged in first');
-                $interface->assign('subTemplate', '../MyResearch/login.tpl');
-                $interface->setTemplate('view-alt.tpl');
-                $interface->display('layout.tpl', 'PutHold' . $_GET['id']); //'RecordPutHold'
-                */
                 $sessionInitiator = $interface->get_template_vars("sessionInitiator");
                 header("Location: $sessionInitiator");
                 die();
             }
             exit();
         }
+
         if (preg_match('/@guest$/', $user->username)) {
             $target = urlencode($interface->get_template_vars("currentURL"));
             header("Location: https://vufind-trunk.mzk.cz/MyResearch/Logout?redirect=/Shibboleth.sso/Login?target=$target");
@@ -73,13 +65,13 @@ class PutHold extends Record
         }
 
         if (isset($_POST['submit'])) {
-            $result = $this->putHold();
+            $result = $this->placeHold();
             if (!$result['success']) {
                 $interface->assign('error', true);
                 //print $result['sysMessage'] . "<BR>";
                 $interface->assign('error_str', $result['sysMessage']);
             }
-            $interface->assign('subTemplate', 'puthold-status.tpl');
+            $interface->assign('subTemplate', 'extended-hold-status.tpl');
             $interface->setTemplate('view-alt.tpl');
             $interface->display('layout.tpl');
         } else {
@@ -99,7 +91,7 @@ class PutHold extends Record
         if (!isset($_REQUEST['barcode'])) {
             $interface->assign('error', true);
             $interface->assign('error_str', "barcode is missing!");
-            $interface->assign('subTemplate', 'puthold-status.tpl');
+            $interface->assign('subTemplate', 'extended-hold-status.tpl');
             $interface->setTemplate('view-alt.tpl');
             $interface->display('layout.tpl');
             return;
@@ -120,21 +112,21 @@ class PutHold extends Record
         }
         $interface->assign('item', $group); // interface->assign('item', $_GET['barcode']);
         $interface->assign('formTargetPath',
-            '/Record/' . urlencode($id) . '/PutHold');
+            '/Record/' . urlencode($id) . '/ExtendedHold');
         if (isset($_GET['lightbox'])) {
             // Use for lightbox
             $interface->assign('title', $_GET['message']);
-            return $interface->fetch('Record/puthold.tpl');
+            return $interface->fetch('Record/extended-hold.tpl');
         } else {
             // Display Page
             $interface->setPageTitle('Hold');
-            $interface->assign('subTemplate', 'puthold.tpl');
+            $interface->assign('subTemplate', 'extended-hold.tpl');
             $interface->setTemplate('view-alt.tpl');
-            $interface->display('layout.tpl', 'RecordPutHold' . $_GET['id']);
+            $interface->display('layout.tpl', 'RecordExtendedHold' . $_GET['id']);
         }
     }
 
-    function putHold() {
+    function placeHold() {
         global $configArray;
         global $interface;
         $id = $_REQUEST['id'];

@@ -73,7 +73,7 @@ a.jt {
       {/if}
       </a>
       {if $row.reserve == 'Y' }
-        <a class="request" href="{$url}/Record/{$id|escape:'url'}/PutHold?barcode={$row.item_id|escape:'url'}">
+        <a class="request" href="{$url}/Record/{$id|escape:'url'}/ExtendedHold?barcode={$row.item_id|escape:'url'}">
            {translate text="Place a Hold"}
         </a>
       {/if}
