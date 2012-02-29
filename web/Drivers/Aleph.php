@@ -30,8 +30,113 @@
  * @link     http://vufind.org/wiki/building_an_ils_driver Wiki
  */
 require_once 'Interface.php';
-require_once 'AlephTables.php';
+//require_once 'AlephTables.php';
 require_once 'sys/Proxy_Request.php';
+require_once 'sys/VuFindCache.php';
+
+class AlephTranslator
+{
+
+    function __construct()
+    {
+        $configArray = parse_ini_file('conf/Aleph.ini', true);
+        $this->charset = $configArray['util']['charset'];
+        $this->table15 = $this->parsetable($configArray['util']['tab15'], "AlephTranslator::tab15_callback");
+        $this->table40 = $this->parsetable($configArray['util']['tab40'], "AlephTranslator::tab40_callback");
+        $this->table_sub_library = $this->parsetable($configArray['util']['tab_sub_library'], "AlephTranslator::tab_sub_library_callback");
+    }
+
+    function parsetable($file, $callback) {
+        $result = array();
+        $file_handle = fopen($file, "r, ccs=UTF-8");
+        $rgxp = "";
+        while (!feof($file_handle) ) {
+            $line = fgets($file_handle);
+            $line = chop($line);
+            if (preg_match("/!!/", $line)) {
+                $line = chop($line);
+                $rgxp = AlephTranslator::regexp($line);
+            } if (preg_match("/!.*/", $line) || $rgxp == "" || $line == "") {
+            } else {
+                $line = str_pad($line, 80);
+                $matches = "";
+                if (preg_match($rgxp, $line, $matches)) {
+                    call_user_func($callback, $matches, &$result, $this->charset);
+                }
+            }
+        }
+        fclose($file_handle);
+        return $result;
+    }
+
+    function tab40_translate($collection, $sublib) {
+        $findme = $collection . "|" . $sublib;
+        $desc = $this->table40[$findme];
+        if ($desc == NULL) {
+            $findme = $collection . "|";
+            $desc = $table40[$findme];
+        }
+        return $desc;
+    }
+
+    function tab_sub_library_translate($sl) {
+        return $this->table_sub_library[$sl];
+    }
+
+    function tab15_translate($slc, $isc, $ipsc) {
+        $tab15 = $this->tab_sub_library_translate($slc);
+        if ($tab15 == NULL) {
+            print "tab15 is null!<br>";
+        }
+        $findme = $tab15["tab15"] . "|" . $isc . "|" . $ipsc;
+        $result = $this->table15[$findme];
+        if ($result == NULL) {
+            $findme = $tab15["tab15"] . "||" . $ipsc;
+            $result = $this->table15[$findme];
+        }
+        $result["sub_lib_desc"] = $tab15["desc"];
+        return $result;
+    }
+
+    static function tab15_callback($matches, $tab15, $charset) {
+        $lib = $matches[1];
+        $no1 = $matches[2];
+        if ($no1 == "##") $no1="";
+        $no2 = $matches[3];
+        if ($no2 == "##") $no2="";
+        $desc = iconv($charset, 'UTF-8', $matches[5]);
+        $loan = $matches[6];
+        $request = $matches[8];
+        $opac = $matches[10];
+        $key = trim($lib) . "|" . trim($no1) . "|" . trim($no2);
+        $tab15[trim($key)] = array( "desc" => trim($desc), "loan" => $matches[6], "request" => $matches[8], "opac" => $matches[10] );
+    }
+
+    static function tab40_callback($matches, $tab40, $charset) {
+        $code = trim($matches[1]);
+        $sub = trim($matches[2]);
+        $sub = trim(preg_replace("/#/", "", $sub));
+        $desc = trim(iconv($charset, 'UTF-8', $matches[4]));
+        $key = $code . "|" . $sub;
+        $tab40[trim($key)] = array( "desc" => $desc );
+    }
+
+    static function tab_sub_library_callback($matches, $tab_sub_library, $charset) {
+        $sublib = trim($matches[1]);
+        $desc = trim(iconv($charset, 'UTF-8', $matches[5]));
+        $tab = trim($matches[6]);
+        $tab_sub_library[$sublib] = array( "desc" => $desc, "tab15" => $tab );
+    }
+
+    static function regexp($string) {
+        $string = preg_replace("/\\-/", ")\\s(", $string);
+        $string = preg_replace("/!/", ".", $string);
+        $string = preg_replace("/[<>]/", "", $string);
+        $string = "/(" . $string . ")/";
+        return $string;
+    }
+    
+}
 
 /**
  * Aleph ILS driver
@@ -65,6 +170,16 @@ class Aleph implements DriverInterface
         $this->duedates = $configArray['duedates'];
         $this->available_statuses = split(',', $configArray['Catalog']['available_statuses']);
         $this->holds_enabled = $configArray['Catalog']['holds_enabled'];
+        if (isset($configArray['Cache']['type'])) {
+            $cache = new VuFindCache($configArray['Cache']['type'], 'aleph');
+            $this->translator = $cache->load('translator');
+            if ($this->translator == false) {
+                $this->translator = new AlephTranslator();
+                $cache->save($this->translator, 'translator');
+            }
+        } else {
+            $this->translator = new AlephTranslator();
+        }
     }
 
     protected function doXRequest($op, $params, $auth=false)
@@ -284,7 +399,7 @@ class Aleph implements DriverInterface
            $item_status = $item->xpath('z30-item-status-code/text()'); // $isc
            $item_process_status = $item->xpath('z30-item-process-status-code/text()'); // $ipsc
            $sub_library = $item->xpath('z30-sub-library-code/text()'); // $slc
-           $item_status = tab15_translate((string) $sub_library[0], (string) $item_status[0], (string) $item_process_status[0]);
+           $item_status = $this->translator->tab15_translate((string) $sub_library[0], (string) $item_status[0], (string) $item_process_status[0]);
            if ($item_status['opac'] != 'Y') {
               continue;
            }
@@ -299,7 +414,7 @@ class Aleph implements DriverInterface
            $number = $item->xpath('z30/z30-inventory-number/text()');
            $collection = $item->xpath('z30/z30-collection/text()');
            $collection_code = $item->xpath('z30-collection-code/text()');
-           $collection_desc = tab40_translate((string) $collection_code[0], (string) $location[0]);
+           $collection_desc = $this->translator->tab40_translate((string) $collection_code[0], (string) $location[0]);
            $sig1 = $item->xpath('z30/z30-call-no/text()');
            $sig2 = $item->xpath('z30/z30-call-no-2/text()');
            $desc = $item->xpath('z30/z30-description/text()');
