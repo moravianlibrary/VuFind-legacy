@@ -411,4 +411,6 @@ if ($configArray['Profiler']['enabled']) {
     echo "<a href='$url'>Profiler output</a><br /><br />";
 }
 
+session_write_close();
+
 ?>
