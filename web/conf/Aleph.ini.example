@@ -11,13 +11,14 @@ useradm      = MZK50
 ; adm-Lib
 admlib       = MZK50
 
-; WWW-X user
-wwwuser      = "YOUR-WWW-X-USER"
-wwwpasswd    = "YOUR-WWW-X-USER-PASSWORD"
+; WWW-X user - optional, if not set, X-server functionality will be disabled
+;wwwuser      = "YOUR-WWW-X-USER"
+;wwwpasswd    = "YOUR-WWW-X-USER-PASSWORD"
 
 ; statuses when an item is available
 available_statuses = "On Shelf,Open St.-Month,Vol.výb.-měs."
 holds_enabled      = true
+quick_availability = true
 
 ; adm-lib / sub-library array
 ; This is a list of patron home libraries and the ADM the library belongs to
@@ -25,18 +26,20 @@ holds_enabled      = true
 ARC     = ACC50
 CBR     = ACC50
 
+; match z30-item-status-code item_status
 [duedates]
 present_studium     = "/^(Jen do|Studov)/"
 reference_library   = "/^Příruč/"
 in_processing       = "/^Ve\ zpr/"
 absent_loan         = "/.*/"
 
-; Aleph configuration files
+; Aleph configuration files - optional
 [util]
-tab40               = /home/vufind/vufind-trunk/tab40.cze
-tab15               = /home/vufind/vufind-trunk/tab15.cze
-tab_sub_library     = /home/vufind/vufind-trunk/tab_sub_library.cze
-charset             = "ISO-8859-2"
-output              = /home/vufind/vufind-trunk/web/Drivers/AlephTables.php
-tab15_output        = /home/vufind/vufind-trunk/tab15.txt
-libraries_output    = /home/vufind/vufind-trunk/libraries.txt
+;tab40               = /home/vufind/vufind-trunk/tab40.cze
+;tab15               = /home/vufind/vufind-trunk/tab15.cze
+;tab_sub_library     = /home/vufind/vufind-trunk/tab_sub_library.cze
+;charset             = "ISO-8859-2"
+;output              = /home/vufind/vufind-trunk/web/Drivers/AlephTables.php
+;tab15_output        = /home/vufind/vufind-trunk/tab15.txt
+;libraries_output    = /home/vufind/vufind-trunk/libraries.txt
+

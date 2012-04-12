@@ -169,16 +169,20 @@ class Aleph implements DriverInterface
         $this->sublibadm = $configArray['sublibadm'];
         $this->duedates = $configArray['duedates'];
         $this->available_statuses = split(',', $configArray['Catalog']['available_statuses']);
-        $this->holds_enabled = $configArray['Catalog']['holds_enabled'];
-        if (isset($configArray['Cache']['type'])) {
-            $cache = new VuFindCache($configArray['Cache']['type'], 'aleph');
-            $this->translator = $cache->load('translator');
-            if ($this->translator == false) {
+        $this->quick_availability = $configArray['Catalog']['quick_availability'];
+        if (isset($configArray['util']['tab40']) && isset($configArray['util']['tab15']) && isset($configArray['util']['tab_sub_library'])) {
+            if (isset($configArray['Cache']['type'])) {
+                $cache = new VuFindCache($configArray['Cache']['type'], 'aleph');
+                $this->translator = $cache->load('translator');
+                if ($this->translator == false) {
+                    $this->translator = new AlephTranslator();
+                    $cache->save($this->translator, 'translator');
+                }
+            } else {
                 $this->translator = new AlephTranslator();
-                $cache->save($this->translator, 'translator');
             }
         } else {
-            $this->translator = new AlephTranslator();
+            $this->translator = false;
         }
     }
 
@@ -203,7 +207,6 @@ class Aleph implements DriverInterface
         }
         $url = "http://$this->host:$this->dlfport/rest-dlf/" . $path;
         $url = $this->appendQueryString($url, $params);
-        // print "$url<BR>";
         return $this->doHTTPRequest($url, $method, $body);
     }
 
@@ -259,38 +262,15 @@ class Aleph implements DriverInterface
      * failure, a PEAR_Error.
      * @access public
      */
-    public function getStatus($id) 
-    {
-        list($bib, $sys_no) = $this->parseId($id);
-        $xml = $this->doXRequest("publish_avail", array('library' => $bib, 'doc_num' => $sys_no), false);
-        $records = $xml->xpath('/publish-avail/OAI-PMH/ListRecords/record/metadata/record') or print "xpath eval failed";
-        $holding = array();
-        foreach ($records as $record) {
-           $signature = '';
-           foreach ($record->xpath("//datafield[@tag='MZK']") as $datafield) {
-              $signature = $datafield->xpath('subfield[@code="f"]/text()');
-           }
-           foreach ($record->xpath("//datafield[@tag='AVA']") as $datafield) {
-              $status = $datafield->xpath('subfield[@code="e"]/text()');
-              $location = $datafield->xpath('subfield[@code="a"]/text()');
-              //$signature = $datafield->xpath('subfield[@code="d"]/text()');
-              $availability = ($status[0] == 'available' || $status[0] == 'check_holdings');
-              $reserve = true;
-              $callnumber = $signature;
-              $holding[] = array('id' => $id,
-                              'availability' => $availability,
-                              'status' => (string) $status[0],
-                              'location' => (string) $location[0],
-                              'signature' => (string) $signature[0],
-                              'reserve' => $reserve,
-                              'callnumber' => (string) $signature[0]
-                           );
-           }
+    public function getStatus($id) {
+        $statuses = $this->getHolding($id);
+        foreach($statuses as &$status) {
+            $status['status'] = ($status['availability'] == 1) ? 'available' : 'unavailable';
         }
-        return $holding;
+        return $statuses;
     }
 
-    public function getStatusFast($bib, $ids) {
+    public function getStatusesX($bib, $ids) {
         $doc_nums = "";
         $sep = "";
         foreach($ids as $id) {
@@ -348,7 +328,15 @@ class Aleph implements DriverInterface
     public function getStatuses($idList)
     {   
         if (!$this->xserver_enabled) {
-            return array();
+            if (!$this->quick_availability) {
+                return array();
+            }
+            $result = array();
+            foreach ($idList as $id) {
+                $items = $this->getStatus($id);
+                $result[] = $items;
+            }
+            return $result;
         }
         $ids = array();
         $holdings = array();
@@ -357,7 +345,7 @@ class Aleph implements DriverInterface
             $ids[$bib][] = $sys_no;
         }
         foreach ($ids as $key => $values) {
-            $holds = $this->getStatusFast($key, $values);
+            $holds = $this->getStatusesX($key, $values);
             foreach ($holds as $hold) {
                $holdings[] = $hold;
             }
@@ -399,22 +387,33 @@ class Aleph implements DriverInterface
            $item_status = $item->xpath('z30-item-status-code/text()'); // $isc
            $item_process_status = $item->xpath('z30-item-process-status-code/text()'); // $ipsc
            $sub_library = $item->xpath('z30-sub-library-code/text()'); // $slc
-           $item_status = $this->translator->tab15_translate((string) $sub_library[0], (string) $item_status[0], (string) $item_process_status[0]);
+           if ($this->translator) {
+              $item_status = $this->translator->tab15_translate((string) $sub_library[0], (string) $item_status[0], (string) $item_process_status[0]);
+           } else {
+              $z30_item_status = $item->xpath('z30/z30-item-status/text()');
+              $z30_sub_library = $item->xpath('z30/z30-sub-library/text()');
+              $item_status = array('opac' => 'Y', 'request' => 'C', 'desc' => $z30_item_status[0], 'sub_lib_desc' => $z30_sub_library[0]);
+           }
            if ($item_status['opac'] != 'Y') {
-              continue;
+                 continue;
            }
            $group = $item->xpath('@href');
            $group = substr(strrchr($group[0], "/"), 1);
            $status = $item->xpath('status/text()');
            $availability = false;
            $location = $item->xpath('z30/z30-sub-library-code/text()');
-           $reserve = ($item_status['request'] == 'C')?'Y':'N';
+           $reserve = ($item_status['request'] == 'C')?'N':'Y';
            $callnumber = $item->xpath('z30/z30-call-no/text()');
            $barcode = $item->xpath('z30/z30-barcode/text()');
            $number = $item->xpath('z30/z30-inventory-number/text()');
            $collection = $item->xpath('z30/z30-collection/text()');
            $collection_code = $item->xpath('z30-collection-code/text()');
-           $collection_desc = $this->translator->tab40_translate((string) $collection_code[0], (string) $location[0]);
+           if ($this->translator) {
+              $collection_desc = $this->translator->tab40_translate((string) $collection_code[0], (string) $location[0]);
+           } else {
+              $z30_collection = $item->xpath('z30/z30-collection/text()');
+              $collection_desc = array('desc' => $z30_collection[0]);
+           }
            $sig1 = $item->xpath('z30/z30-call-no/text()');
            $sig2 = $item->xpath('z30/z30-call-no-2/text()');
            $desc = $item->xpath('z30/z30-description/text()');
@@ -427,7 +426,11 @@ class Aleph implements DriverInterface
                $availability = true;
            }
            if ($item_status['request'] == 'Y' && $availability == false) {
-              $reserve = 'Y';
+              $reserve = 'N';
+           }
+           if ($patron) {
+              $hold_request = $item->xpath('info[@type="HoldRequest"]/@allowed');
+              $reserve = ($hold_request[0] == 'Y')?'N':'Y';
            }
            $matches = array();
            if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*);([a-zA-Z ]*)/", $status, &$matches)) {
@@ -450,9 +453,6 @@ class Aleph implements DriverInterface
                if ($status == "On Hold" || $status == "Requested") {
                  $duedate = "requested";
               }
-           }
-           if (!$this->holds_enabled) {
-              $reserve = 'N';
            }
            $holding[] = array('id' => $id,
                               'item_id' => $item_id,
@@ -945,6 +945,9 @@ class Aleph implements DriverInterface
     }
 
     public function barcodeToID($bar) {
+        if (!$this->xserver_enabled) {
+           return null;
+        }
         foreach ($this->bib as $base) {
            try {
               $xml = $this->doXRequest("find", array("base" => $base, "request" => "BAR=$bar"), false);
