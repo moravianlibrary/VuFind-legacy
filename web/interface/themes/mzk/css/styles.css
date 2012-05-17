@@ -1549,3 +1549,18 @@ td.format {
 	font-weight: bold;
 	padding: 8px 0 0 0;
 }
+
+
+.cluetip-outer {
+  borderBottom: '1px solid #900';
+  background-color: white;
+  text-align: left;
+  padding: 8px 8px;
+}
+.cluetip-title {
+  color: black;
+  font-size: 13px;
+}
+a.jt {
+  cursor: help;
+}

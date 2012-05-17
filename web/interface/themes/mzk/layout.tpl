@@ -42,7 +42,8 @@
     <script language="JavaScript" type="text/javascript">
     {literal}
     $(document).ready(function() {       
-	   $('a.jt').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false});	   
+	   $('a.jt').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false, delayedClose: 5000, mouseOutClose: false });
+           $('a.jt_sticky').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false, sticky: true,  closePosition: 'bottom'});
 	});
     {/literal}
     </script>
@@ -98,7 +99,7 @@
 				<a href="{$url}"><img src="{$path}/interface/themes/mzk/images/logo-mzk.png" alt="MZK"></a>
 			  </div>
 			  {if $pageTemplate != 'advanced.tpl'}
-				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCO"}
+				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCO" || $module=="PCI"}
 				  {include file="`$module`/searchbox.tpl"}
 				{else}
 				  {include file="Search/searchbox.tpl"}

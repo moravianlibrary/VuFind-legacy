@@ -9,9 +9,11 @@
 	<div class="col"><p><strong>{translate text='Find More'}</strong></p>
 	  <ul>
 		<li><a href="{$path}/Browse/Home">{translate text='Browse the Catalog'}</a></li>
-		<!--<li><a href="{$path}/AlphaBrowse/Home">{translate text='Browse Alphabetically'}</a></li>
+		<li><a href="{$path}/AlphaBrowse/Home">{translate text='Browse Alphabetically'}</a></li>
+		<!--
 		<li><a href="{$path}/Search/Reserves">{translate text='Course Reserves'}</a></li>
-		<li><a href="{$path}/Search/NewItem">{translate text='New Items'}</a></li>-->
+		<li><a href="{$path}/Search/NewItem">{translate text='New Items'}</a></li>
+		-->
 	  </ul>
 	</div>
 	<div class="col last"><p><strong>{translate text='Need Help?'}</strong></p>

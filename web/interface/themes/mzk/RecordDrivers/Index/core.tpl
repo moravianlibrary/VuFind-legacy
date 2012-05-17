@@ -87,7 +87,7 @@
 {* Display Title *}
 <h1>{$coreShortTitle|escape}
 {if $coreSubtitle}{$coreSubtitle|escape}{/if}
-{if $coreTitleSection}{$coreTitleSection|escape}{/if}
+&nbsp;{if $coreTitleSection}{$coreTitleSection|escape}{/if}
 {* {if $coreTitleStatement}{$coreTitleStatement|escape}{/if} *}
 </h1>
 {* End Title *}
@@ -291,6 +291,14 @@
       <a href="{$holdingsURL}">{translate text='holdings'}</a>
     </td>
   </tr>
+
+  <tr valign="top">
+    <th>{translate text='Link to catalog'}: </th>
+    <td>
+      <a href="https://aleph.mzk.cz/cgi-bin/librarything.pl?isbn={$isbn|escape:url}">{translate text='full view'}</a>
+    </td>
+  </tr>
+
   <!-- end of costumization for MZK -->
 </table>
 
@@ -301,7 +309,7 @@
               <tr>
                  <td>
                     <a href="http://books2ebooks.eu/odm/orderformular.do?formular_id=131&sys_id={$sys_no}" target="blank">
-                       <img src='https://aleph.mzk.cz/exlibris/aleph/u/alephe/www_f_cze/icon/eod_button.gif'/>
+                       <img src='/interface/themes/mzk/images/eod_button_{$userLang}.gif'/>
                     </a>
                  </td>
                  <td>&nbsp;&nbsp;</td>

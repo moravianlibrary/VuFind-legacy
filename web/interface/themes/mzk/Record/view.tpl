@@ -134,6 +134,17 @@
       {/if}
     </div>
 
+    <!-- Library Thing -->
+    {if $isbn}
+    <script src="https://ltfl.librarything.com/forlibraries/widget.js?id=1495-310789133" type="text/JavaScript"></script>
+    <div class="sidegroup librarything">
+      <h4>{translate text="LibraryThing"}</h4>
+      <div id="ltfl_related" class="ltfl"></div>
+      <div id="ltfl_similars" class="ltfl"></div>
+      <div id="ltfl_tagbrowse" class="ltfl"></div>
+    </div>
+    {/if}
+
     {if is_array($editions)}
     <div class="sidegroup">
       <h4>{translate text="Other Editions"}</h4>
