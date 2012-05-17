@@ -833,7 +833,6 @@ class Solr implements IndexEngine
         if (!isset($query) || $query  == '') {
             $query = '*:*';
         }
-
         return $query;
     }
 
@@ -1831,9 +1830,11 @@ class Solr implements IndexEngine
             'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e',
             'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
             'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b',
-            'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r', 'ř'=>'r', 'Ř'=>'R'
+            'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r', 'ř'=>'r', 'Ř'=>'R', 'ě'=>'e', 'Ě'=>'E',
         );
-        return strtolower(strtr($string, $table));
+        $result = strtolower(strtr($string, $table));
+        $result = VuFindSolrUtils::capitalizeBooleans($result);
+        return $result;
     }
     // end of costumization for MZK
 
