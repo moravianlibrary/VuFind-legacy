@@ -162,14 +162,21 @@ class Aleph implements DriverInterface
         $this->bib = split(',', $configArray['Catalog']['bib']);
         $this->useradm = $configArray['Catalog']['useradm'];
         $this->admlib = $configArray['Catalog']['admlib'];
-        $this->wwwuser = $configArray['Catalog']['wwwuser'];
-        $this->wwwpasswd = $configArray['Catalog']['wwwpasswd'];
-        $this->xserver_enabled = ($this->wwwuser && $this->wwwpasswd);
+        if (isset($configArray['Catalog']['wwwuser']) && isset($configArray['Catalog']['wwwpasswd'])) {
+            $this->wwwuser = $configArray['Catalog']['wwwuser'];
+            $this->wwwpasswd = $configArray['Catalog']['wwwpasswd'];
+            $this->xserver_enabled = true;
+        } else {
+            $this->xserver_enabled = false;
+        }
         $this->dlfport = $configArray['Catalog']['dlfport'];
         $this->sublibadm = $configArray['sublibadm'];
-        $this->duedates = $configArray['duedates'];
+        if (isset($configArray['duedates'])) {
+            $this->duedates = $configArray['duedates'];
+        }
         $this->available_statuses = split(',', $configArray['Catalog']['available_statuses']);
         $this->quick_availability = $configArray['Catalog']['quick_availability'];
+        $this->debug_enabled = $configArray['Catalog']['debug'];
         if (isset($configArray['util']['tab40']) && isset($configArray['util']['tab15']) && isset($configArray['util']['tab_sub_library'])) {
             if (isset($configArray['Cache']['type'])) {
                 $cache = new VuFindCache($configArray['Cache']['type'], 'aleph');
@@ -195,22 +202,56 @@ class Aleph implements DriverInterface
         }
         $result = $this->doHTTPRequest($url);
         if ($result->error) {
+           if ($this->debug_enabled) {
+               $this->debug("XServer error, URL is $url, error message: $result->error.");
+           }
            throw new Exception("XServer error: $result->error.");
         }
         return $result;
     }
 
-    protected function doRestDLFRequest($path_elements, $params = null, $method='GET', $body = null) {
+    protected function doPDSRequest($op, $params, $auth=false)
+    {
+        $url = "http://$this->host/pds?func=$op";
+        $url = $this->appendQueryString($url, $params);
+        print "$url<BR>";
+        $result = $this->doHTTPRequest($url);
+        if ($result->error) {
+           if ($this->debug_enabled) {
+               $this->debug("PDS error, URL is $url, error message: $result->error.");
+           }
+           throw new Exception("PDS error: $result->error.");
+        }
+        return $result;
+    }
+
+    protected function doRestDLFRequest($path_elements, $params = null, $method='GET', $body = null) 
+    {
         $path = '';
         foreach ($path_elements as $path_element) {
            $path .= $path_element . "/";
         }
         $url = "http://$this->host:$this->dlfport/rest-dlf/" . $path;
         $url = $this->appendQueryString($url, $params);
-        return $this->doHTTPRequest($url, $method, $body);
+        $result = $this->doHTTPRequest($url, $method, $body);
+        $replyCode = (string) $result->{'reply-code'};
+        if ($replyCode != "0000") {
+           $replyText = (string) $result->{'reply-text'};
+           $this->handleError("DLF Request failed with error: $replyCode : $replyText, URL: $url");
+        }
+        return $result;
     }
 
-    protected function appendQueryString($url, $params) {
+    protected function handleError($errorMessage)
+    {
+        if ($this->debug_enabled) {
+           $this->debug($errorMessage);
+        }
+        throw new Exception($errorMessage);
+    }
+
+    protected function appendQueryString($url, $params)
+    {
         $sep = (strpos($url, "?") === false)?'?':'&';
         if ($params != null) {
            foreach ($params as $key => $value) {
@@ -221,8 +262,11 @@ class Aleph implements DriverInterface
         return $url;
     }
 
-    protected function doHTTPRequest($url, $method='GET', $body = null) {
-        // print "$url<BR>";
+    protected function doHTTPRequest($url, $method='GET', $body = null)
+    {
+        if ($this->debug_enabled) {
+            $this->debug("URL: '$url'");
+        }
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -230,13 +274,36 @@ class Aleph implements DriverInterface
            curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         }
         $answer = curl_exec($ch);
+        if (!$answer) {
+           $error = curl_error($ch);
+           $message = "HTTP request failed with message: $error, URL: '$url'.";
+           if ($this->debug_enabled) {
+               $this->debug($message);
+           }
+           throw new Exception($message);
+        }
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($http_code != 200) { // Do not throw exeption, continue
+           $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+           if ($this->debug_enabled) {
+               $this->debug("Request failed with http code: $http_code, URL: '$url'");
+           }
+        }
         curl_close($ch);
         $answer = str_replace('xmlns=', 'ns=', $answer);
-        $result = simplexml_load_string($answer);
-        if (!$result) { 
-           throw new Exception("XML is not valid, URL is '$url'.");
+        $result = @simplexml_load_string($answer);
+        if (!$result) {
+           if ($this->debug_enabled) {
+               $this->debug("XML is not valid, URL: '$url'");
+           }
+           throw new Exception("XML is not valid, URL: '$url'.");
         }
         return $result;
+    }
+
+    protected function debug($msg) 
+    {
+        print($msg . "<BR>");
     }
 
 
@@ -262,7 +329,8 @@ class Aleph implements DriverInterface
      * failure, a PEAR_Error.
      * @access public
      */
-    public function getStatus($id) {
+    public function getStatus($id)
+    {
         $statuses = $this->getHolding($id);
         foreach($statuses as &$status) {
             $status['status'] = ($status['availability'] == 1) ? 'available' : 'unavailable';
@@ -270,7 +338,8 @@ class Aleph implements DriverInterface
         return $statuses;
     }
 
-    public function getStatusesX($bib, $ids) {
+    public function getStatusesX($bib, $ids)
+    {
         $doc_nums = "";
         $sep = "";
         foreach($ids as $id) {
@@ -280,17 +349,9 @@ class Aleph implements DriverInterface
         $xml = $this->doXRequest("publish_avail", array('library' => $bib, 'doc_num' => $doc_nums), false);
         $holding = array();
         foreach ($xml->xpath('/publish-avail/OAI-PMH') as $rec) {
-           // $identifier = $rec->xpath(".//controlfield[@tag='001']/text()");
-           // str_pad($month, 2, "0", STR_PAD_LEFT)
            $identifier = $rec->xpath(".//identifier/text()");
-           //$id = "$bib" . "-" . str_pad(substr($identifier[0], strrpos($identifier[0], ':') + 1), 9, "0", STR_PAD_LEFT);
            $id = "$bib" . "-" . substr($identifier[0], strrpos($identifier[0], ':') + 1);
-           //print "id:$id\n";
            $temp = array();
-           /*$signature = array("");
-           foreach ($rec->xpath(".//datafield[@tag='MZK']") as $datafield) {
-              $signature = $datafield->xpath('subfield[@code="f"]/text()');
-           }*/
            foreach ($rec->xpath(".//datafield[@tag='AVA']") as $datafield) {
               $status = $datafield->xpath('./subfield[@code="e"]/text()');
               $location = $datafield->xpath('./subfield[@code="a"]/text()');
@@ -306,7 +367,6 @@ class Aleph implements DriverInterface
                               'reserve' => $reserve,
                               'callnumber' => (string) $signature[0]
                            );
-              //print "id:$id signature:$signature[0]\n";
            }
            $holding[] = $temp;
         }
@@ -443,11 +503,15 @@ class Aleph implements DriverInterface
            }
            // process duedate
            if ($availability) {
-               foreach ($this->duedates as $key => $value) {
-                  if (preg_match($value, $item_status['desc'])) {
-                     $duedate = $key;
-                     break;
+               if ($this->duedates) {
+                  foreach ($this->duedates as $key => $value) {
+                     if (preg_match($value, $item_status['desc'])) {
+                        $duedate = $key;
+                        break;
+                     }
                   }
+               } else {
+                  $duedate = $item_status['desc'];
                }
            } else {
                if ($status == "On Hold" || $status == "Requested") {
@@ -480,7 +544,8 @@ class Aleph implements DriverInterface
         return $holding;
     }
 
-    public function getMyHistory($user) {
+    public function getMyHistory($user)
+    {
         return $this->getMyTransactions($user, true);
     }
 
@@ -550,11 +615,13 @@ class Aleph implements DriverInterface
         return $transList;
     }
 
-    public function getRenewDetails($details) {
+    public function getRenewDetails($details)
+    {
         return $details['item_id'];
     }
 
-    public function renewMyItems($details) {
+    public function renewMyItems($details)
+    {
         $patron = $details['patron'];
         foreach ($details['details'] as $id) {
            $xml = $this->doRestDLFRequest(array('patron', $patron['id'], 'circulationActions', 'loans', $id), null, 'POST', null);
@@ -746,7 +813,8 @@ class Aleph implements DriverInterface
      * @return mixed      Array of the patron's profile data on success, PEAR_Error otherwise.
      * @access public
      */
-    function getMyProfile($user) {
+    function getMyProfile($user)
+    {
         if ($this->xserver_enabled) {
            return $this->getMyProfileX($user);
         } else {
@@ -848,7 +916,12 @@ class Aleph implements DriverInterface
           return $this->getMyProfile($temp);
        }
        try {
-            $xml = $this->doXRequest('bor-auth', array('library' => $this->useradm, 'bor_id' => $user, 'verification' => $password), true);
+            if ($this->xserver_enabled) {
+                $xml = $this->doXRequest('bor-auth', array('library' => $this->useradm, 'bor_id' => $user, 'verification' => $password), true);
+            } else {
+                $xml = $this->doPDSRequest('authenticate', array('institute' => $this->useradm, 'bor_id' => $user,
+                    'bor_verification' => $password, 'calling_system' => 'aleph'), true);
+            }
         } catch (Exception $ex) {
             $patron = new PEAR_Error($ex->getMessage());
             return $patron;
@@ -873,14 +946,15 @@ class Aleph implements DriverInterface
         $patron['barcode'] = (string) $barcode;
         $patron['firstname'] = (string) $firstName;
         $patron['lastname'] = (string) $lastName;
-        $patron['cat_username'] = (string) $barcode;
-        $patron['cat_password'] = (string) $lname;
+        $patron['cat_username'] = (string) $id;
+        $patron['cat_password'] = $password;
         $patron['email'] = (string) $email_addr;
         $patron['major'] = NULL;
         return $patron;
     }
 
-    public function getHoldingInfoForItem($patronId, $id, $group) {
+    public function getHoldingInfoForItem($patronId, $id, $group)
+    {
         list($bib, $sys_no) = $this->parseId($id);
         $resource = $bib . $sys_no;
         $xml = $this->doRestDLFRequest(array('patron', $patronId, 'record', $resource, 'items', $group));
@@ -907,7 +981,8 @@ class Aleph implements DriverInterface
         return array('pickup-locations' => $locations, 'last-interest-date' => $date, 'order' => $requests + 1);
     }
 
-    function placeHold($details) {
+    function placeHold($details)
+    {
         list($bib, $sys_no) = $this->parseId($details['id']);
         $recordId = $bib . $sys_no;
         $itemId = $details['item_id'];
@@ -944,7 +1019,8 @@ class Aleph implements DriverInterface
         }
     }
 
-    public function barcodeToID($bar) {
+    public function barcodeToID($bar)
+    {
         if (!$this->xserver_enabled) {
            return null;
         }
@@ -968,7 +1044,8 @@ class Aleph implements DriverInterface
         return new PEAR_Error('barcode not found');
     }
 
-    function parseDate($date) {
+    function parseDate($date)
+    {
        if (preg_match("/^[0-9]{8}$/", $date) === 1) {
            return substr($date, 6, 2) . "." .substr($date, 4, 2) . "." . substr($date, 0, 4);
         } else {
@@ -979,7 +1056,8 @@ class Aleph implements DriverInterface
         }
     }
 
-    public function getConfig($func) {
+    public function getConfig($func)
+    {
         if ($func == "Holds") {
            return array("HMACKeys" => "id:item_id", "extraHoldFields" => "comments:requiredByDate",
               "defaultRequiredDate" => "0:1:0");
