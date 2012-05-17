@@ -65,6 +65,9 @@
               <li{if $tab == 'Description'} class="active"{/if}>
                 <a href="{$url}/Record/{$id|escape:"url"}/Description#tabnav" class="first"><span></span>{translate text='Description'}</a>
               </li>
+              <li{if $tab == 'Citace'} class="active"{/if}>
+                <a href="{$url}/Record/{$id|escape:"url"}/Citace#tabnav" class="first"><span></span>{translate text='Citace'}</a>
+              </li>
               {if $hasTOC}
               <li{if $tab == 'TOC'} class="active"{/if}>
                 <a href="{$url}/Record/{$id|escape:"url"}/TOC#tabnav" class="first"><span></span>{translate text='Table of Contents'}</a>
