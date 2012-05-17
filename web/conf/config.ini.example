@@ -568,3 +568,6 @@ HMACkey = kTwXFs78remn,s.re
 [Statuses]
 File = /home/vufind/vufind-trunk/web/conf/statuses.txt
 
+[Citace]
+url = https://www.citacepro.com/api/mzk/citace/
+
