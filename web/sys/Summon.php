@@ -27,7 +27,7 @@
  * @link     http://api.summon.serialssolutions.com/help/api/ API Documentation
  */
 
-require_once 'HTTP/Request.php';
+require_once 'sys/Proxy_Request.php';
 require_once 'sys/ConfigArray.php';
 require_once 'sys/SolrUtils.php';
 
@@ -56,11 +56,18 @@ class Summon
     public $client;
 
     /**
-     * The HTTP_Request object used for API transactions
-     * @var object HTTP_Request
+     * The URL of the Summon API server
+     * @var string
      */
     public $host;
 
+    /**
+     * The base path for API requests on the Summon API server
+     *
+     * @var string
+     */
+    public $apiPath;
+    
     /**
      * The secret Key used for authentication
      * @var string
@@ -122,10 +129,12 @@ class Summon
             $this->debug = true;
         }
 
+        // Set hostname and base API path separately; this simplifies authentication:
         $this->host = 'http://api.summon.serialssolutions.com';
+        $this->apiPath = '/2.0.0';
         $this->apiId = $apiId;
         $this->apiKey = $apiKey;
-        $this->client = new HTTP_Request(null, array('useBrackets' => false));
+        $this->client = new Proxy_Request(null, array('useBrackets' => false));
         $this->_config = getExtraConfigArray('Summon');
 
         // Store preferred boolean behavior:
@@ -283,6 +292,10 @@ class Summon
         // Query String Parameters
         $options = array('s.q' => $this->_buildQuery($query));
 
+        // TODO: add configurable authentication mechanisms to identify authorized
+        // users and switch this to "authenticated" when appropriate (VUFIND-475):
+        $options['s.role'] = 'none';
+
         // Which facets should we include in results?  Set defaults if not provided.
         if (!$facets) {
             $facets = array_keys($this->_config['Facets']);
@@ -425,7 +438,7 @@ class Summon
     private function _call($params = array(), $service = 'search', $method = 'POST',
         $raw = false
     ) {
-        $this->client->setURL($this->host . '/' . $service);
+        $this->client->setURL($this->host . $this->apiPath . '/' . $service);
         //$this->client->setMethod($method);
         $this->client->setMethod('GET');
 
@@ -448,7 +461,7 @@ class Summon
 
         if ($this->debug) {
             echo "<pre>$method: ";
-            print_r($this->host . "/$service?" . $queryString);
+            print_r($this->host . $this->apiPath . "/$service?" . $queryString);
             echo "</pre>\n";
         }
 
@@ -456,7 +469,7 @@ class Summon
         $headers = array('Accept' => 'application/json',
                          'x-summon-date' => date('D, d M Y H:i:s T'),
                          'Host' => 'api.summon.serialssolutions.com');
-        $data = implode($headers, "\n") . "\n/$service\n" .
+        $data = implode($headers, "\n") . "\n$this->apiPath/$service\n" .
             urldecode($queryString) . "\n";
         $hmacHash = $this->_hmacsha1($this->apiKey, $data);
         foreach ($headers as $key => $value) {
