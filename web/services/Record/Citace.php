@@ -34,7 +34,7 @@ class Citace extends Record
         $baseURL = $configArray['Citace']['url'];
         $id = $this->recordDriver->getUniqueID();
         list($base, $sysno) = split("-", $id);
-        $interface->assign('citace', array('url' => $baseURL . $sysno));
+        $interface->assign('citace', array('url' => $baseURL . $base . "/citace/" . $sysno));
         $interface->setTemplate('view.tpl');
         // Display Page
         $interface->display('layout.tpl');
