@@ -1,6 +1,6 @@
-<div class="span-18">
-  <h3>{translate text='Advanced Search'}</h3>
-  <form method="get" action="{$url}/Summon/Search" id="advSearchForm" name="searchForm" class="search">
+<form method="get" action="{$url}/Summon/Search" id="advSearchForm" name="searchForm" class="search">
+  <div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
+    <h3>{translate text='Advanced Search'}</h3>
     <div class="advSearchContent">
       {if $editErr}
       {assign var=error value="advSearchError_$editErr"}
@@ -109,33 +109,33 @@
       {/if}
     </div>
     {if $lastSort}<input type="hidden" name="sort" value="{$lastSort|escape}" />{/if}
-  </form>
-</div>
-
-<div class="span-5 last">
-  {if $searchFilters}
-    <div class="filterList">
-      <h3>{translate text="adv_search_filters"}<br/><span>({translate text="adv_search_select_all"} <input type="checkbox" checked="checked" onclick="filterAll(this);" />)</span></h3>
-      {foreach from=$searchFilters item=data key=field}
-      <div>
-        <h4>{translate text=$field}</h4>
-        <ul>
-          {foreach from=$data item=value}
-          <li><input type="checkbox" checked="checked" name="filter[]" value='{$value.field|escape}:"{$value.value|escape}"' /> {$value.display|escape}</li>
-          {/foreach}
-        </ul>
-      </div>
-      {/foreach}
-    </div>
-  {/if}
-  <div class="sidegroup">
-    <h4>{translate text="Search Tips"}</h4>
-    <a href="{$url}/Help/Home?topic=advsearch" class="advsearchHelp">{translate text="Help with Advanced Search"}</a><br />
-    <a href="{$url}/Help/Home?topic=search" class="searchHelp">{translate text="Help with Search Operators"}</a>
   </div>
-</div>
-
-<div class="clear"></div>
+  
+  <div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
+    {if $searchFilters}
+      <div class="filterList">
+        <h3>{translate text="adv_search_filters"}<br/><span>({translate text="adv_search_select_all"} <input type="checkbox" checked="checked" onclick="filterAll(this, 'advSearchForm');" />)</span></h3>
+        {foreach from=$searchFilters item=data key=field}
+        <div>
+          <h4>{translate text=$field}</h4>
+          <ul>
+            {foreach from=$data item=value}
+            <li><input type="checkbox" checked="checked" name="filter[]" value='{$value.field|escape}:"{$value.value|escape}"' /> {$value.display|escape}</li>
+            {/foreach}
+          </ul>
+        </div>
+        {/foreach}
+      </div>
+    {/if}
+    <div class="sidegroup">
+      <h4>{translate text="Search Tips"}</h4>
+      <a href="{$url}/Help/Home?topic=advsearch" class="advsearchHelp">{translate text="Help with Advanced Search"}</a><br />
+      <a href="{$url}/Help/Home?topic=search" class="searchHelp">{translate text="Help with Search Operators"}</a>
+    </div>
+  </div>
+  
+  <div class="clear"></div>
+</form>
 
 {* Step 1: Define our search arrays so they are usuable in the javascript *}
 <script type="text/javascript">

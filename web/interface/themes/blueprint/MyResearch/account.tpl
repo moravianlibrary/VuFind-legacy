@@ -2,7 +2,7 @@
 
 {if $message}<div class="error">{$message|translate}</div>{/if}
 
-<form method="post" action="{$url}/MyResearch/Account" name="accountForm">
+<form method="post" action="{$url}/MyResearch/Account" name="accountForm" id="accountForm">
   <label class="span-3" for="account_firstname">{translate text="First Name"}:</label>
   <input id="account_firstname" type="text" name="firstname" value="{$formVars.firstname|escape}" size="30" 
     class="mainFocus {jquery_validation required='This field is required'}"/><br class="clear"/>
@@ -24,3 +24,10 @@
   <input class="push-3 button" type="submit" name="submit" value="{translate text="Submit"}"/>
   <div class="clear"></div>
 </form>
+<script>
+  {literal}
+  $(document).ready(function() {
+    $('#accountForm').validate();
+  });
+  {/literal}
+</script>

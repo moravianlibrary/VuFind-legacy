@@ -50,10 +50,6 @@
         </div>
       {/if}
 
-      <input type="hidden" name="gatheredDetails[id]" value="{$id|escape}" />
-      {if $gatheredDetails.item_id}<input type="hidden" name="gatheredDetails[item_id]" value="{$gatheredDetails.item_id|escape}" />{/if}
-      {if $gatheredDetails.holdtype}<input type="hidden" name="gatheredDetails[holdtype]" value="{$gatheredDetails.holdtype|escape}" />{/if}
-      {if $gatheredDetails.format_id}<input type="hidden" name="gatheredDetails[format_id]" value="{$gatheredDetails.format_id|escape}" />{/if}
       <input type="submit" name="placeHold" value="{translate text='request_submit_text'}"/>
 
     </form>

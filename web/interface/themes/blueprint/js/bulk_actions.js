@@ -4,23 +4,42 @@ $(document).ready(function(){
 
 function registerBulkActions() {
     $('form[name="bulkActionForm"] input[type="submit"]').unbind('click').click(function(){
-        var ids = $.map($(this.form).find('input.checkbox:checked'), function(i) {
+        var ids = $.map($(this.form).find('input.checkbox_ui:checked'), function(i) {
             return $(i).val();
         });
         var action = $(this).attr('name');
         var message = $(this).attr('title');
+        var id = '';
+        var module = "Cart";
         switch (action) {
         case 'export':
-            action = 'Export';
+            var postParams = {origin: 'Favorites', ids:ids, 'export':'1'};
+            action = "Home";
             break;
         case 'delete':
-            action = 'Delete';
+            module = "MyResearch";
+            action = "Delete";
+            var postParams = {origin: 'Favorites', ids:ids, 'delete':'1'};
+            id = $(this).attr('id');
+            id = (id.indexOf('bottom_delete_list_items_') != -1) 
+                ? id.replace('bottom_delete_list_items_', '')
+                : id.replace('delete_list_items_', '');
             break;
         case 'email':
-            action = 'Email';
+            action = "Home";
+            var postParams = {origin: 'Favorites', ids:ids, email:'1'};
+            break;
+        case 'print': 
+            var printing = printIDs(ids);
+            if(printing) {
+                return false;
+            } else {
+                action = "Home";
+                var postParams = {origin: 'Favorites', error:'1'};
+            }
             break;
         }
-        getLightbox('MyResearch', action, '', '', message, '', '', '', {ids:ids});
+        getLightbox(module, action, id, '', message, '', '', '', postParams);
         return false;
     });
 
@@ -28,8 +47,8 @@ function registerBulkActions() {
     $('.deleteList').unbind('click').click(function(){
         var id = $(this).attr('id').substr('deleteList'.length);
         var message = $(this).attr('title');
-        var postParams = {listID: id, deleteList: 'deleteList'};
-        getLightbox('MyResearch', 'Confirm', '', '', message, 'MyResearch', 'Favorites', '', postParams);
+        var postParams = {origin: 'Favorites', listID: id, deleteList: 'deleteList'};
+        getLightbox('Cart', 'Home', '', '', message, 'MyResearch', 'Favorites', '', postParams);
         return false;
     });
 }

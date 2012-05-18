@@ -189,7 +189,9 @@
     {if $coreThumbLarge}<a href="{$coreThumbLarge|escape}">{/if}
       <img alt="{translate text='Cover Image'}" class="recordcover" src="{$coreThumbMedium|escape}"/>
     {if $coreThumbLarge}</a>{/if}
-        {/if}
+  {else}
+    <img src="{$path}/bookcover.php" class="recordcover" alt="{translate text='No Cover Image'}"/>
+  {/if}
   {* End Cover Image *}
 
   {* Display the lists that this record is saved to *}
@@ -197,29 +199,29 @@
     <strong>{translate text="Saved in"}:</strong>
   </div>
 
-  {if $showPreviews && (!empty($holdingLCCN) || !empty($isbn) || !empty($holdingOCLC))}
+  {if $showPreviews && (!empty($holdingLCCN) || !empty($isbn) || !empty($holdingArrOCLC))}
     {if $showGBSPreviews}
       <div class="previewDiv">
-        <a title="{translate text='Preview from'} Google Books" class="hide previewGBS{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingOCLC} OCLC{$holdingOCLC|@implode:' OCLC'}{/if}" target="_blank">
+        <a title="{translate text='Preview from'} Google Books" class="hide previewGBS{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingArrOCLC} OCLC{$holdingArrOCLC|@implode:' OCLC'}{/if}" target="_blank">
           <img src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.png" alt="{translate text='Preview'}"/>
         </a>
       </div>
     {/if}
     {if $showOLPreviews}
       <div class="previewDiv">
-        <a title="{translate text='Preview from'} Open Library" href="" class="hide previewOL{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingOCLC} OCLC{$holdingOCLC|@implode:' OCLC'}{/if}" target="_blank">
+        <a title="{translate text='Preview from'} Open Library" href="" class="hide previewOL{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingArrOCLC} OCLC{$holdingArrOCLC|@implode:' OCLC'}{/if}" target="_blank">
           <img src="{$path}/images/preview_ol.gif" alt="{translate text='Preview'}"/>
         </a>
       </div>
     {/if}
     {if $showHTPreviews}
       <div class="previewDiv">
-        <a title="{translate text='Preview from'} HathiTrust" class="hide previewHT{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingOCLC} OCLC{$holdingOCLC|@implode:' OCLC'}{/if}" target="_blank">
+        <a title="{translate text='Preview from'} HathiTrust" class="hide previewHT{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingArrOCLC} OCLC{$holdingArrOCLC|@implode:' OCLC'}{/if}" target="_blank">
           <img src="{$path}/images/preview_ht.gif" alt="{translate text='Preview'}"/>
         </a>
       </div>
     {/if}
-    <span class="previewBibkeys{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingOCLC} OCLC{$holdingOCLC|@implode:' OCLC'}{/if}"></span>
+    <span class="previewBibkeys{if $isbn} ISBN{$isbn}{/if}{if $holdingLCCN} LCCN{$holdingLCCN}{/if}{if $holdingArrOCLC} OCLC{$holdingArrOCLC|@implode:' OCLC'}{/if}"></span>
   {/if}
 </div>
 

@@ -1,4 +1,4 @@
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   {if $user->cat_username}
     <h3>{translate text='Your Checked Out Items'}</h3>
     {if $blocks}
@@ -28,7 +28,7 @@
     {foreach from=$transList item=resource name="recordLoop"}
       <li class="result{if ($smarty.foreach.recordLoop.iteration % 2) == 0} alt{/if}">
       {if $renewForm}
-        {if $resource.ils_details.renewable && $resource.ils_details.renew_details}
+        {if $resource.ils_details.renewable && isset($resource.ils_details.renew_details)}
             <label for="checkbox_{$resource.id|regex_replace:'/[^a-z0-9]/':''|escape}" class="offscreen">{translate text="Select this record"}</label>
             <input type="checkbox" name="renewSelectedIDS[]" value="{$resource.ils_details.renew_details}" class="checkbox" style="margin-left: 0" id="checkbox_{$resource.id|regex_replace:'/[^a-z0-9]/':''|escape}" />
             <input type="hidden" name="renewAllIDS[]" value="{$resource.ils_details.renew_details}" />
@@ -130,7 +130,7 @@
   {/if}
 </div>
 
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {include file="MyResearch/menu.tpl"}
 </div>
 

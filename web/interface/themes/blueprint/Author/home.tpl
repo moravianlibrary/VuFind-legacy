@@ -1,4 +1,4 @@
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   {if $info}
     <div class="authorbio">
       <h2>{$info.name|escape}</h2>
@@ -85,7 +85,7 @@
 </div>
   
 {* Recommendations *}
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {if $sideRecommendations}
     {foreach from=$sideRecommendations item="recommendations"}
       {include file=$recommendations}

@@ -11,7 +11,7 @@
   </div>
 {/capture}
 
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   <div class="resulthead">
     <form method="get" action="{$path}/AlphaBrowse/Results" name="alphaBrowseForm" id="alphaBrowseForm">
       <label for="alphaBrowseForm_source">{translate text='Browse Alphabetically'}</label>
@@ -92,7 +92,7 @@
   {/if}
 </div>
 
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
 </div>
 
 <div class="clear"></div>

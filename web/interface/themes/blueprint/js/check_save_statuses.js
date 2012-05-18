@@ -21,7 +21,7 @@ function checkSaveStatuses() {
                 if(response.status == 'OK') {
                     $('.savedLists > ul').empty();
                     $.each(response.data, function(i, result) {
-                        var $container = $('#savedLists' + result.record_id);
+                        var $container = $('#savedLists' + jqEscape(result.record_id));
                         var $ul = $container.children('ul:first');
                         if ($ul.length == 0) {
                             $container.append('<ul></ul>');

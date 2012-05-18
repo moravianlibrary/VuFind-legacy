@@ -15,11 +15,21 @@ function checkItemStatuses() {
             success: function(response) {
                 if(response.status == 'OK') {
                     $.each(response.data, function(i, result) {
-                        $('#status' + result.id).empty().append(result.availability_message);
-                        if (result.locationList) {
-                            $('#callnumber' + result.id).hide();
-                            $('.hideIfDetailed' + result.id).hide();
-                            $('#location' + result.id).hide();
+                        var safeId = jqEscape(result.id);
+                        $('#status' + safeId).empty().append(result.availability_message);
+                        if (typeof(result.full_status) != 'undefined'
+                            && result.full_status.length > 0
+                            && $('#callnumAndLocation' + safeId).length > 0
+                        ) {
+                            $('#callnumAndLocation' + safeId).empty().append(result.full_status);
+                            $('#callnumber' + safeId).hide();
+                            $('#location' + safeId).hide();
+                            $('.hideIfDetailed' + safeId).hide();
+                            $('#status' + safeId).hide();
+                        } else if (result.locationList) {
+                            $('#callnumber' + safeId).hide();
+                            $('.hideIfDetailed' + safeId).hide();
+                            $('#location' + safeId).hide();
                             var locationListHTML = "";
                             for (x=0; x<result.locationList.length; x++) {
                                 locationListHTML += '<div class="groupLocation">';
@@ -36,11 +46,15 @@ function checkItemStatuses() {
                                      ?  result.locationList[x].callnumbers : '';
                                 locationListHTML += '</div>';
                             }
-                            $('#locationDetails' + result.id).show();
-                            $('#locationDetails' + result.id).empty().append(locationListHTML);
+                            $('#locationDetails' + safeId).show();
+                            $('#locationDetails' + safeId).empty().append(locationListHTML);
                         } else {
-                            $('#callnumber' + result.id).empty().append(result.callnumber);
-                            $('#location' + result.id).empty().append(result.reserve == 'true' ? result.reserve_message : result.location);
+                            $('#callnumber' + safeId).empty().append(result.callnumber);
+                            $('#location' + safeId).empty().append(
+                                result.reserve == 'true' 
+                                ? result.reserve_message 
+                                : result.location
+                            );
                         }
                     });
                 } else {

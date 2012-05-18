@@ -1,4 +1,4 @@
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   {if $user->cat_username}
     <h3>{translate text='Your Holds and Recalls'}</h3>
 
@@ -85,20 +85,34 @@
               <strong>{translate text='Year of Publication'}:</strong> {$resource.ils_details.publication_year|escape}<br />
             {/if}
 
-            {if $pickup}
+            {* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
+               value to display... *}
+            {assign var="pickupDisplay" value=""}
+            {assign var="pickupTranslate" value="0"}
+            {if isset($resource.ils_details.location)}
+              {if $pickup}
+                {foreach from=$pickup item=library}
+                  {if $library.locationID == $resource.ils_details.location}
+                    {assign var="pickupDisplay" value=$library.locationDisplay}
+                    {assign var="pickupTranslate" value="1"}
+                  {/if}
+                {/foreach}
+              {/if}
+              {if empty($pickupDisplay)}
+                {assign var="pickupDisplay" value=$resource.ils_details.location}
+              {/if}
+            {/if}
+            {if !empty($pickupDisplay)}
               <strong>{translate text='pick_up_location'}:</strong>
-              {foreach from=$pickup item=library}
-                {if $library.locationID == $resource.ils_details.location}
-                  {translate text=$library.locationDisplay}
-                {/if}
-              {/foreach}
+              {if $pickupTranslate}{translate text=$pickupDisplay}{else}{$pickupDisplay|escape}{/if}
               <br />
             {/if}
+
             <strong>{translate text='Created'}:</strong> {$resource.ils_details.create|escape} |
             <strong>{translate text='Expires'}:</strong> {$resource.ils_details.expire|escape}
             <br />
 
-            {foreach from=$cancelResults item=cancelResult key=itemId}
+            {foreach from=$cancelResults.items item=cancelResult key=itemId}
               {if $itemId == $resource.ils_details.item_id && $cancelResult.success == false}
                 <div class="error">{translate text=$cancelResult.status}{if $cancelResult.sysMessage} : {translate text=$cancelResult.sysMessage|escape}{/if}</div>
               {/if}
@@ -132,7 +146,7 @@
   {/if}
 </div>
 
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {include file="MyResearch/menu.tpl"}
 </div>
 

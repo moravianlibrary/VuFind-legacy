@@ -12,7 +12,7 @@ function getBookPreviews() {
     
     // fetch Google preview if enabled
     if ($('.previewGBS').length > 0) {
-        var script = 'http://books.google.com/books?jscmd=viewapi&bibkeys=' 
+        var script = 'https://encrypted.google.com/books?jscmd=viewapi&bibkeys=' 
             + bibkeys.join(',') + '&callback=processGBSBookInfo';
         $.getScript(script);
     }

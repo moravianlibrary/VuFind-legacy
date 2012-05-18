@@ -4,22 +4,22 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 
     <title>{translate text="VuFind Administration"} - {$pageTitle}</title>
-    
+
     {* Load Blueprint CSS framework *}
     {css media="screen, projection" filename="blueprint/screen.css"}
     {css media="print" filename="blueprint/print.css"}
     <!--[if lt IE 8]><link rel="stylesheet" href="blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
-    
+
     {* Load VuFind specific stylesheets *}
     {css media="screen" filename="styles.css"}
-    {css media="screen" filename="print.css"}    
+    {css media="print" filename="print.css"}
   </head>
 
   <body>
     <div class="container">
-	  <div class="header">
-	    {include file="header.tpl"}
-	  </div>
+      <div class="header">
+        {include file="header.tpl"}
+      </div>
 
       {if $showBreadcrumbs}
       <div class="breadcrumbs">
@@ -30,13 +30,13 @@
       </div>
       {/if}
 
-	  <div class="main">
+      <div class="main">
         {include file="$module/$pageTemplate"}
-	  </div>
+      </div>
 
-	  <div class="footer">
-	    {include file="footer.tpl"}
-	  </div>
+      <div class="footer">
+        {include file="footer.tpl"}
+      </div>
     </div>
   </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Home action for Cart module
+ * Home action for Bulk module
  *
  * PHP version 5
  *
@@ -22,24 +22,40 @@
  * @category VuFind
  * @package  Controller_Cart
  * @author   Tuan Nguyen <tuan@yorku.ca>
+ * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_module Wiki
  */
 
 require_once 'Action.php';
-require_once 'Cart.php';
+require_once 'Bulk.php';
 
 /**
- * Home action for Cart module
+ * Home action for Bulk module
  *
  * @category VuFind
  * @package  Controller_Cart
  * @author   Tuan Nguyen <tuan@yorku.ca>
+ * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_module Wiki
  */
-class Home extends Cart
+class Home extends Bulk
 {
+    /**
+     * Constructor.
+     *
+     * @access public
+     */
+    function __construct()
+    {
+        global $interface;
+        global $configArray;
+        global $user;
+
+        parent::__construct();
+    }
+
     /**
      * Process parameters and display the page.
      *
@@ -48,16 +64,63 @@ class Home extends Cart
      */
     public function launch()
     {
+        global $configArray;
         global $interface;
+        global $user;
 
-        if ($_REQUEST['empty']) {
-            $this->cart->emptyCart();
-        } else if ($_REQUEST['add']) {
-            $this->cart->addItems($_REQUEST['id']);
-        } else if ($_REQUEST['delete']) {
-            $this->cart->removeItem($_REQUEST['delete']);
+        // Generic Bulk Functions
+        if (isset($_REQUEST['export']) || isset($_REQUEST['exportInit'])) {
+            // Export
+            if (isset($_REQUEST['exportToRefworks'])) {
+                $_SESSION['exportIDS'] = $_REQUEST['ids'];
+                $_SESSION['exportFormat'] = 'refworks_data';
+            }
+            $action = array('module' => 'Cart', 'action' => 'Export');
+        } else if (isset($_REQUEST['email'])) {
+            // Email
+            $action = array('module' => 'Cart', 'action' => 'Email');
+        } else if (isset($_REQUEST['print'])) {
+            // Print
+            $action = array('module' => 'Cart', 'action' => 'PrintCart');
+        } else if ($this->origin == "Favorites") {
+            // Favorites Functions
+            if (isset($_REQUEST['delete'])) {
+                // Delete
+                $action = array('module' => 'MyResearch', 'action' => 'Delete');
+            } else if (isset($_REQUEST['deleteList'])) {
+                // Delete List
+                $action = array('module' => 'Cart', 'action' => 'Confirm');
+            } else if (isset($_REQUEST['editList']) && isset($_POST['listID'])) {
+                // Edit List
+                $this->followupUrl = $configArray['Site']['url'] .
+                    "/MyResearch/EditList/" . $_POST['listID'];
+                header("Location: " . $this->followupUrl);
+                exit();
+            } else if (isset($_REQUEST['add'])) {
+                //Update Cart
+                $action = array('module' => 'Cart', 'action' => 'Cart');
+            } else {
+                //Error
+                $action = array('module' => 'Cart', 'action' => 'BulkError');
+            }
+        } else {
+            // Cart Functions (Default)
+            if (isset($_REQUEST['empty'])
+                || isset($_REQUEST['delete']) || isset($_REQUEST['update'])
+            ) {
+                // Empty / Delete Cart
+                $action = array('module' => 'Cart', 'action' => 'Cart');
+            } else if (isset($_REQUEST['saveCart'])) {
+                // Save Cart
+                $action = array('module' => 'Cart', 'action' => 'Save');
+            } else {
+                // View Cart
+                $action = array('module' => 'Cart', 'action' => 'Cart');
+            }
         }
-        
-        $this->viewCart();
+        $className = $action['action'];
+        include_once "services/{$action['module']}/{$action['action']}.php";
+        $service = new $className();
+        return $service->launch();
     }
 }

@@ -6,7 +6,7 @@
   </div>
 {/if}
 {if empty($list)}
-  <div class="error">{translate text='edit_list_deny'}</div>
+  <div class="error">{translate text='edit_list_fail'}</div>
 {else}
   <form method="post" name="editListForm" action="">
     <label class="displayBlock" for="list_title">{translate text="List"}:</label>

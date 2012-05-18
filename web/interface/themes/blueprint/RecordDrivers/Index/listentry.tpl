@@ -1,6 +1,6 @@
 <div class="listentry recordId" id="record{$listId|escape}">
     <label for="checkbox_{$listId|regex_replace:'/[^a-z0-9]/':''|escape}" class="offscreen">{translate text="Select this record"}</label>
-    <input id="checkbox_{$listId|regex_replace:'/[^a-z0-9]/':''|escape}" type="checkbox" name="ids[]" value="{$listId|escape}" class="checkbox"/>
+    <input id="checkbox_{$listId|regex_replace:'/[^a-z0-9]/':''|escape}" type="checkbox" name="ids[]" value="{$listId|escape}" class="checkbox_ui"/>
     <input type="hidden" name="idsAll[]" value="{$listId|escape}" />
     <div class="span-2">
     {if $listThumb}

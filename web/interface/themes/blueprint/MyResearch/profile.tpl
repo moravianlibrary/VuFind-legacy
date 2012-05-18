@@ -3,7 +3,7 @@
 {else}
   {assign var='showHomeLibForm' value=false}
 {/if}
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   {if $user->cat_username}
     <h3>{translate text='Your Profile'}</h3>
     {if $userMsg}
@@ -46,7 +46,7 @@
   {/if}
 </div>
 
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {include file="MyResearch/menu.tpl"}
 </div>
 

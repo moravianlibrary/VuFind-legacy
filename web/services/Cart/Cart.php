@@ -26,7 +26,7 @@
  * @link     http://vufind.org/wiki/building_a_module Wiki
  */
 
-require_once 'Action.php';
+require_once 'Bulk.php';
 require_once 'sys/Cart_Model.php';
 
 
@@ -39,9 +39,9 @@ require_once 'sys/Cart_Model.php';
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_module Wiki
  */
-class Cart extends Action
+class Cart extends Bulk
 {
-    protected $cart;
+    public $cart;
 
     /**
      * Constructor.
@@ -54,6 +54,77 @@ class Cart extends Action
         $this->cart = Cart_Model::getInstance();
     }
 
+     /**
+     * Process parameters and display the page.
+     *
+     * @return void
+     * @access public
+     */
+    public function launch()
+    {
+        $ids = array();
+
+        if (isset($_POST['selectAll']) && is_array($_REQUEST['idsAll'])) {
+            $ids = $_POST['idsAll'];
+        } else if (isset($_POST['ids'])) {
+            $ids = $_POST['ids'];
+        }
+
+        if (isset($_POST['empty'])) {
+            $this->cart->emptyCart();
+        } else if (isset($_POST['delete'])) {
+            $this->_deleteItems($ids);
+        } else if (isset($_POST['add'])) {
+            $this->_addItems($ids);
+        }
+
+        if (isset($_GET['lightbox'])) {
+            // Use for lightbox
+            return $this->viewCartLightBox();
+        } else {
+            $this->viewCart();
+        }
+    }
+
+    /**
+     * Add Items to Cart
+     *
+     * @param array $ids IDs to add
+     *
+     * @return void
+     * @access private
+     */
+    private function _addItems($ids)
+    {
+        if (!empty($ids)) {
+            $addItems = $this->cart->addItems($ids);
+            if (!$addItems['success']) {
+                $this->infoMsg = translate('bookbag_full_msg') . ". " .
+                $addItems['notAdded'] . " " .
+                translate('items_already_in_bookbag') . ".";
+            }
+        } else {
+            $this->errorMsg = "bulk_noitems_advice";
+        }
+    }
+
+    /**
+     * Delete Items from Cart
+     *
+     * @param array $ids IDs to delete.
+     *
+     * @return void
+     * @access private
+     */
+    private function _deleteItems($ids)
+    {
+        if (!empty($ids)) {
+            $this->cart->removeItems($ids);
+        } else {
+            $this->errorMsg =  "bulk_noitems_advice";
+        }
+    }
+
     /**
      * Process parameters and display cart contents.
      *
@@ -63,38 +134,30 @@ class Cart extends Action
     public function viewCart()
     {
         global $interface;
-        $interface->assign('cart', $this->getCartAsHTML());
-        $interface->assign('isEmpty', $this->cart->isEmpty());
+        $interface->assign('errorMsg', $this->errorMsg);
+        $interface->assign('infoMsg', $this->infoMsg);
+        $interface->assign('showExport', $this->showExport);
+        $interface->assign('exportOptions', $this->exportOptions);
         $interface->setTemplate('view.tpl');
+        $interface->assign('subTemplate', 'cart-view.tpl');
         $interface->setPageTitle('Book Bag');
         $interface->display('layout.tpl');
     }
 
     /**
-     * Process parameters and return the cart content as HTML.
+     * Process parameters and display cart contents.
      *
-     * @return string the cart content formatted as HTML
+     * @return void
      * @access public
      */
-    public function getCartAsHTML()
+    public function viewCartLightBox()
     {
         global $interface;
-
-        // Setup Search Engine Connection
-        $db = ConnectionManager::connectToIndex();
-
-        // fetch records from search engine
-        // FIXME: currently only work with VuFind records
-        // we should make this work with Summon/WorldCat too
-        $records = array();
-        $items = $this->cart->getItems();
-        foreach ($items as $item) {
-            if ($record = $db->getRecord($item)) {
-                // TODO: perhaps we could use RecordDriver here
-                $records[] = $record;
-            }
-        }
-        $interface->assign('records', $records);
-        return $interface->fetch('Cart/cart.tpl');
+        $interface->assign('title', $_GET['message']);
+        $interface->assign('errorMsg', $this->errorMsg);
+        $interface->assign('infoMsg', $this->infoMsg);
+        $interface->assign('showExport', $this->showExport);
+        $interface->assign('exportOptions', $this->exportOptions);
+        return $interface->fetch('Cart/cart-view.tpl');
     }
 }

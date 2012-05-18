@@ -11,6 +11,7 @@ function makePublishDateSlider(prefix) {
     // create the slider widget
     $('#' + prefix + 'Slider').slider({
         range: true,
+        min: 0, max: 9999, values: [0, 9999],
         slide: function(event, ui) {
             $('#' + prefix + 'from').val(ui.values[0]);
             $('#' + prefix + 'to').val(ui.values[1]);

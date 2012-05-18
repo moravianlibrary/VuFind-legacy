@@ -1,6 +1,6 @@
 {js filename="record.js"}
 {js filename="openurl.js"}
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   <div class="toolbar">
     <ul>
       {* TODO: citations <li><a href="{$url}/Summon/Cite?id={$id|escape:"url"}" class="citeRecord summonRecord cite" id="citeRecord{$id|escape}" title="{translate text="Cite this"}">{translate text="Cite this"}</a></li> *}
@@ -197,7 +197,7 @@
   <span class="Z3988" title="{$record.openUrl|escape}"></span>
 </div>
 
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
 </div>
 
 <div class="clear"></div>

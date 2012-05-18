@@ -1,4 +1,4 @@
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   <h3>{translate text='Find New Items'}</h3>
   <form method="get" action="{$url}/Search/NewItem" class="search">
     <div class="span-5">
@@ -32,7 +32,7 @@
   </form>
   {* not currently supported: <p><a href="{$url}/Search/NewItem/RSS" class="feed">{translate text='New Item Feed'}</a></p> *}
 </div>
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
 </div>
 <div class="clear"></div>
       

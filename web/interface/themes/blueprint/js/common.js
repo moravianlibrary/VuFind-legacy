@@ -63,6 +63,23 @@ $(document).ready(function(){
     $('.gridCellHover').mouseout(function() {
         $(this).removeClass('gridMouseOver')
     });  
+    
+    // assign click event to "viewCart" links
+    $('a.viewCart').click(function() {
+        var $dialog = getLightbox('Cart', 'Home', null, null, this.title, '', '', '', {viewCart:"1"});
+        return false;
+    });
+    
+    // Print
+    var url = window.location.href;
+    if(url.indexOf('?' + 'print' + '=') != -1  || url.indexOf('&' + 'print' + '=') != -1) {
+        $("link[media='print']").attr("media", "all");
+        window.print();
+    }
+    
+    //ContextHelp
+    contextHelp.init();
+    contextHelp.contextHelpSys.load();
 });
 
 function toggleMenu(elemId) {
@@ -84,9 +101,12 @@ function lessFacets(name) {
     $("#narrowGroupHidden_"+name).addClass("offscreen");
 }
 
-function filterAll(element) {
+function filterAll(element, formId) {
     //  Look for filters (specifically checkbox filters)
-    $("#searchForm :input[type='checkbox'][name='filter[]']")
+    if (formId == null) {
+        formId = "searchForm";
+    }
+    $("#" + formId + " :input[type='checkbox'][name='filter[]']")
         .attr('checked', element.checked);
 }
 
@@ -141,3 +161,154 @@ function initAutocomplete() {
     });
 }
 
+function htmlEncode(value){
+    if (value) {
+        return jQuery('<div />').text(value).html();
+    } else {
+        return '';
+    }
+}
+
+// mostly lifted from http://docs.jquery.com/Frequently_Asked_Questions#How_do_I_select_an_element_by_an_ID_that_has_characters_used_in_CSS_notation.3F
+function jqEscape(myid) {
+    return String(myid).replace(/(:|\.)/g,'\\$1');
+}
+
+function printIDs(ids) {
+
+    var url = '';
+    if(ids.length == 0) {
+        return false;
+    }
+    if(ids.length == 1) {
+            url =  path + '/Record/' + encodeURIComponent(ids[0]) + '?type=ids&print=true';
+    }
+    else {
+        $(ids).each(function() {
+           url += encodeURIComponent(this) + '+'; 
+        });
+        url =  path + '/Search/Results?lookfor=' + url + '&type=ids&print=true';
+    }
+    window.open(url);
+    return true;
+}
+
+var contextHelp = {
+        
+    init: function() {
+        $('body').append('<table cellspacing="0" cellpadding="0" id="contextHelp"><tbody><tr class="top"><td class="left"></td><td class="center"><div class="arrow up"></div></td><td class="right"></td></tr><tr class="middle"><td></td><td class="body"><div id="closeContextHelp"></div><div id="contextHelpContent"></div></td><td></td></tr><tr class="bottom"><td class="left"></td><td class="center"><div class="arrow down"></div></td><td class="right"></td></tr></tbody></table>');
+    },
+    
+    hover: function(listenTo, widthOffset, heightOffset, direction, align, msgText) {     
+        $(listenTo).mouseenter(function() {
+            contextHelp.contextHelpSys.setPosition(listenTo, widthOffset, heightOffset, direction, align, '', false);
+            contextHelp.contextHelpSys.updateContents(msgText);
+        });
+        $(listenTo).mouseleave(function() {
+            contextHelp.contextHelpSys.hideMessage();
+        });
+    }, 
+    
+    flash: function(id, widthOffset, heightOffset, direction, align, msgText, duration) {
+        this.contextHelpSys.setPosition(id, widthOffset, heightOffset, direction, align);
+        this.contextHelpSys.updateContents(msgText);
+        setTimeout(this.contextHelpSys.hideMessage, duration);
+    },
+    
+    contextHelpSys: {
+        CHTable:"#contextHelp",
+        CHContent:"#contextHelpContent",
+        arrowUp:"#contextHelp .arrow.up",
+        arrowDown:"#contextHelp .arrow.down",
+        closeButton:"#closeContextHelp",
+        showCloseButton: true,
+        curElement:null,
+        curOffsetX:0,
+        curOffsetY:0,
+        curDirection:"auto",
+        curAlign:"auto",
+        curMaxWidth:null,
+        isUp:false,
+        load:function(){
+            $(contextHelp.contextHelpSys.closeButton).click(contextHelp.contextHelpSys.hideMessage);
+            $(window).resize(contextHelp.contextHelpSys.position)},
+        setPosition:function(element, offsetX, offsetY, direction, align, maxWidth, showCloseButton){
+            if(element==null){element=document}
+            if(offsetX==null){offsetX=0}
+            if(offsetY==null){offsetY=0}
+            if(direction==null){direction="auto"}
+            if(align==null){align="auto"}
+            if(showCloseButton==null){showCloseButton=true}
+            contextHelp.contextHelpSys.curElement=$(element);
+            contextHelp.contextHelpSys.curOffsetX=offsetX;
+            contextHelp.contextHelpSys.curOffsetY=offsetY;
+            contextHelp.contextHelpSys.curDirection=direction;
+            contextHelp.contextHelpSys.curAlign=align;
+            contextHelp.contextHelpSys.curMaxWidth=maxWidth;
+            contextHelp.contextHelpSys.showCloseButton=showCloseButton;},
+        position:function(){
+            if(!contextHelp.contextHelpSys.isUp||!contextHelp.contextHelpSys.curElement.length){return}
+            var offset=contextHelp.contextHelpSys.curElement.offset();
+            var left=parseInt(offset.left)+parseInt(contextHelp.contextHelpSys.curOffsetX);
+            var top=parseInt(offset.top)+parseInt(contextHelp.contextHelpSys.curOffsetY);
+            var direction=contextHelp.contextHelpSys.curDirection;
+            var align=contextHelp.contextHelpSys.curAlign;
+            if(contextHelp.contextHelpSys.curMaxWidth){
+                $(contextHelp.contextHelpSys.CHTable).css("width",contextHelp.contextHelpSys.curMaxWidth)}
+            else{
+                $(contextHelp.contextHelpSys.CHTable).css("width","auto")}
+            if(direction=="auto"){
+                if(parseInt(top)-parseInt($(contextHelp.contextHelpSys.CHTable).height()<$(document).scrollTop())){
+                    direction="down"}
+                else{direction="up"}
+            }
+            if(direction=="up"){
+                top = parseInt(top) - parseInt($(contextHelp.contextHelpSys.CHTable).height());
+                $(contextHelp.contextHelpSys.arrowUp).css("display","none");
+                $(contextHelp.contextHelpSys.arrowDown).css("display","block")}
+            else{
+                if(direction=="down"){
+                    top = parseInt(top) + parseInt(contextHelp.contextHelpSys.curElement.height());
+                    $(contextHelp.contextHelpSys.arrowUp).css("display","block");
+                    $(contextHelp.contextHelpSys.arrowDown).css("display","none")}
+                }
+            if(align=="auto"){
+                if(left+parseInt($(contextHelp.contextHelpSys.CHTable).width()>$(document).width())){
+                    align="left"}
+                else{align="right"}
+            }
+            if(align=="right"){
+                left-=24;
+                $(contextHelp.contextHelpSys.arrowUp).css("background-position","0 0");
+                $(contextHelp.contextHelpSys.arrowDown).css("background-position","0 -6px")
+            }
+            else{
+                if(align=="left"){
+                    left-=parseInt($(contextHelp.contextHelpSys.CHTable).width());
+                    left+=24;
+                    $(contextHelp.contextHelpSys.arrowUp).css("background-position","100% 0");
+                    $(contextHelp.contextHelpSys.arrowDown).css("background-position","100% -6px")}
+            }
+            if(contextHelp.contextHelpSys.showCloseButton) {
+                $(contextHelp.contextHelpSys.closeButton).show();
+            } else {
+                $(contextHelp.contextHelpSys.closeButton).hide();
+            }
+            $(contextHelp.contextHelpSys.CHTable).css("left",left + "px");
+            $(contextHelp.contextHelpSys.CHTable).css("top",top + "px");},
+            
+        updateContents:function(msg){
+            contextHelp.contextHelpSys.isUp=true;
+            $(contextHelp.contextHelpSys.CHContent).empty();
+            $(contextHelp.contextHelpSys.CHContent).append(msg);
+            contextHelp.contextHelpSys.position();
+            $(contextHelp.contextHelpSys.CHTable).hide();
+            $(contextHelp.contextHelpSys.CHTable).fadeIn()
+            },
+        hideMessage:function(){
+            if(contextHelp.contextHelpSys.isUp){
+                $(contextHelp.contextHelpSys.CHTable).fadeOut();
+                contextHelp.contextHelpSys.isUp=false}
+        }
+    }
+}

@@ -16,4 +16,9 @@
   <input type="hidden" name="followupAction" value="{$followupAction}"/>
   <input type="hidden" name="followupId" value="{$followupId}"/>
   <input type="hidden" name="followupText" value="{translate text='Add to favorites'}"/>
+  {if $bulkIDs}
+    {foreach from=$bulkIDs item="bulkID"}
+      <input type="hidden" name="ids[]" value="{$bulkID}"/>
+    {/foreach}
+  {/if}
 </form>

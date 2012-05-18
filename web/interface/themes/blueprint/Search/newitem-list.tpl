@@ -1,5 +1,11 @@
 {* Main Listing *}
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
+  {if $errorMsg || $infoMsg}
+    <div class="messages">
+      {if $errorMsg}<div class="error">{$errorMsg|translate}</div>{/if}
+      {if $infoMsg}<div class="info">{$infoMsg|translate}</div>{/if}
+    </div>
+  {/if}
   {if empty($recordSet)}
         <p>{translate text="No new item information is currently available."}</p>
   {else}
@@ -67,7 +73,7 @@
 {* End Main Listing *}
 
 {* Narrow Search Options *}
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {if $sideRecommendations}
     {foreach from=$sideRecommendations item="recommendations"}
       {include file=$recommendations}

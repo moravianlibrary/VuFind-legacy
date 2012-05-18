@@ -201,6 +201,35 @@
   </tr>
   {/if}
 
+  {if !empty($extendedAuthorNotes)}
+  {assign var=extendedContentDisplayed value=1}
+  <tr valign="top">
+    <th>{translate text='Author Notes'}: </th>
+    <td>
+      {foreach from=$extendedAuthorNotes item=providerList key=provider}
+        {foreach from=$providerList item=field name=loop}
+          {$field.Content}<br/>
+        {/foreach}
+      {/foreach}
+    </td>
+  </tr>
+  {/if}
+
+  {if !empty($extendedVideoClips)}
+  {assign var=extendedContentDisplayed value=1}
+  <tr valign="top">
+    <th>{translate text='Video Clips'}: </th>
+    <td>
+      {foreach from=$extendedVideoClips item=providerList key=provider}
+        {foreach from=$providerList item=field name=loop}
+          {$field.Content}<br/>
+          {$field.Copyright}<br/>
+        {/foreach}
+      {/foreach}
+    </td>
+  </tr>
+  {/if}
+
   {* Avoid errors if there were no rows above *}
   {if !$extendedContentDisplayed}
   <tr><td>&nbsp;</td></tr>

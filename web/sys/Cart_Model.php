@@ -41,6 +41,8 @@ class Cart_Model
 {
     private static $_singleton;
     private $_items;
+    private $_maxSize = 100;
+    protected $db;
 
     const CART_COOKIE =  'vufind_cart';
     const CART_COOKIE_DELIM = "\t";
@@ -52,7 +54,13 @@ class Cart_Model
      */
     private function __construct()
     {
+        global $configArray;
+        if (isset($configArray['Site']['bookBagMaxSize'])) {
+            $this->_maxSize = $configArray['Site']['bookBagMaxSize'];
+        }
         $this->_items = array();
+        // Setup Search Engine Connection
+        $this->db = ConnectionManager::connectToIndex();
     }
 
     /**
@@ -100,12 +108,13 @@ class Cart_Model
      *
      * @param string $item ID of item to remove
      *
-     * @return void
+     * @return array       Associative array with two keys: success (bool) and
+     * notAdded (array of IDs that were unable to be added to the cart)
      * @access public
      */
     public function addItem($item)
     {
-        $this->addItems(array($item));
+        return $this->addItems(array($item));
     }
 
     /**
@@ -113,34 +122,64 @@ class Cart_Model
      *
      * @param array $items IDs of items to add
      *
-     * @return void
+     * @return array       Associative array with two keys: success (bool) and
+     * notAdded (array of IDs that were unable to be added to the cart)
      * @access public
      */
     public function addItems($items)
     {
-        $results = array_unique(array_merge($this->_items, $items));
-        $this->_items = $results;
+        $items = array_merge($this->_items, $items);
+
+        $total = count($items);
+        $this->_items = array_slice(array_unique($items), 0, $this->_maxSize);
         $this->_save();
+        if ($total > $this->_maxSize) {
+            $notAdded = $total-$this->_maxSize;
+            return array('success' => false, 'notAdded' => $notAdded);
+        }
+        return array('success' => true);
     }
 
     /**
      * Remove an item from the cart.
      *
-     * @param string $item ID of item to remove
+     * @param array $items An array of item IDS
      *
      * @return void
      * @access public
      */
-    public function removeItem($item)
+    public function removeItems($items)
     {
         $results = array();
         foreach ($this->_items as $id) {
-            if ($id != $item) {
+            if (!in_array($id, $items)) {
                 $results[] = $id;
             }
         }
         $this->_items = $results;
         $this->_save();
+    }
+
+    /**
+     * Get cart size.
+     *
+     * @return string The maximum cart size
+     * @access public
+     */
+    public function getMaxSize()
+    {
+        return $this->_maxSize;
+    }
+
+    /**
+     * Check whether the cart is full.
+     *
+     * @return boolean   true if full, false otherwise
+     * @access public
+     */
+    public function isFull()
+    {
+        return (count($this->_items) >= $this->_maxSize);
     }
 
     /**
@@ -181,5 +220,26 @@ class Cart_Model
     {
         $cookie = implode(Cart_Model::CART_COOKIE_DELIM, $this->_items);
         setcookie(Cart_Model::CART_COOKIE, $cookie, 0, '/');
+    }
+
+    /**
+     * Process parameters and return the cart content.
+     *
+     * @return array $records The cart content
+     * @access public
+     */
+    public function getRecordDetails()
+    {
+        // fetch records from search engine
+        // FIXME: currently only work with VuFind records
+        // we should make this work with Summon/WorldCat too
+        $records = array();
+        foreach ($this->_items as $item) {
+            if ($record = $this->db->getRecord($item)) {
+                // TODO: perhaps we could use RecordDriver here
+                $records[] = $record;
+            }
+        }
+        return $records;
     }
 }

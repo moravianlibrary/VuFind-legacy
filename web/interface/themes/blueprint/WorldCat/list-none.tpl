@@ -1,4 +1,4 @@
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   {* Recommendations *}
   {if $topRecommendations}
     {foreach from=$topRecommendations item="recommendations"}
@@ -23,7 +23,7 @@
 
   
 {* Narrow Search Options *}
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {if $sideRecommendations}
     {foreach from=$sideRecommendations item="recommendations"}
       {include file=$recommendations}

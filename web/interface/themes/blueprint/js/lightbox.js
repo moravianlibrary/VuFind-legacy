@@ -1,5 +1,6 @@
 // keep a handle to the current opened dialog so we can access it later
-var __dialogHandle = {dialog: null, processFollowup:false, followupModule: null, followupAction: null, recordId: null};
+var __dialogHandle = {dialog: null, processFollowup:false, followupModule: null, followupAction: null, recordId: null, postParams: null};
+var vufindString = {}
 
 function getLightbox(module, action, id, lookfor, message, followupModule, followupAction, followupId, postParams) {
     // Optional parameters
@@ -33,10 +34,12 @@ function getLightbox(module, action, id, lookfor, message, followupModule, follo
                 close: function () {
                     // check if the dialog was successful, if so, load the followup action
                     if (__dialogHandle.processFollowup && __dialogHandle.followupModule
-                            && __dialogHandle.followupAction && __dialogHandle.recordId) {
+                            && __dialogHandle.followupAction) {
+                        $(this).remove();
                         getLightbox(__dialogHandle.followupModule, __dialogHandle.followupAction,
-                                __dialogHandle.recordId, null, message);
+                                __dialogHandle.recordId, null, message, null, null, null, postParams);
                     }
+                    $(this).remove();
                 }
             });
 
@@ -46,6 +49,7 @@ function getLightbox(module, action, id, lookfor, message, followupModule, follo
     __dialogHandle.followupModule = followupModule;
     __dialogHandle.followupAction = followupAction;
     __dialogHandle.recordId = id;
+    __dialogHandle.postParams = postParams;
 
     // done
     return $dialog.dialog('open');
@@ -89,12 +93,15 @@ function hideLoadingGraphic($form) {
  */
 function lightboxDocumentReady() {
     registerAjaxLogin();
+    registerAjaxCart();
+    registerAjaxCartExport();
     registerAjaxSaveRecord();
     registerAjaxListEdit();
     registerAjaxEmailRecord();
     registerAjaxSMSRecord();
     registerAjaxTagRecord();
     registerAjaxEmailSearch();
+    registerAjaxBulkSave();
     registerAjaxBulkEmail();
     registerAjaxBulkExport();
     registerAjaxBulkDelete();
@@ -163,6 +170,113 @@ function registerAjaxLogin() {
     });
 }
 
+function registerAjaxCart() {
+
+    var $form = $('#modalDialog > form[name="cartForm"]');
+    if($form) {
+        $("input[name='ids[]']", $form).attr('checked', false);
+        $($form).validate({
+            rules: {
+                "ids[]": "required"
+            },
+            showErrors: function(x) {
+                hideLoadingGraphic($form);
+                for (y in x) {
+                    if (y == 'ids[]') {
+                        displayFormError($form, vufindString.bulk_noitems_advice);
+                    }
+                 }
+            }
+        });
+        $("input[name='email']", $form).unbind('click').click(function(){
+            showLoadingGraphic($form);
+            if (!$($form).valid()) { return false; }
+            var selected = $("input[name='ids[]']:checked", $form);
+            var postParams = [];
+            $.each(selected, function(i) {
+                postParams[i] = encodeURIComponent(this.value);           
+            });
+            hideLightbox();
+            var $dialog = getLightbox('Cart', 'Home', null, null, this.title, 'Cart', 'Home', '', {email: 1, ids: postParams});
+            return false;
+        });
+        $("input[name='print']", $form).unbind('click').click(function(){
+            showLoadingGraphic($form);
+            var selected = $("#modalDialog input[name='ids[]']:checked");
+            var ids = [];
+            $.each(selected, function(i) {
+                ids[i] = encodeURIComponent(this.value);           
+            });
+            var printing = printIDs(ids);
+            if(!printing) {
+                hideLoadingGraphic($form);
+                displayFormError($($form), vufindString.bulk_noitems_advice);
+            } else {
+                hideLightbox();
+            }
+            return false;
+        });
+        $("input[name='empty']", $form).unbind('click').click(function(){    
+            if (confirm(vufindString.confirmEmpty)) {
+                showLoadingGraphic($form);
+                 hideLightbox();
+                 // This always assumes the Empty command was successful as no indication of success or failure is given 
+                 var $dialog = getLightbox('Cart', 'Home', null, null, vufindString.viewBookBag, '', '', '', {"empty":1});
+                 redrawCartStatus();
+                 removeRecordState();
+            }
+            return false;
+        });
+        $("input[name='export']", $form).unbind('click').click(function(){
+            showLoadingGraphic($form);
+            if (!$($form).valid()) { return false; }
+            var selected = $("input[name='ids[]']:checked", $form);
+            var postParams = [];
+            $.each(selected, function(i) {
+                postParams[i] = encodeURIComponent(this.value);           
+            });
+            hideLightbox();
+            var $dialog = getLightbox('Cart', 'Home', null, null, this.title, 'Cart', 'Home', '', {"export": "1", ids: postParams});
+            return false;
+        });
+        $("input[name='delete']", $form).unbind('click').click(function(){
+            showLoadingGraphic($form);
+            if (!$($form).valid()) { return false; }
+            var url = path + '/AJAX/JSON?' + $.param({method:'removeItemsCart'});
+            $($form).ajaxSubmit({
+                url: url,
+                dataType: 'json',
+                success: function(response, statusText, xhr, $form) {
+                    if (response.status == 'OK') {
+                        var items = getItemsFromCartCookie();
+                        redrawCartStatus()
+                        hideLightbox();
+                    }
+                    var $dialog = getLightbox('Cart', 'Home', null, null, vufindString.viewBookBag, '', '', '', {viewCart:"1"});
+                }
+            });       
+            return false;
+        });
+        $("input[name='saveCart']", $form).unbind('click').click(function(){
+            showLoadingGraphic($form);
+            if (!$($form).valid()) { return false; }
+            var selected = $("input[name='ids[]']:checked", $form);
+            var postParams = [];
+            $.each(selected, function(i) {
+                postParams[i] = encodeURIComponent(this.value);           
+            });
+            hideLightbox();
+            var $dialog = getLightbox('Cart', 'Home', null, null, this.title, 'Cart', 'Home', '', {saveCart: 1, ids: postParams});
+            return false;
+        });
+    }
+    
+    // assign action to the "select all checkboxes" class
+    $('input[type="checkbox"].selectAllCheckboxes').change(function(){
+        $(this.form).find('input[type="checkbox"]').attr('checked', $(this).attr('checked'));
+    });
+}
+
 function registerAjaxSaveRecord() {
     $('#modalDialog > form[name="saveRecord"]').unbind('submit').submit(function(){
         if (!$(this).valid()) { return false; }
@@ -194,7 +308,7 @@ function registerAjaxSaveRecord() {
     $('a.listEdit').unbind('click').click(function(){
         var id = this.id.substr('listEdit'.length);
         hideLightbox();
-        getLightbox('MyResearch', 'ListEdit', id, null, this.title, 'Record', 'Save', id);
+        var $dialog = getLightbox('MyResearch', 'ListEdit', id, null, this.title, 'Record', 'Save', id);
         return false;
     });
 }
@@ -310,7 +424,7 @@ function refreshTagList(id) {
             if (response.status == 'OK') {
                 $.each(response.data, function(i, tag) {
                     var href = path + '/Search/Results?' + $.param({tag:tag.tag});
-                    var html = (i>0 ? ', ' : ' ') + '<a href="' + href + '">' + tag.tag +'</a> (' + tag.cnt + ')';
+                    var html = (i>0 ? ', ' : ' ') + '<a href="' + htmlEncode(href) + '">' + htmlEncode(tag.tag) +'</a> (' + htmlEncode(tag.cnt) + ')';
                     $('#tagList').append(html);
                 });
             } else if (response.data && response.data.length > 0) {
@@ -349,10 +463,10 @@ function registerAjaxEmailSearch() {
 function registerAjaxBulkEmail() {
     $('#modalDialog > form[name="bulkEmail"]').unbind('submit').submit(function(){
         if (!$(this).valid()) { return false; }
-        var url = path + '/AJAX/JSON?' + $.param({method:'emailSearch'});
+        var url = path + '/AJAX/JSON?' + $.param({method:'emailBulk'});
         var ids = [];
         $(':input[name="ids[]"]', this).each(function() {
-            ids.push(this.value);
+            ids.push(encodeURIComponent(this.value));
         });
         var searchURL = path + '/Search/Results?lookfor=' + ids.join('+') + '&type=ids';
         $(this).ajaxSubmit({
@@ -389,6 +503,59 @@ function registerAjaxBulkExport() {
         });
         return false;
     });    
+}
+
+function registerAjaxCartExport() {
+    $('#modalDialog form[name="exportForm"]').unbind('submit').submit(function(){
+        if (!$(this).valid()) { return false; }
+        var url = path + '/AJAX/JSON?' + $.param({method:'exportFavorites'});
+        $(this).ajaxSubmit({
+            url: url,
+            dataType: 'json',
+            success: function(response, statusText, xhr, $form) {
+                if (response.status == 'OK') {
+                    $form.parent().empty().append(response.data.result_additional);
+                } else {
+                    displayFormError($form, response.data);
+                }
+            }
+        });
+        return false;
+    });    
+}
+
+function registerAjaxBulkSave() {
+    $('#modalDialog form[name="bulkSave"]').unbind('submit').submit(function(){
+        if (!$(this).valid()) { return false; }
+        var url = path + '/AJAX/JSON?' + $.param({method:'bulkSave'});
+        $(this).ajaxSubmit({
+            url: url,
+            dataType: 'json',
+            success: function(response, statusText, xhr, $form) {
+                if (response.status == 'OK') {
+                    displayLightboxFeedback($form, response.data.info, 'info');
+                    var url =  path + '/MyResearch/MyList/' + response.data.result.list;
+                    setTimeout(function() { hideLightbox(); window.location = url; }, 2000);
+                } else {
+                    displayFormError($form, response.data.info);
+                }
+            }
+        });
+        return false;
+    });
+    
+    $('a.listEdit').unbind('click').click(function(){
+        var $form = $('#modalDialog > form[name="bulkSave"]');
+        var id = this.id.substr('listEdit'.length);
+        var ids = $("input[name='ids[]']", $form);
+        var postParams = [];
+        $.each(ids, function(i) {
+            postParams[i] = encodeURIComponent(this.value);           
+        });
+        hideLightbox();
+        var $dialog = getLightbox('MyResearch', 'ListEdit', id, null, this.title, 'Cart', 'Home', '', {save: 1, ids: postParams});
+        return false;
+    });
 }
 
 function registerAjaxBulkDelete() {

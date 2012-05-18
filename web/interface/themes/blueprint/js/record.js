@@ -64,7 +64,56 @@ $(document).ready(function(){
     $('a.subjectHeading').mouseout(function() {
         $('.subjectHeading').removeClass('highlight');
     });
+
+    $('.checkRequest').each(function(i) {
+        if($(this).hasClass('checkRequest')) {
+            $(this).addClass('ajax_hold_availability');
+        }
+    });
+    
+    setUpCheckRequest();
 });
+
+function setUpCheckRequest() {
+    $('.checkRequest').each(function(i) {
+        if($(this).hasClass('checkRequest')) {
+            var isValid = checkRequestIsValid(this, this.href);
+        }
+    });
+}
+
+function checkRequestIsValid(element, requestURL) {
+    var recordId = requestURL.match(/\/Record\/([^\/]+)\//)[1];
+    var vars = {}, hash;
+    var hashes = requestURL.slice(requestURL.indexOf('?') + 1).split('&');
+
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        var x = hash[0];
+        var y = hash[1]
+        vars[x] = y;
+    }
+    vars['id'] = recordId;
+    
+    var url = path + '/AJAX/JSON?' + $.param({method:'checkRequestIsValid', id: recordId, data: vars});
+    $.ajax({
+        dataType: 'json',
+        cache: false,
+        url: url,
+        success: function(response) {
+            if (response.status == 'OK') {
+                if (response.data.status) {
+                    $(element).removeClass('checkRequest ajax_hold_availability').html(response.data.msg);
+                } else {
+                    $(element).remove();
+                }
+            } else if (response.status == 'NEED_AUTH') {
+                $(element).replaceWith('<span class="holdBlocked">' + response.data.msg + '</span>');
+            }
+        }
+    });   
+}
 
 function registerAjaxCommentRecord() {
     $('form[name="commentRecord"]').unbind('submit').submit(function(){

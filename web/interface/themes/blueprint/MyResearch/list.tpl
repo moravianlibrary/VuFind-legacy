@@ -1,14 +1,29 @@
 {js filename="bulk_actions.js"}
+{if $bookBag}
+<script type="text/javascript">
+vufindString.bulk_noitems_advice = "{translate text="bulk_noitems_advice"}";
+vufindString.confirmEmpty = "{translate text="bookbag_confirm_empty"}";
+vufindString.viewBookBag = "{translate text="View Book Bag"}";
+vufindString.addBookBag = "{translate text="Add to Book Bag"}";
+vufindString.removeBookBag = "{translate text="Remove from Book Bag"}";
+vufindString.itemsAddBag = "{translate text="items_added_to_bookbag"}";
+vufindString.itemsInBag = "{translate text="items_already_in_bookbag"}";
+vufindString.bookbagMax = "{$bookBag->getMaxSize()}";
+vufindString.bookbagFull = "{translate text="bookbag_full_msg"}";
+vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
+</script>
+{/if}
 
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   {if $list}
-    <div class="floatright">
-      <form method="post" name="addForm" action="{$url}/MyResearch/Bulk">
+    <div class="toolbar floatright">
+      <form method="post" name="addForm" action="{$url}/Cart/Home">
         <input type="hidden" name="listID" value="{$list->id|escape}" />
         <input type="hidden" name="listName" value="{$list->title|escape}" />
         {if $listEditAllowed}
-          <input type="submit" class="edit smallButton" name="editList" value="{translate text="edit_list"}" />
-          <input type="submit" class="delete deleteList smallButton" id="deleteList{$list->id|escape}" title="{translate text="delete_list"}" name="deleteList" value="{translate text="delete_list"}" />
+          <input type="hidden" value="Favorites" name="origin">
+          <input type="submit" class="edit button" name="editList" value="{translate text="edit_list"}" />
+          <input type="submit" class="delete deleteList button" id="deleteList{$list->id|escape}" title="{translate text="delete_list"}" name="deleteList" value="{translate text="delete_list"}" />
         {/if}
       </form>
     </div>
@@ -21,7 +36,7 @@
   {if $errorMsg || $infoMsg}
   <div class="messages">
     {if $errorMsg}<p class="error">{$errorMsg|translate}</p>{/if}
-    {if $infoMsg}<p class="info">{$infoMsg|translate}{if $showExport} <a class="save" target="_new" href="{$url}/MyResearch/Export?exportInit">{translate text="export_save"}</a>{/if}</p>{/if}
+    {if $infoMsg}<p class="info">{$infoMsg|translate}{if $showExport} <a class="save" target="_new" href="{$showExport|escape}">{translate text="export_save"}</a>{/if}</p>{/if}
   </div>
   {/if}
   {if $resourceList}
@@ -46,18 +61,31 @@
       </div>
       <div class="clear"></div>
     </div>
-    <form method="post" name="bulkActionForm" action="{$url}/MyResearch/Bulk">
+    <form method="post" name="bulkActionForm" action="{$url}/Cart/Home">
+      <input type="hidden" name="origin" value="Favorites" />
+      <input type="hidden" name="followup" value="true" />
+      <input type="hidden" name="followupModule" value="MyResearch" />
+      <input type="hidden" name="followupAction" value="Favorites" />
     {if $list && $list->id}
       <input type="hidden" name="listID" value="{$list->id|escape}" />
       <input type="hidden" name="listName" value="{$list->title|escape}" />
     {/if}
     <div class="bulkActionButtons">
-      <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="addFormCheckboxSelectAll"/> <label for="addFormCheckboxSelectAll">{translate text="select_page"}</label>
-      <input type="submit" class="mail floatright smallButton" name="email" value="{translate text='email_selected'}" title="{translate text='email_selected'}"/>
-      {if $listEditAllowed}<input type="submit" class="delete floatright smallButton" name="delete" value="{translate text='delete_selected'}" title="{translate text='delete_selected'}"/>{/if}
-      {if is_array($exportOptions) && count($exportOptions) > 0}
-      <input type="submit" class="export floatright smallButton" name="export" value="{translate text='export_selected'}" title="{translate text='export_selected'}"/>
+      <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="addFormCheckboxSelectAll"/> <label class="floatleft" for="addFormCheckboxSelectAll">{translate text="select_page"}</label>
+      <span class="floatleft">|</span>
+      <span class="floatleft"><strong>{translate text="with_selected"}: </strong></span>
+      {if $bookBag}
+      <a id="updateCart" class="bookbagAdd offscreen" href="">{translate text='Add to Book Bag'}</a>
+      <noscript>
+        <input type="submit"  class="button floatleft bookbagAdd" name="add" value="{translate text='Add to Book Bag'}"/>
+      </noscript>
       {/if}
+      <input type="submit" class="mail floatleft button" name="email" value="{translate text='Email'}" title="{translate text='email_selected'}"/>
+      {if $listEditAllowed}<input id="delete_list_items_{if $list}{$list->id|escape}{/if}" type="submit" class="delete floatleft button" name="delete" value="{translate text='Delete'}" title="{translate text='delete_selected'}"/>{/if}
+      {if is_array($exportOptions) && count($exportOptions) > 0}
+      <input type="submit" class="export floatleft button" name="export" value="{translate text='Export'}" title="{translate text='export_selected'}"/>
+      {/if}
+      <input type="submit" class="print floatleft button" name="print" value="{translate text='Print'}" title="{translate text='print_selected'}"/>
       <div class="clear"></div>
     </div> 
     <ul class="recordSet">
@@ -69,6 +97,24 @@
       </li>
     {/foreach}
     </ul>
+    <div class="bulkActionButtons">
+      <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="addFormCheckboxSelectAllBottom"/> <label class="floatleft" for="addFormCheckboxSelectAllBottom">{translate text="select_page"}</label>
+      <span class="floatleft">|</span>
+      <span class="floatleft"><strong>{translate text="with_selected"}: </strong></span>
+      {if $bookBag}
+      <a id="updateCartBottom" class="bookbagAdd offscreen" href="">{translate text='Add to Book Bag'}</a>
+      <noscript>
+        <input type="submit"  class="button floatleft bookbagAdd" name="add" value="{translate text='Add to Book Bag'}"/>
+      </noscript>
+      {/if}
+      <input type="submit" class="mail floatleft button" name="email" value="{translate text='Email'}" title="{translate text='email_selected'}"/>
+      {if $listEditAllowed}<input id="bottom_delete_list_items_{if $list}{$list->id|escape}{/if}" type="submit" class="delete floatleft button" name="delete" value="{translate text='Delete'}" title="{translate text='delete_selected'}"/>{/if}
+      {if is_array($exportOptions) && count($exportOptions) > 0}
+      <input type="submit" class="export floatleft button" name="export" value="{translate text='Export'}" title="{translate text='export_selected'}"/>
+      {/if}
+      <input type="submit" class="print floatleft button" name="print" value="{translate text='Print'}" title="{translate text='print_selected'}"/>
+      <div class="clear"></div>
+    </div> 
     </form>
     {if $pageLinks.all}<div class="pagination">{$pageLinks.all}</div>{/if}
   {else}
@@ -76,7 +122,7 @@
   {/if}
 </div>
   
-<div class="span-5 last">  
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">  
   {include file="MyResearch/menu.tpl"}
   
   {if $listList}

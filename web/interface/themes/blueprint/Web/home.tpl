@@ -52,11 +52,11 @@
 </script>
 
 
-<div class="span-18">
+<div class="span-18{if $sidebarOnLeft} push-5 last{/if}">
   <div id="searchcontrol">{translate text='Loading'}...</div>
 </div>
    
-<div class="span-5 last">
+<div class="span-5 {if $sidebarOnLeft}pull-18 sidebarOnLeft{else}last{/if}">
   {foreach from=$recommendations item=current}
     {include file=$current}
   {/foreach}
