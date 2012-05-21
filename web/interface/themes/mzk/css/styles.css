@@ -175,6 +175,7 @@ b.bbot b, b.gbot b{background-position: 100% -30px}
 .searchcontent .login-box img { margin: 0 5px 0 5px; }
 .searchcontent .login-box #loginOptions,
 .searchcontent .login-box #logoutOptions { border: 1px solid #D1EFF1; height: 33px; &height: 35px; position: absolute; right: 0; top: 31px; width: 210px; margin: 0; background: #fff; text-align: left; }
+.searchcontent .login-box #cartSummary { height: 33px; &height: 35px; position: absolute; right: 0; top: 75px; width: 210px; margin: 0; background: #fff; text-align: left; }
 /*.homepage .searchcontent .login-box #loginOptions,
 .homepage .searchcontent .login-box #logoutOptions { border: none; height: auto; position: static; width: auto; margin: 0 0 10px 0; }*/
 .homepage .searchheader { background: none; }
@@ -462,7 +463,7 @@ div.popupBox {
     left: 33%;
     width: 33%;
     font-size: 95%;
-    height: 400px;
+    height: 450px;
 }
 
 div.popupBox .header {
@@ -1092,6 +1093,22 @@ table.datagrid tr.oddrow { background-color: #DFF4F5; }
 }
 .renewAll {
     background-image:url(/interface/themes/default/images/fugue/renewAll.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding:.5em .5em .5em 20px;
+    margin-right:1em;
+}
+
+.print {
+    background-image:url(/interface/themes/default/images/silk/printer.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding:.5em .5em .5em 20px;
+    margin-right:1em;
+}
+
+.cartSummary {
+    background-image:url(/interface/themes/default/images/fugue/bookbagEmpty.png);
     background-repeat:no-repeat;
     background-position: left;
     padding:.5em .5em .5em 20px;

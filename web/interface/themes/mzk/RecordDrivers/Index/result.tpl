@@ -1,12 +1,20 @@
 <div id="record{$summId|escape}" class="yui-ge">
+
   <div class="yui-u first" _id="obalka_{$summId}">
     <table align="left">
     <tr>
+    <td>
+      {if $bookBag}
+        <!--<label for="checkbox_{$summId|regex_replace:'/[^a-z0-9]/':''|escape}" class="offscreen">{translate text="Select this record"}</label>-->
+        <input id="checkbox_{$summId|regex_replace:'/[^a-z0-9]/':''|escape}" type="checkbox" name="ids[]" value="{$summId|escape}" class="checkbox_ui"/>
+        <input type="hidden" name="idsAll[]" value="{$summId|escape}" />
+      {/if}
+    </td>
     <td id="obalka_{$summId}"><img id="obalka_{$summId}_format" src="{$path}/interface/themes/mzk/images/formats/{$summFormats[0]}.png"
     title="{translate text=$summFormats[0]}" align="left"/></td>
     </tr>
     <tr>
-    <!--<td align='center'><span class="iconlabel">{translate text=$summFormats[0]}</span></td>-->
+    <td></td>
     <td class="format">{translate text=$summFormats[0]}</td>
     </tr>
     </table>

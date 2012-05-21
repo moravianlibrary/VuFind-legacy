@@ -21,6 +21,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script language="JavaScript" type="text/javascript">
       path = '{$url}';
+      var vufindString = {ldelim}{rdelim};
     </script>
 
     {js filename="yui/yahoo-dom-event.js"}
@@ -35,10 +36,17 @@
     {js filename="obalkyknih/functions.js"}
     {js filename="obalkyknih/custom.js"}
     {js filename="jquery-1.7.min.js"}
+    {js filename="jquery.cookie.js"}
     {js filename="europeana.js"}
     {js filename="ajax.yui.js"}
     {js filename="thickbox-compressed.js"}
     {js filename="jquery.cluetip.min.js"}
+    {js filename="common.js"}
+    {js filename="lightbox.js"}
+    {if $bookBag}
+       {js filename="cart.js"}
+       {assign var=bookBagItems value=$bookBag->getItems()}
+    {/if}
     <script language="JavaScript" type="text/javascript">
     {literal}
     $(document).ready(function() {       
@@ -107,7 +115,6 @@
 			  {/if}
 		  </div>
         <!--{/if}-->
-		
 
 		<div class="login-box">
 	{if is_array($allLangs) && count($allLangs) > 1}
@@ -134,13 +141,19 @@
               <a href="{$path}/MyResearch/Home">{translate text="Login"}</a>
             {/if}
           </div>
-        </div>
-		
+          {if $bookBag}
+          <div id="cartSummary" class="cartSummary">
+            <a id="cartItems" title="{translate text='View Book Bag'}" class="bookbag" href="{$url}/Cart/Home"><strong><span>{$bookBagItems|@count}</span></strong> {translate text='items'}{if $bookBag->isFull()}({translate text='bookbag_full'}){/if}</a>
+            <a id="viewCart" title="{translate text='View Book Bag'}" class="viewCart bookbag offscreen" href="{$url}/Cart/Home"><strong><span id="cartSize">{$bookBagItems|@count}</span></strong> {translate text='items in book bag'}{if $bookBag->isFull()}<span id="cartStatus">({translate text='bookbag_full'}){else}</span>{/if}</a>
+          </div>
+          {/if}
+        </div> <!-- class="login-box" -->
         <br clear="all">
       </div>
     </div>
 	{/if}
-    
+
+
     {if $showBreadcrumbs}
     <div class="breadcrumbs">
       <div class="breadcrumbinner">
