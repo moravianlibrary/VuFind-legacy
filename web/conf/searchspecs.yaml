@@ -149,6 +149,7 @@ Author:
       - [onephrase, 100]
       - [and, 50]
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 ISN:
   DismaxFields:
@@ -189,6 +190,7 @@ Subject:
     - era:
       - [and, 100]
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 JournalTitle:
   DismaxFields:
@@ -260,6 +262,7 @@ Title:
     - series2:
       - [onephrase, 50]
       - [and , ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 Series:
   DismaxFields:
@@ -296,6 +299,8 @@ AllFields:
     - fulltext_unstemmed^10
     - allfields
     - fulltext
+  # modification for MZK
+    - publishDateFacet
   QueryFields:
     - 
       - [OR, 50]
@@ -346,6 +351,7 @@ AllFields:
       - [or, ~]
     fulltext:
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 # These are advanced searches that never use Dismax:
 id:
@@ -363,16 +369,19 @@ TopicBrowse:
   QueryFields:
     - topic_browse:
       - [onephrase, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 AuthorBrowse:
   QueryFields:
     - author_browse:
       - [onephrase, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 TitleBrowse:
   QueryFields:
     - title_full:
       - [onephrase, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 DeweyBrowse:
   QueryFields:
@@ -418,23 +427,27 @@ publisher:
     - publisher:
       - [and, 100]
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 year:
   QueryFields:
     - publishDate:
       - [and, 100]
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 language:
   QueryFields:
     - language:
       - [and, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 toc:
   QueryFields:
     - contents:
       - [and, 100]
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 topic:
   QueryFields:
@@ -442,6 +455,7 @@ topic:
       - [and, 50]
     - topic_facet:
       - [and, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 geographic:
   QueryFields:
@@ -449,6 +463,7 @@ geographic:
       - [and, 50]
     - geographic_facet:
       - [and ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 genre:
   QueryFields:
@@ -456,11 +471,13 @@ genre:
       - [and, 50]
     - genre_facet:
       - [and, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 era:
   QueryFields:
     - era:
       - [and, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 oclc_num:
   CustomMunge:
@@ -472,12 +489,3 @@ oclc_num:
     - oclc_num:
       - [oclc_num, ~]
 
-# test
-# Title_autocomplete:
-#   CustomMunge:
-#     title_full:
-#       - [append, "* "]
-#   QueryFields:
-#     - title_full:
-#       - [onephrase, 500]
-#       - [and, 200]
