@@ -10,6 +10,7 @@
 	  <ul>
 		<li><a href="{$path}/Browse/Home">{translate text='Browse the Catalog'}</a></li>
 		<li><a href="{$path}/AlphaBrowse/Home">{translate text='Browse Alphabetically'}</a></li>
+		<li><a href="https://listky.mzk.cz/">{translate text='Card Catalogues'}</a></li>
 		<!--
 		<li><a href="{$path}/Search/Reserves">{translate text='Course Reserves'}</a></li>
 		<li><a href="{$path}/Search/NewItem">{translate text='New Items'}</a></li>
