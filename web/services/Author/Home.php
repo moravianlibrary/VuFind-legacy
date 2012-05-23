@@ -1,4 +1,4 @@
-	<?php
+<?php
 /**
  * Home action for Author module
  *
@@ -89,10 +89,6 @@ class Home extends Action
 
         // What language should we use?
         $this->_lang = $configArray['Site']['language'];
-        if ($this->_lang == 'cz') { // Fix for the Czech language
-            $this->_lang = 'cs';
-        }
-
 
         // Retrieve User Search History -- note that we only want to offer a
         // "back to search" link if the saved URL is not for the current action;
