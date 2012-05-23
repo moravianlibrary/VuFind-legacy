@@ -1,4 +1,4 @@
-<?php
+	<?php
 /**
  * Home action for Author module
  *
@@ -70,22 +70,8 @@ class Home extends Action
 
         // Determine whether to display book previews
         if (isset($configArray['Content']['previews'])) {
-            $providers = explode(',', $configArray['Content']['previews']);
-            $interface->assign('showPreviews', true);
-            foreach ($providers as $provider) {
-                switch ($provider) {
-                case 'Google':
-                    $interface->assign('showGBSPreviews', true);
-                    break;
-                case 'OpenLibrary':
-                    $interface->assign('showOLPreviews', true);
-                    break;
-                case 'HathiTrust':
-                    $interface->assign('showHTPreviews', true);
-                    break;
-                }
-            }
-        }        
+            $interface->assignPreviews();
+        }   
         // TODO : Stats
 
         $interface->caching = false;
@@ -103,6 +89,10 @@ class Home extends Action
 
         // What language should we use?
         $this->_lang = $configArray['Site']['language'];
+        if ($this->_lang == 'cz') { // Fix for the Czech language
+            $this->_lang = 'cs';
+        }
+
 
         // Retrieve User Search History -- note that we only want to offer a
         // "back to search" link if the saved URL is not for the current action;
@@ -253,9 +243,6 @@ class Home extends Action
     {
         if ($lang) {
             $this->_lang = $lang;
-        }
-        if ($this->_lang == 'cz') {
-            $this->_lang = 'cs';
         }
 
         $url = "http://$this->_lang.wikipedia.org/w/api.php" .
@@ -490,6 +477,10 @@ class Home extends Action
         // Fix pronunciation guides
         $pattern[] = '/({{)pron-en\|([^}]*)(}})/Us';
         $replacement[] = translate("pronounced") . " /$2/";
+
+        // Fix dashes
+        $pattern[] = '/{{ndash}}/';
+        $replacement[] = ' - ';
 
         // Removes citations
         $pattern[] = '/({{)[^}]*(}})/Us';

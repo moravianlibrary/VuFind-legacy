@@ -70,7 +70,7 @@ class JSON extends Action
         ) {
             $this->$_GET['method']();
         } else {
-            $this->output(translate('Invalid Method'), JSON::STATUS_ERROR);
+            return $this->output(translate('Invalid Method'), JSON::STATUS_ERROR);
         }
     }
 
@@ -86,9 +86,9 @@ class JSON extends Action
 
         $user = UserAccount::isLoggedIn();
         if ($user) {
-            $this->output(true, JSON::STATUS_OK);
+            return $this->output(true, JSON::STATUS_OK);
         } else {
-            $this->output(false, JSON::STATUS_OK);
+            return $this->output(false, JSON::STATUS_OK);
         }
     }
 
@@ -106,7 +106,7 @@ class JSON extends Action
         $salt = $this->_generateSalt();
 
         // HexDecode Password
-        $password = pack('H*', $_GET['password']);
+        $password = pack('H*', $_POST['ajax_password']);
 
         // Decrypt Password
         include_once 'Crypt/rc4.php';
@@ -114,16 +114,16 @@ class JSON extends Action
 
         // Put the username/password in POST fields where the authentication module
         // expects to find them:
-        $_POST['username'] = $_GET['username'];
+        $_POST['username'] = $_POST['ajax_username'];
         $_POST['password'] = $password;
 
         // Authenticate the user:
         $user = UserAccount::login();
         if (PEAR::isError($user)) {
-            $this->output(translate($user->getMessage()), JSON::STATUS_ERROR);
+            return $this->output(translate($user->getMessage()), JSON::STATUS_ERROR);
         }
 
-        $this->output(true, JSON::STATUS_OK);
+        return $this->output(true, JSON::STATUS_OK);
     }
 
     /**
@@ -134,7 +134,79 @@ class JSON extends Action
      */
     public function getSalt()
     {
-        $this->output($this->_generateSalt(), JSON::STATUS_OK);
+        return $this->output($this->_generateSalt(), JSON::STATUS_OK);
+    }
+
+    /**
+     * Check Request is Valid
+     *
+     * @return void
+     * @access public
+     */
+    public function checkRequestIsValid()
+    {
+        if (isset($_REQUEST['id']) && isset($_REQUEST['data'])) {
+            // check if user is logged in
+            $user = UserAccount::isLoggedIn();
+            if (!$user) {
+                return $this->output(
+                    array(
+                        'status' => false,
+                        'msg' => translate('You must be logged in first')
+                    ), JSON::STATUS_NEED_AUTH
+                );
+            }
+
+            $catalog = ConnectionManager::connectToCatalog();
+            if ($catalog && $catalog->status) {
+                if ($patron = UserAccount::catalogLogin()) {
+                    if (!PEAR::isError($patron)) {
+                        $results = $catalog->checkRequestIsValid(
+                            $_REQUEST['id'], $_REQUEST['data'], $patron
+                        );
+
+                        if (!PEAR::isError($results)) {
+                            $msg = $results
+                                ? translate('request_place_text')
+                                : translate('hold_error_blocked');
+                            return $this->output(
+                                array(
+                                    'status' => $results, 'msg' => $msg
+                               ), JSON::STATUS_OK
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        return $this->output(translate('An error has occurred'), JSON::STATUS_ERROR);
+    }
+
+    /**
+     * Support method for getItemStatuses() -- filter suppressed locations from the
+     * array of item information for a particular bib record.
+     *
+     * @param array $record Information on items linked to a single bib record
+     *
+     * @return array        Filtered version of $record
+     * @access private
+     */
+    private function _filterSuppressedLocations($record)
+    {
+        global $configArray;
+        static $hideHoldings = false;
+        if ($hideHoldings === false) {
+            $hideHoldings = isset($configArray['Record']['hide_holdings'])
+                ? $configArray['Record']['hide_holdings'] : array();
+        }
+
+        $filtered = array();
+        foreach ($record as $current) {
+            if (!in_array($current['location'], $hideHoldings)) {
+                $filtered[] = $current;
+            }
+        }
+        return $filtered;
     }
 
     /**
@@ -155,11 +227,13 @@ class JSON extends Action
 
         $catalog = ConnectionManager::connectToCatalog();
         if (!$catalog || !$catalog->status) {
-            $this->output(translate('An error has occurred'), JSON::STATUS_ERROR);
+            return $this->output(
+                translate('An error has occurred'), JSON::STATUS_ERROR
+            );
         }
         $results = $catalog->getStatuses($_GET['id']);
         if (PEAR::isError($results)) {
-            $this->output($results->getMessage(), JSON::STATUS_ERROR);
+            return $this->output($results->getMessage(), JSON::STATUS_ERROR);
         } else if (!is_array($results)) {
             // If getStatuses returned garbage, let's turn it into an empty array
             // to avoid triggering a notice in the foreach loop below.
@@ -175,7 +249,8 @@ class JSON extends Action
         // Load messages for response:
         $messages = array(
             'available' => $interface->fetch('AJAX/status-available.tpl'),
-            'unavailable' => $interface->fetch('AJAX/status-unavailable.tpl')
+            'unavailable' => $interface->fetch('AJAX/status-unavailable.tpl'),
+            'unknown' => $interface->fetch('AJAX/status-unknown.tpl')
         );
 
         // Load callnumber and location settings:
@@ -183,12 +258,20 @@ class JSON extends Action
             ? $configArray['Item_Status']['multiple_call_nos'] : 'msg';
         $locationSetting = isset($configArray['Item_Status']['multiple_locations'])
             ? $configArray['Item_Status']['multiple_locations'] : 'msg';
+        $showFullStatus = isset($configArray['Item_Status']['show_full_status'])
+            ? $configArray['Item_Status']['show_full_status'] : false;
 
         // Loop through all the status information that came back
         $statuses = array();
         foreach ($results as $record) {
             // Skip errors and empty records:
             if (!PEAR::isError($record) && count($record)) {
+                // Filter out suppressed locations, and skip record if none remain:
+                $record = $this->_filterSuppressedLocations($record);
+                if (empty($record)) {
+                    continue;
+                }
+
                 if ($locationSetting == "group") {
                     $current = $this->_getItemStatusGroup(
                         $record, $messages, $callnumberSetting
@@ -198,6 +281,12 @@ class JSON extends Action
                         $record, $messages, $locationSetting, $callnumberSetting
                     );
                 }
+
+                // If a full status display has been requested, append the HTML:
+                if ($showFullStatus) {
+                    $current['full_status'] = $this->_getItemStatusFull($record);
+                }
+
                 $statuses[] = $current;
 
                 // The current ID is not missing -- remove it from the missing list.
@@ -205,7 +294,8 @@ class JSON extends Action
             }
         }
 
-        // If any IDs were missing, send back appropriate dummy data
+        // If any IDs were missing, send back appropriate dummy data, including a
+        // "missing data" flag which can be used to completely suppress status info:
         foreach ($missingIds as $missingId => $junk) {
             $statuses[] = array(
                 'id'                   => $missingId,
@@ -215,12 +305,13 @@ class JSON extends Action
                 'locationList'         => false,
                 'reserve'              => 'false',
                 'reserve_message'      => translate('Not On Reserve'),
-                'callnumber'           => ''
+                'callnumber'           => '',
+                'missing_data'         => true
             );
         }
 
         // Done
-        $this->output($statuses, JSON::STATUS_OK);
+        return $this->output($statuses, JSON::STATUS_OK);
     }
 
     /**
@@ -237,7 +328,7 @@ class JSON extends Action
         // check if user is logged in
         $user = UserAccount::isLoggedIn();
         if (!$user) {
-            $this->output(
+            return $this->output(
                 translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
             );
         }
@@ -264,7 +355,7 @@ class JSON extends Action
                 }
             }
         }
-        $this->output($result, JSON::STATUS_OK);
+        return $this->output($result, JSON::STATUS_OK);
     }
 
     /**
@@ -280,16 +371,18 @@ class JSON extends Action
         // check if user is logged in
         $user = UserAccount::isLoggedIn();
         if (!$user) {
-            $this->output(
+            return $this->output(
                 translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
             );
         }
 
         if (!Save::saveRecord($user)) {
-            $this->output(translate($result->getMessage()), JSON::STATUS_ERROR);
+            return $this->output(
+                translate($result->getMessage()), JSON::STATUS_ERROR
+            );
         }
 
-        $this->output(translate('Done'), JSON::STATUS_OK);
+        return $this->output(translate('Done'), JSON::STATUS_OK);
     }
 
     /**
@@ -310,10 +403,12 @@ class JSON extends Action
         );
 
         if (PEAR::isError($result)) {
-            $this->output(translate($result->getMessage()), JSON::STATUS_ERROR);
+            return $this->output(
+                translate($result->getMessage()), JSON::STATUS_ERROR
+            );
         }
 
-        $this->output(translate('email_success'), JSON::STATUS_OK);
+        return $this->output(translate('email_success'), JSON::STATUS_OK);
     }
 
     /**
@@ -332,10 +427,12 @@ class JSON extends Action
         $result = $sms->sendSMS();
 
         if (PEAR::isError($result)) {
-            $this->output(translate($result->getMessage()), JSON::STATUS_ERROR);
+            return $this->output(
+                translate($result->getMessage()), JSON::STATUS_ERROR
+            );
         }
 
-        $this->output(translate('sms_success'), JSON::STATUS_OK);
+        return $this->output(translate('sms_success'), JSON::STATUS_OK);
     }
 
     /**
@@ -348,17 +445,17 @@ class JSON extends Action
     {
         $user = UserAccount::isLoggedIn();
         if ($user === false) {
-            $this->output(
+            return $this->output(
                 translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
             );
         }
 
         include_once 'services/Record/AddTag.php';
         if (!AddTag::save($user)) {
-            $this->output(translate('Failed'), JSON::STATUS_ERROR);
+            return $this->output(translate('Failed'), JSON::STATUS_ERROR);
         }
 
-        $this->output(translate('Done'), JSON::STATUS_OK);
+        return $this->output(translate('Done'), JSON::STATUS_OK);
     }
 
     /**
@@ -385,9 +482,9 @@ class JSON extends Action
         if (empty($tagList)) {
             $msg = translate('No Tags') . ', ' .
                 translate('Be the first to tag this record') . '!';
-            $this->output($msg, JSON::STATUS_ERROR);
+            return $this->output($msg, JSON::STATUS_ERROR);
         } else {
-            $this->output($tagList, JSON::STATUS_OK);
+            return $this->output($tagList, JSON::STATUS_OK);
         }
     }
 
@@ -403,16 +500,18 @@ class JSON extends Action
 
         $user = UserAccount::isLoggedIn();
         if ($user === false) {
-            $this->output(
+            return $this->output(
                 translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
             );
         }
 
         if (!UserComments::saveComment($user)) {
-            $this->output(translate('comment_error_save'), JSON::STATUS_ERROR);
+            return $this->output(
+                translate('comment_error_save'), JSON::STATUS_ERROR
+            );
         }
 
-        $this->output(translate('Done'), JSON::STATUS_OK);
+        return $this->output(translate('Done'), JSON::STATUS_OK);
     }
 
     /**
@@ -430,7 +529,7 @@ class JSON extends Action
         $interface->assign('id', $_GET['id']);
         UserComments::assignComments();
         $html = $interface->fetch('Record/view-comments-list.tpl');
-        $this->output($html, JSON::STATUS_OK);
+        return $this->output($html, JSON::STATUS_OK);
     }
 
     /**
@@ -445,15 +544,42 @@ class JSON extends Action
 
         $user = UserAccount::isLoggedIn();
         if ($user === false) {
-            $this->output(
+            return $this->output(
                 translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
             );
         }
 
         if (!UserComments::deleteComment($_GET['id'], $user)) {
-            $this->output(translate('An error has occurred'), JSON::STATUS_ERROR);
+            return $this->output(
+                translate('An error has occurred'), JSON::STATUS_ERROR
+            );
         }
-        $this->output(translate('Done'), JSON::STATUS_OK);
+        return $this->output(translate('Done'), JSON::STATUS_OK);
+    }
+
+    /**
+     * Email Bulk Results
+     *
+     * @return void
+     * @access public
+     */
+    public function emailBulk()
+    {
+        include_once 'services/Cart/Email.php';
+
+        $emailService = new Email();
+        $result = $emailService->sendEmail(
+            $_REQUEST['url'], $_REQUEST['to'], $_REQUEST['from'],
+            $_REQUEST['message']
+        );
+
+        if (PEAR::isError($result)) {
+            return $this->output(
+                translate($result->getMessage()), JSON::STATUS_ERROR
+            );
+        }
+
+        return $this->output(translate('email_success'), JSON::STATUS_OK);
     }
 
     /**
@@ -473,10 +599,12 @@ class JSON extends Action
         );
 
         if (PEAR::isError($result)) {
-            $this->output(translate($result->getMessage()), JSON::STATUS_ERROR);
+            return $this->output(
+                translate($result->getMessage()), JSON::STATUS_ERROR
+            );
         }
 
-        $this->output(translate('email_success'), JSON::STATUS_OK);
+        return $this->output(translate('email_success'), JSON::STATUS_OK);
     }
 
     /**
@@ -491,7 +619,7 @@ class JSON extends Action
 
         $user = UserAccount::isLoggedIn();
         if ($user === false) {
-            $this->output(
+            return $this->output(
                 translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
             );
         }
@@ -499,10 +627,12 @@ class JSON extends Action
         $listService = new ListEdit();
         $result = $listService->addList();
         if (PEAR::isError($result)) {
-            $this->output(translate($result->getMessage()), JSON::STATUS_ERROR);
+            return $this->output(
+                translate($result->getMessage()), JSON::STATUS_ERROR
+            );
         }
 
-        $this->output(array('newId'=>$result), JSON::STATUS_OK);
+        return $this->output(array('newId'=>$result), JSON::STATUS_OK);
     }
 
     /**
@@ -515,17 +645,65 @@ class JSON extends Action
      */
     public function exportFavorites()
     {
+        include_once 'services/Cart/Export.php';
+
         global $configArray;
         $_SESSION['exportIDS'] =  $_POST['ids'];
         $_SESSION['exportFormat'] = $_POST['format'];
 
-        $html = '<p><a class="save" onclick="hideLightbox();" href="'
-           . $configArray['Site']['url'] . '/MyResearch/Bulk?exportInit">'
-           . translate('Download') . '</a></p>';
-        $this->output(
+        $url = Export::getExportUrl();
+        $html = '<p><a class="save" onclick="hideLightbox();" href="';
+        if (strtolower($_POST['format']) == 'refworks') {
+            $html .= $url . '" target="_blank">' . translate('export_refworks') .
+                '</a></p>';
+        } else {
+            $html .= $url . '">' . translate('export_download') . '</a></p>';
+        }
+        return $this->output(
             array('result'=>translate('Done'), 'result_additional'=>$html),
             JSON::STATUS_OK
         );
+    }
+
+    /**
+     * Saves records to a User's favorites
+     *
+     * @return void
+     * @access public
+     */
+    public function bulkSave()
+    {
+        // Without IDs, we can't continue
+        if (empty($_REQUEST['ids'])) {
+            return $this->output(
+                array('result'=>translate('bulk_error_missing')),
+                JSON::STATUS_ERROR
+            );
+        }
+
+        include_once 'services/Cart/Save.php';
+
+        $user = UserAccount::isLoggedIn();
+        if ($user === false) {
+            return $this->output(
+                translate('You must be logged in first'), JSON::STATUS_NEED_AUTH
+            );
+        }
+
+        $saveService = new Save();
+        $result = $saveService->saveRecord();
+        if ($result) {
+            return $this->output(
+                array('result' => $result, 'info' => translate("bulk_save_success")),
+                JSON::STATUS_OK
+            );
+        } else {
+            return $this->output(
+                array('info' => translate('bulk_save_error')),
+                JSON::STATUS_ERROR
+            );
+        }
+
     }
 
     /**
@@ -543,14 +721,37 @@ class JSON extends Action
             $deleteFavorites = new Delete();
             $result = $deleteFavorites->deleteFavorites($ids, $listID);
             if (!PEAR::isError($result) && !empty($result['deleteDetails'])) {
-                $this->output(
+                return $this->output(
                     array('result' => translate($result['deleteDetails'])),
                     JSON::STATUS_OK
                 );
             }
         } else {
-             $this->output(array('result'=>translate('delete_missing')));
+             return $this->output(
+                 array('result'=>translate('delete_missing')), JSON::STATUS_ERROR
+             );
         }
+    }
+
+    /**
+     * Delete records from a User's cart
+     *
+     * @return void
+     * @access public
+     */
+    public function removeItemsCart()
+    {
+        include_once 'services/Cart/Cart.php';
+        $cart = new Cart();
+        // Without IDs, we can't continue
+        if (empty($_POST['ids'])) {
+            $this->output(
+                array('result'=>translate('bulk_error_missing')),
+                JSON::STATUS_ERROR
+            );
+        }
+        $cart->cart->removeItems($_REQUEST['ids']);
+        return $this->output(array('delete' => true), JSON::STATUS_OK);
     }
 
     /**
@@ -603,7 +804,7 @@ class JSON extends Action
         } else {
             echo translate('Cannot Load Action');
         }
-        $interface->display('AJAX/lightbox.tpl');
+        return $interface->display('AJAX/lightbox.tpl');
     }
 
     /**
@@ -628,7 +829,7 @@ class JSON extends Action
             ? $configArray['OpenURL']['resolver'] : 'other';
         $resolver = new ResolverConnection($resolverType);
         if (!$resolver->driverLoaded()) {
-            $this->output(
+            return $this->output(
                 translate("Could not load driver for $resolverType"),
                 JSON::STATUS_ERROR
             );
@@ -665,7 +866,7 @@ class JSON extends Action
         $html = $interface->fetch('AJAX/resolverLinks.tpl');
 
         // output HTML encoded in JSON object
-        $this->output($html, JSON::STATUS_OK);
+        return $this->output($html, JSON::STATUS_OK);
     }
 
     /**
@@ -742,10 +943,17 @@ class JSON extends Action
         // Summarize call number, location and availability info across all items:
         $callNumbers = $locations = array();
         $available = false;
+        $use_unknown_status = false;
         foreach ($record as $info) {
             // Find an available copy
             if ($info['availability']) {
                 $available = true;
+            }
+            // Check for a use_unknown_message flag
+            if (isset($info['use_unknown_message'])
+                && $info['use_unknown_message'] == true
+            ) {
+                $use_unknown_status = true;
             }
             // Store call number/location info:
             $callNumbers[] = $info['callnumber'];
@@ -762,19 +970,22 @@ class JSON extends Action
             $locations, $locationSetting, 'Multiple Locations'
         );
 
+        $availability_message = $use_unknown_status
+            ? $messages['unknown']
+            : $messages[$available ? 'available' : 'unavailable'];
+
         // Send back the collected details:
         return array(
             'id' => $record[0]['id'],
             'availability' => ($available ? 'true' : 'false'),
-            'availability_message' =>
-                $messages[$available ? 'available' : 'unavailable'],
-            'location' => $location,
+            'availability_message' => $availability_message,
+            'location' => htmlentities($location, ENT_COMPAT, 'UTF-8'),
             'locationList' => false,
             'reserve' =>
                 ($record[0]['reserve'] == 'Y' ? 'true' : 'false'),
             'reserve_message' => $record[0]['reserve'] == 'Y'
                 ? translate('on_reserve') : translate('Not On Reserve'),
-            'callnumber' => $callNumber
+            'callnumber' => htmlentities($callNumber, ENT_COMPAT, 'UTF-8')
         );
     }
 
@@ -797,10 +1008,17 @@ class JSON extends Action
         // Summarize call number, location and availability info across all items:
         $locations =  array();
         $available = false;
+        $use_unknown_status = false;
         foreach ($record as $info) {
             // Find an available copy
             if ($info['availability']) {
                 $available = $locations[$info['location']]['available'] = true;
+            }
+            // Check for a use_unknown_message flag
+            if (isset($info['use_unknown_message'])
+                && $info['use_unknown_message'] == true
+            ) {
+                $use_unknown_status = true;
             }
             // Store call number/location info:
             $locations[$info['location']]['callnumbers'][] = $info['callnumber'];
@@ -817,18 +1035,22 @@ class JSON extends Action
             $locationInfo = array(
                 'availability' =>
                     isset($details['available']) ? $details['available'] : false,
-                'location' => $location,
-                'callnumbers' => $locationCallnumbers
+                'location' => htmlentities($location, ENT_COMPAT, 'UTF-8'),
+                'callnumbers' =>
+                    htmlentities($locationCallnumbers, ENT_COMPAT, 'UTF-8')
             );
             $locationList[] = $locationInfo;
         }
+
+        $availability_message = $use_unknown_status
+            ? $messages['unknown']
+            : $messages[$available ? 'available' : 'unavailable'];
 
         // Send back the collected details:
         return array(
             'id' => $record[0]['id'],
             'availability' => ($available ? 'true' : 'false'),
-            'availability_message' =>
-                $messages[$available ? 'available' : 'unavailable'],
+            'availability_message' => $availability_message,
             'location' => false,
             'locationList' => $locationList,
             'reserve' =>
@@ -840,10 +1062,26 @@ class JSON extends Action
     }
 
     /**
+     * Support method for getItemStatuses() -- process a single bibliographic record
+     * for "details" location setting.
+     *
+     * @param array $record Information on items linked to a single bib record
+     *
+     * @return array        Detailed availability information
+     * @access private
+     */
+    private function _getItemStatusFull($record)
+    {
+        global $interface;
+        $interface->assign('statusItems', $record);
+        return $interface->fetch('AJAX/status-full.tpl');
+    }
+
+    /**
      * Generate the "salt" used in the salt'ed login request.
      *
      * @return string
-     * @access public
+     * @access private
      */
     private function _generateSalt()
     {
