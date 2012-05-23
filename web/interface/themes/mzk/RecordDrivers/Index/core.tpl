@@ -285,17 +285,10 @@
   {/if}
 
   <tr valign="top">
-    <th>{translate text='Link to catalog'}: </th>
+    <th>{translate text='Link to Aleph'}: </th>
     <td>
       <a href="{$fullViewURL}">{translate text='full view'}</a>,
       <a href="{$holdingsURL}">{translate text='holdings'}</a>
-    </td>
-  </tr>
-
-  <tr valign="top">
-    <th>{translate text='Link to catalog'}: </th>
-    <td>
-      <a href="https://aleph.mzk.cz/cgi-bin/librarything.pl?isbn={$isbn|escape:url}">{translate text='full view'}</a>
     </td>
   </tr>
 
