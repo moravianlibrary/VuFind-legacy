@@ -58,28 +58,8 @@ class MarcRecord extends IndexRecord
      */
     public function __construct($record)
     {
-        // Call the parent's constructor...
         parent::__construct($record);
-        $this->marcRecord = new LazyMarcRecord($record); // $marc->next();
-        /*
-        // Also process the MARC record:
-        $marc = trim($record['fullrecord']);
-
-        // check if we are dealing with MARCXML
-        $xmlHead = '<?xml version';
-        if (strcasecmp(substr($marc, 0, strlen($xmlHead)), $xmlHead) === 0) {
-            $marc = new File_MARCXML($marc, File_MARCXML::SOURCE_STRING);
-        } else {
-            $marc = preg_replace('/#31;/', "\x1F", $marc);
-            $marc = preg_replace('/#30;/', "\x1E", $marc);
-            $marc = new File_MARC($marc, File_MARC::SOURCE_STRING);
-        }
-
-        $this->marcRecord = $marc->next();
-        if (!$this->marcRecord) {
-            PEAR::raiseError(new PEAR_Error('Cannot Process MARC Record'));
-        }
-        */
+        $this->marcRecord = new LazyMarcRecord($record);
     }
 
     /**
@@ -510,7 +490,7 @@ class MarcRecord extends IndexRecord
      * @return string
      * @access private
      */
-    private function _getFirstFieldValue($field, $subfields = null)
+    protected function _getFirstFieldValue($field, $subfields = null)
     {
         $matches = $this->_getFieldArray($field, $subfields);
         return (is_array($matches) && count($matches) > 0) ?
@@ -946,7 +926,7 @@ class MarcRecord extends IndexRecord
      * @return array|bool                 Array on success, boolean false if no
      * valid link could be found in the data.
      */
-    private function _getFieldData($field, $value)
+     function _getFieldData($field, $value)
     {
         global $configArray;
 
@@ -990,12 +970,6 @@ class MarcRecord extends IndexRecord
             'value' => $field->getSubfield('t')->getData(),
             'link'  => $link
         );
-    }
-
-    // costumization for MZK
-    protected function getEOD() {
-        $eod = $this->_getFirstFieldValue('EOD', array('a'));
-        return ($eod == 'Y')?true:false;
     }
 }
 

@@ -232,6 +232,8 @@ class IndexRecord implements RecordInterface
         $interface->assign('coreRecordLinks', $this->getAllRecordLinks());
         $interface->assign('coreThumbMedium', $this->getThumbnail('medium'));
         $interface->assign('coreThumbLarge', $this->getThumbnail('large'));
+        $interface->assign('coreContainerTitle', $this->getContainerTitle());
+        $interface->assign('coreContainerReference', $this->getContainerReference());
 
         // Only display OpenURL link if the option is turned on and we have
         // an ISSN.  We may eventually want to make this rule more flexible,
@@ -274,11 +276,7 @@ class IndexRecord implements RecordInterface
         $summary = $this->getSummary();
         $summary = count($summary) > 0 ? $summary[0] : null;
         $interface->assign('coreSummary', $summary);
-        // Begin of costumization for MZK
-        $interface->assign('itemLink', $this->fields['itemlink']);
-        $interface->assign('EOD', $this->getEOD());
-        $interface->assign('callNumber', $this->getCallNumber());
-        // End of costumization for MZK
+
         // Send back the template name:
         return 'RecordDrivers/Index/core.tpl';
     }
@@ -294,7 +292,6 @@ class IndexRecord implements RecordInterface
      */
     public function getEditions()
     {
-        return null; // modification for MZK
         include_once 'sys/WorldCatUtils.php';
         $wc = new WorldCatUtils();
 
@@ -324,12 +321,18 @@ class IndexRecord implements RecordInterface
 
         // If we have query parts, we should try to find related records:
         if (!empty($parts)) {
+            // Limit the number of parts based on the boolean clause limit:
+            $index = $this->getIndexEngine();
+            $limit = $index->getBooleanClauseLimit();
+            if (count($parts) > $limit) {
+                $parts = array_slice($parts, 0, $limit);
+            }
+
             // Assemble the query parts and filter out current record:
-            $query = '(' . implode(' OR ', $parts) . ') NOT id:' .
-                $this->getUniqueID();
+            $query = '(' . implode(' OR ', $parts) . ') NOT id:"' .
+                addcslashes($this->getUniqueID(), '"') . '"';
 
             // Perform the search and return either results or an error:
-            $index = $this->getIndexEngine();
             $result = $index->search($query, null, null, 0, 5);
             if (PEAR::isError($result)) {
                 return $result;
@@ -370,6 +373,37 @@ class IndexRecord implements RecordInterface
         $ed = new ExternalExcerpts($this->getCleanISBN());
         return $ed->fetch();
     }
+
+    /**
+     * Get any author notes associated with this record.  For details of
+     * the return format, see sys/AuthorNotes.php.
+     *
+     * @return array Author Notes data.
+     * @access public
+     */
+    public function getAuthorNotes()
+    {
+        include_once 'sys/AuthorNotes.php';
+
+        $ed = new ExternalAuthorNotes($this->getCleanISBN());
+        return $ed->fetch();
+    }
+
+    /**
+     * Get any video clips associated with this record.  For details of
+     * the return format, see sys/Video.php.
+     *
+     * @return array Video Clips content
+     * @access public
+     */
+    public function getVideoClips()
+    {
+        include_once 'sys/VideoClips.php';
+
+        $ed = new ExternalVideoClips($this->getCleanISBN());
+        return $ed->fetch();
+    }
+
 
     /**
      * Assign necessary Smarty variables and return a template name to
@@ -418,7 +452,6 @@ class IndexRecord implements RecordInterface
         // Assign various values for display by the template; we'll prefix
         // everything with "extended" to avoid clashes with values assigned
         // elsewhere.
-        $interface->assign('extendedDescription', $this->getDescription());
         $interface->assign('extendedSummary', $this->getSummary());
         $interface->assign('extendedAccess', $this->getAccessRestrictions());
         $interface->assign('extendedRelated', $this->getRelationshipNotes());
@@ -435,6 +468,8 @@ class IndexRecord implements RecordInterface
         $interface->assign('extendedCredits', $this->getProductionCredits());
         $interface->assign('extendedBibliography', $this->getBibliographyNotes());
         $interface->assign('extendedFindingAids', $this->getFindingAids());
+        $interface->assign('extendedAuthorNotes', $this->getAuthorNotes());
+        $interface->assign('extendedVideoClips', $this->getVideoClips());
 
         return 'RecordDrivers/Index/extended.tpl';
     }
@@ -455,13 +490,6 @@ class IndexRecord implements RecordInterface
         global $interface;
         global $configArray;
 
-        if ("driver" == CatalogConnection::getHoldsMode()) {
-            $interface->assign('driverMode', true);
-            if (!UserAccount::isLoggedIn()) {
-                $interface->assign('showLoginMsg', true);
-            }
-        }  
-        
         // Only display OpenURL link if the option is turned on and we have
         // an ISSN.  We may eventually want to make this rule more flexible,
         // but for now the ISSN restriction is designed to be consistent with
@@ -484,10 +512,7 @@ class IndexRecord implements RecordInterface
         // Load real-time data if available:
         $interface->assign('holdings', $this->getRealTimeHoldings($patron));
         $interface->assign('history', $this->getRealTimeHistory());
-        // Begin of costumizations for MZK
-        $interface->assign('id', $this->getUniqueID());
-        $interface->assign('itemLink', $this->fields['itemlink']);
-        // End of costumizations for MZK
+
         return 'RecordDrivers/Index/holdings.tpl';
     }
 
@@ -535,6 +560,22 @@ class IndexRecord implements RecordInterface
     }
 
     /**
+     * getMapView - gets the map view template.
+     *
+     * @return string template name
+     * @access public
+     */
+    public function getMapView()
+    {
+        global $configArray;
+        global $interface;
+        if ($configArray['Content']['recordMap'] == 'google') {
+            $interface->assign('map_marker', $this->getGoogleMapMarker());
+        }
+        return 'view-'. $configArray['Content']['recordMap'] . 'map.tpl';
+    }
+
+    /**
      * Get the OpenURL parameters to represent this record (useful for the
      * title attribute of a COinS span tag).
      *
@@ -570,9 +611,12 @@ class IndexRecord implements RecordInterface
         // Add additional parameters based on the format of the record:
         $formats = $this->getFormats();
 
-        // If we have multiple formats, Book and Journal are most important...
+        // If we have multiple formats, Book, Journal and Article are most
+        // important...
         if (in_array('Book', $formats)) {
             $format = 'Book';
+        } else if (in_array('Article', $formats)) {
+            $format = 'Article';
         } else if (in_array('Journal', $formats)) {
             $format = 'Journal';
         } else {
@@ -583,7 +627,7 @@ class IndexRecord implements RecordInterface
             $params['rft_val_fmt'] = 'info:ofi/fmt:kev:mtx:book';
             $params['rft.genre'] = 'book';
             $params['rft.btitle'] = $params['rft.title'];
-            // $series = $this->getSeries();
+            $series = $this->getSeries();
             if (count($series) > 0) {
                 // Handle both possible return formats of getSeries:
                 $params['rft.series'] = is_array($series[0]) ?
@@ -596,6 +640,27 @@ class IndexRecord implements RecordInterface
             }
             $params['rft.edition'] = $this->getEdition();
             $params['rft.isbn'] = $this->getCleanISBN();
+            break;
+        case 'Article':
+            $params['rft_val_fmt'] = 'info:ofi/fmt:kev:mtx:journal';
+            $params['rft.genre'] = 'article';
+            $params['rft.issn'] = $this->getCleanISSN();
+            // an article may have also an ISBN:
+            $params['rft.isbn'] = $this->getCleanISBN();
+            $params['rft.volume'] = $this->getContainerVolume();
+            $params['rft.issue'] = $this->getContainerIssue();
+            $params['rft.spage'] = $this->getContainerStartPage();
+            // unset default title -- we only want jtitle/atitle here:
+            unset($params['rft.title']);
+            $params['rft.jtitle'] = $this->getContainerTitle();
+            $params['rft.atitle'] = $this->getTitle();
+            $params['rft.au'] = $this->getPrimaryAuthor();
+
+            $params['rft.format'] = $format;
+            $langs = $this->getLanguages();
+            if (count($langs) > 0) {
+                $params['rft.language'] = $langs[0];
+            }
             break;
         case 'Journal':
             /* This is probably the most technically correct way to represent
@@ -680,7 +745,7 @@ class IndexRecord implements RecordInterface
      * search results.
      *
      * @param string $view The current view.
-     * 
+     *
      * @return string      Name of Smarty template file to display.
      * @access public
      */
@@ -704,20 +769,7 @@ class IndexRecord implements RecordInterface
         $interface->assign('summLCCN', $this->getLCCN());
         $interface->assign('summOCLC', $this->getOCLC());
         $interface->assign('summCallNo', $this->getCallNumber());
-        // Begin of costumizations for MZK
-        $interface->assign('itemLink', $this->fields['itemlink']);
-        $statuses = $this->fields['statuses'];
-        if ($statuses == null) {
-           $statuses = array();
-        } 
-        if (in_array("absent", $statuses)) {
-            $interface->assign('status', "absent");
-        } else if (in_array("present", $statuses)) {
-            $interface->assign('status', "present");
-        } else {
-            $interface->assign('status', "no items");
-        }
-        // End of costumizations for MZK
+
         // Obtain and assign snippet information:
         $snippet = $this->getHighlightedSnippet();
         $interface->assign(
@@ -738,8 +790,6 @@ class IndexRecord implements RecordInterface
 
         // Display regular URLs unless OpenURL is present and configured to
         // replace them:
-        // commented - modifications for MZK
-        /*
         if (!isset($configArray['OpenURL']['replace_other_urls'])
             || !$configArray['OpenURL']['replace_other_urls'] || !$hasOpenURL
         ) {
@@ -747,8 +797,6 @@ class IndexRecord implements RecordInterface
         } else {
             $interface->assign('summURLs', array());
         }
-        */
-        $interface->assign('summURLs', $this->getURLsFromSolr()); // modifications for MZK
 
         // By default, do not display AJAX status; we won't assume that all
         // records exist in the ILS.  Child classes can override this setting
@@ -890,6 +938,25 @@ class IndexRecord implements RecordInterface
     }
 
     /**
+     * hasMap - checks the long_lat field to determine if this record can be
+     * displayed on a map.
+     *
+     * @return bool
+     * @access public
+     */
+    public function hasMap()
+    {
+        global $configArray;
+
+        if (isset($configArray['Content']['recordMap'])
+            && isset($this->fields['long_lat'])
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Does this record support an RDF representation?
      *
      * @return bool
@@ -899,6 +966,34 @@ class IndexRecord implements RecordInterface
     {
         // No RDF for Solr-based entries yet.
         return false;
+    }
+
+    /**
+     * Check if an item has holdings in order to show or hide the holdings tab
+     *
+     * @return bool
+     * @access public
+     */
+    public function hasHoldings()
+    {
+        // Show holdings tab by default
+        return true;
+    }
+
+    /**
+     * Get Status/Holdings Information from the Marc Record (support method used by
+     * the NoILS driver).
+     *
+     * @param array $field The Marc Field to retrieve
+     * @param array $data  A keyed array of data to retrieve from subfields
+     *
+     * @return array
+     * @access public
+     */
+    public function getFormattedMarcDetails($field, $data)
+    {
+        // Not supported here:
+        return array();
     }
 
     /**
@@ -1060,10 +1155,8 @@ class IndexRecord implements RecordInterface
     {
         // Use the callnumber-a field from the Solr index; the plain callnumber
         // field is normalized to have no spaces, so it is unsuitable for display.
-        //return isset($this->fields['callnumber-a']) ?
-        //    $this->fields['callnumber-a'] : '';
-        // costumization for MZK
-        return isset($this->fields['callnumber']) ? $this->fields['callnumber'] : '';
+        return isset($this->fields['callnumber-a']) ?
+            $this->fields['callnumber-a'] : '';
     }
 
     /**
@@ -1580,18 +1673,6 @@ class IndexRecord implements RecordInterface
     }
 
     /**
-     * Get the description of the record.
-     *
-     * @return string
-     * @access protected
-     */
-    protected function getDescription()
-    {
-        return isset($this->fields['description']) ?
-            $this->fields['description'] : '';
-    }
-
-    /**
      * Get the subtitle of the record.
      *
      * @return string
@@ -1623,7 +1704,18 @@ class IndexRecord implements RecordInterface
      */
     protected function getSummary()
     {
-        // Not currently stored in the Solr index
+        // We need to return an array, so if we have a description, turn it into an
+        // array as needed (it should be a flat string according to the default
+        // schema, but we might as well support the array case just to be on the safe
+        // side:
+        if (isset($this->fields['description'])
+            && !empty($this->fields['description'])
+        ) {
+            return is_array($this->fields['description'])
+                ? $this->fields['description'] : array($this->fields['description']);
+        }
+
+        // If we got this far, no description was found:
         return array();
     }
 
@@ -1684,26 +1776,6 @@ class IndexRecord implements RecordInterface
      * @access protected
      */
     protected function getURLs()
-    {
-        $urls = array();
-        if (isset($this->fields['url']) && is_array($this->fields['url'])) {
-            foreach ($this->fields['url'] as $url) {
-                // The index doesn't contain descriptions for URLs, so we'll just
-                // use the URL itself as the description.
-                $urls[$url] = $url;
-            }
-        }
-        return $urls;
-    }
-
-    /**
-     * Return an associative array of URLs associated with this record (key = URL,
-     * value = description).
-     *
-     * @return array
-     * @access protected
-     */
-    protected function getURLsFromSolr()
     {
         $urls = array();
         if (isset($this->fields['url']) && is_array($this->fields['url'])) {
@@ -1813,6 +1885,91 @@ class IndexRecord implements RecordInterface
                 urlencode($isbn) . '&size=' . urlencode($size);
         }
         return false;
+    }
+
+    /**
+     * getGoogleMapMarker - gets the JSON needed to display the record on a google
+     * map.
+     *
+     * @return string JSON
+     * @access protected
+     */
+    protected function getGoogleMapMarker()
+    {
+        $longLat = explode(',', $this->fields['long_lat']);
+        $markers = array(
+            array(
+                'title' => (string)$this->fields['title'],
+                'lon' => $longLat[0],
+                'lat' => $longLat[1]
+            )
+        );
+        return json_encode($markers);
+    }
+
+    /**
+     * Get the title of the item that contains this record (i.e. MARC 773s of a
+     * journal).
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getContainerTitle()
+    {
+        return isset($this->fields['container_title'])
+            ? $this->fields['container_title'] : '';
+    }
+
+    /**
+     * Get the volume of the item that contains this record (i.e. MARC 773v of a
+     * journal).
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getContainerVolume()
+    {
+        return isset($this->fields['container_volume'])
+            ? $this->fields['container_volume'] : '';
+    }
+
+    /**
+     * Get the issue of the item that contains this record (i.e. MARC 773l of a
+     * journal).
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getContainerIssue()
+    {
+        return isset($this->fields['container_issue'])
+            ? $this->fields['container_issue'] : '';
+    }
+
+    /**
+     * Get the start page of the item that contains this record (i.e. MARC 773q of a
+     * journal).
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getContainerStartPage()
+    {
+        return isset($this->fields['container_start_page'])
+            ? $this->fields['container_start_page'] : '';
+    }
+
+    /**
+     * Get a full, free-form reference to the context of the item that contains this
+     * record (i.e. volume, year, issue, pages).
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getContainerReference()
+    {
+        return isset($this->fields['container_reference'])
+            ? $this->fields['container_reference'] : '';
     }
 }
 

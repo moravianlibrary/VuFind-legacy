@@ -1,5 +1,13 @@
 <?php
+/**
+ * LazyMARC Record Driver
+ *
+ * Delay parsing of MARC record until actually needed
+ * 
+ *
+ */
 class LazyMarcRecord {
+
     protected $record;
     protected $marcRecord;
 
@@ -31,31 +39,23 @@ class LazyMarcRecord {
     }
 
     public function getFields($field) {
-        if (!$this->marcRecord) {
-            $this->load();
-        }
+        $this->load();
         return $this->marcRecord->getFields($field);
     }
 
     public function toXML() {
-        if (!$this->marcRecord) {
-            $this->load();
-        }
-        return $this->marcRecord->toXML($field);
+        $this->load();
+        return $this->marcRecord->toXML();
     }
 
-    public function getField() {
-        if (!$this->marcRecord) {
-            $this->load();
-        }
+    public function getField($field) {
+        $this->load();
         return $this->marcRecord->getField($field);
     }
 
     public function toRaw() {
-        if (!$this->marcRecord) {
-            $this->load();
-        }
-        return $this->marcRecord->getField($field);
+        $this->load();
+        return $this->marcRecord->toRaw();
     }
 
 }
