@@ -42,18 +42,3 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
   {/if}
 </script>
 
-{if $bookBag}
-<!--
-  <div class="bulkActionButtons">
-    <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="addFormCheckboxSelectAllBottom"/> <label class="floatleft" for="addFormCheckboxSelectAllBottom">{translate text="select_page"}</label>
-    <span class="floatleft">|</span>
-    <span class="floatleft"><strong>{translate text="with_selected"}: </strong></span>
-    <a href="#" id="updateCartBottom" class="bookbagAdd offscreen">{translate text='Add to Book Bag'}</a> 
-    <noscript>
-    <input type="submit" class="button bookbagAdd" name="add" value="{translate text='Add to Book Bag'}"/>
-    </noscript>
-    <div class="clear"></div>
-  </div>
--->
-</form>
-{/if}
