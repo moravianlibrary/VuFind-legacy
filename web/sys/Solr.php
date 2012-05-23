@@ -1716,7 +1716,7 @@ class Solr implements IndexEngine
         $db = &DB::connect($configArray['Database']['database']);
         $db->query("SET NAMES UTF8;");
         $sql  = "SELECT display_text AS heading, count(id) AS count FROM browse"
-            . " WHERE sort_text >= ? AND type = ? GROUP BY display_text"
+            . " WHERE sort_text >= ? AND type = ? GROUP BY sort_text"
             . " ORDER BY sort_text LIMIT ? OFFSET ?";
         $res = &$db->query($sql, array($from, $source, $limit, $offset));
         $items = array();
