@@ -22,6 +22,8 @@
     <script language="JavaScript" type="text/javascript">
       path = '{$url}';
       var vufindString = {ldelim}{rdelim};
+      var cover_text = "{translate text='Cover'}";
+      var content_text = "{translate text='TOC'}";
     </script>
 
     {js filename="yui/yahoo-dom-event.js"}
@@ -33,6 +35,7 @@
     {js filename="rc4.js"}
     {js filename="calendar-min.js"}
     {js filename="calendar.js"}
+    
     {js filename="obalkyknih/functions.js"}
     {js filename="obalkyknih/custom.js"}
     {js filename="jquery-1.7.min.js"}
@@ -50,42 +53,14 @@
     <script language="JavaScript" type="text/javascript">
     {literal}
     $(document).ready(function() {       
-	   $('a.jt').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false, delayedClose: 5000, mouseOutClose: false });
-           $('a.jt_sticky').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false, sticky: true,  closePosition: 'bottom'});
-	});
+      $('a.jt').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false, delayedClose: 5000, mouseOutClose: false });
+      $('a.jt_sticky').cluetip({cluetipClass: 'jtip', dropShadow: true, hoverIntent: false, sticky: true,  closePosition: 'bottom'});
+    });
+    function switch_lang(lang) {
+      document.langForm.mylang.value = lang;
+      document.langForm.submit() ;
+    }
     {/literal}
-    </script>
-    <!-- Begin of modifications for Obalky knih -->
-    <script language="JavaScript" type="text/javascript">
-      var cover_text = "{translate text='Cover'}";
-      var content_text = "{translate text='TOC'}";
-      {literal}
-      function obalky_display_image_small(element, data) {
-        href = data["cover_thumbnail_url"];
-        if (href != undefined) {
-          var img_format = '#' + $(element).attr('id') + "_format";
-          $(img_format).remove();
-          $(element).prepend("<a href='" + data["backlink_url"] + "'><img align='left' src='" + data["cover_medium_url"] + "' alt='" + cover_text + "' height='80' width='63'></img></a>");
-        }
-      }
-      function obalky_display_image(element, data) {
-        href = data["cover_thumbnail_url"];
-        if (href != undefined) {
-          var img_format = '#' + $(element).attr('id') + "_format";
-          $(img_format).remove();
-          $(element).prepend("<a href='" + data["backlink_url"] + "'><img align='left' src='" + data["cover_medium_url"] + "' alt='" + cover_text + "'></img></a>");
-        }
-      }
-      {/literal}
-    </script>
-    <!-- End of modifications for Obalky knih  -->
-    <script language="JavaScript" type="text/javascript">
-      {literal}
-      function switch_lang(lang) {
-         document.langForm.mylang.value = lang;
-         document.langForm.submit() ;
-      }
-      {/literal}
     </script>
   </head>
 

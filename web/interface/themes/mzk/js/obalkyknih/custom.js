@@ -1,77 +1,23 @@
-/*
- * http://www.obalkyknih.cz
- *
- * Tento soubor je mozne stahnout a funkce volne modifikovat.
- *
- * (c)2009 Martin Sarfy <martin@sarfy.cz>
- */
 
 function obalky_display_thumbnail(element, bibinfo) {
-	if(bibinfo["cover_thumbnail_url"]) {
-		var ahref = document.createElement("A");
-		ahref.href = bibinfo["backlink_url"];
-		ahref.border = 0;
-		var img = document.createElement("IMG");
-		img.src = bibinfo["cover_thumbnail_url"];
-		ahref.appendChild(img);
-		img.style.borderStyle = "none";
-		element.appendChild(ahref);
-	}
-}
-function obalky_display_cover(element, bibinfo) {
-	if(bibinfo["cover_medium_url"]) {
-		var ahref = document.createElement("A");
-		ahref.href = bibinfo["backlink_url"];
-		ahref.border = 0;
-		var img = document.createElement("IMG");
-		img.src = bibinfo["cover_medium_url"];
-		ahref.appendChild(img);
-		img.style.borderStyle = "none";
-		element.appendChild(ahref);
-	}
-}
-function obalky_display_medium(element, bibinfo) {
-        if(bibinfo["cover_medium_url"]) {
-                var ahref = document.createElement("A");
-                ahref.href = bibinfo["backlink_url"];
-                ahref.border = 0;
-                var img = document.createElement("IMG");
-                img.src = bibinfo["cover_medium_url"];
-                img.height = 80;
-                img.width = 63;
-                ahref.appendChild(img);
-                img.style.borderStyle = "none";
-                element.appendChild(ahref);
-        }
-}
-function obalky_display_reviews(element, book) {
-}
-function obalky_display_comments(element, book) {
-}
-function obalky_display_annotation(element, book) {
-}
-function obalky_display_rating(element, book) {
-}
-function obalky_display_toc(element, book) {
-}
-function obalky_display_tips(element, book) {
+  href = bibinfo["cover_thumbnail_url"];
+  if (href != undefined) {
+    var img_format = '#' + $(element).attr('id') + "_format";
+    $(img_format).remove();
+    $(element).prepend("<a href='" + bibinfo["backlink_url"] + "'><img align='left' src='" + bibinfo["cover_medium_url"] + "' alt='" + cover_text + "' height='80' width='63'></img></a>");
+  }
 }
 
-function obalky_display_all(element, book) {
-	obalky_display_cover(element, book);
-	obalky_display_reviews(element, book);
-	obalky_display_rating(element, book);
-	obalky_display_toc(element, book);
-	obalky_display_tips(element, book);
-	obalky_display_comments(element, book);
-}
-function obalky_display_none(element, book) {
-}
-function obalky_display_default(element, book) {
-	obalky_display_cover(element, book);
-	// obalky_display_rating(element, book);
-}
-function obalky_display_debug(element, bibinfo) { 
-	alert("obalky_display_debug("+obalky.stringify(bibinfo)+")"); 
+function obalky_display_cover(element, bibinfo) {
+  href = bibinfo["cover_thumbnail_url"];
+  if (href != undefined) {
+    var img_format = '#' + $(element).attr('id') + "_format";
+    $(img_format).remove();
+    $(element).prepend("<a href='" + bibinfo["backlink_url"] + "'><img align='left' src='" + bibinfo["cover_medium_url"] + "' alt='" + cover_text + "'></img></a>");
+  }
+  toc = bibinfo["toc_pdf_url"];
+  if (toc != undefined) {
+    $("#bibliographic_details").append("<tr valign='top'><th>"+ content_text + ":</th><td><a href='" + toc + "'</td>obalkyknih.cz</tr>");
+  }
 }
 

@@ -29,7 +29,7 @@
           "title": "{$summTitle}"
         {literal}}{/literal};
         var permalink = "{$url}/Record/{$summId|escape:'url'}";
-        obalky.process("obalky_display_image_small", "obalka_{$summId}", permalink, bibinfo);
+        obalky.process("obalky_display_thumbnail", "obalka_{$summId}", permalink, bibinfo);
       </script>
       <!--<img src="{$path}/bookcover.php" class="alignleft" alt="{translate text='Cover Image'}" id="obalka_{$summId}" height="80" width="63"/>-->
     

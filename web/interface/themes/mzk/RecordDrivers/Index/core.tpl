@@ -44,7 +44,7 @@
           "title": "{$summTitle}"
         {literal}}{/literal};
         var permalink = "{$url}/Record/{$id|escape:'url'}";
-        obalky.process("obalky_display_image", "obalka_{$id}", permalink, bibinfo);
+        obalky.process("obalky_display_cover", "obalka_{$id}", permalink, bibinfo);
       </script>
 
       <div class="alignright" _id="obalka_{$id}">
