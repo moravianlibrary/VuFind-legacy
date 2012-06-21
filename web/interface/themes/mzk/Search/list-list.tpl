@@ -41,4 +41,5 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
   // doGetSaveStatuses();
   {/if}
 </script>
+</form>
 
