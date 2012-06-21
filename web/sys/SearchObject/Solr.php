@@ -978,6 +978,25 @@ class SearchObject_Solr extends SearchObject_Base
                 $this->setQueryIDs($tagList);
             }
         }
+        // Begin of modifications for MZK
+        if (count($search) == 1 && isset($search[0]['index'])
+            && $search[0]['index'] == 'browse'
+        ) {
+            $alephBrowse = new AlephBrowse();
+            $lookfor = $search[0]['lookfor'];
+            list($source, $term) = explode(":", $lookfor, 2);
+            $documents = $alephBrowse->getDocuments($source, $term);
+            $ids = $documents['ids'];
+            // Save search so it displays correctly on the "no hits" page:
+            if (empty($ids)) {
+                return array(
+                    'response' => array('numFound' => 0, 'docs' => array())
+                );
+            } else {
+                $this->setQueryIDs($ids);
+            }
+        }
+        // End of modifications for MZK
 
         // Build Query
         $query = $this->indexEngine->buildQuery($search);

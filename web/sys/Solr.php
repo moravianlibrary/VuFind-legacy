@@ -470,7 +470,7 @@ class Solr implements IndexEngine
                 // with
                 foreach ($clausearray as $spec) {
                     // build a string like title:("one two")
-                    // begin of costumization for MZK
+                    // begin of costumization for MZK - will be solved in Solr 4.0 (https://issues.apache.org/jira/browse/SOLR-2438)
                     //$sstring = $field . ':(' . $values[$spec[0]] . ')';
                     $sstring = $field . ':(' . $this->_normalize($values[$spec[0]]) . ')';
                     // end of costumization for MZK
@@ -700,7 +700,6 @@ class Solr implements IndexEngine
         if (!empty($bq)) {
             $query = '(' . $query . ') AND (*:* OR ' . implode(' OR ', $bq) . ')';
         }
-
         return $query;
     }
 
@@ -1636,12 +1635,12 @@ class Solr implements IndexEngine
         $query = preg_replace('/"[^"]*"/', 'quoted', $query);
 
         // Check for field specifiers:
-        if (preg_match("/[^\s]\:[^\s]/", $query)) {
+        if (preg_match("/[^[\s]^\\\:[^\s]/", $query)) {
             return true;
         }
 
         // Check for parentheses and range operators:
-        if (strstr($query, '(') && strstr($query, ')')) {
+        if (strstr($query, '(') && strstr($query, ')') && (!(strstr($query, '\(') || !strstr($query, '\)')))) {
             return true;
         }
         $rangeReg = '/(\[.+\s+TO\s+.+\])|(\{.+\s+TO\s+.+\})/';
@@ -1707,35 +1706,6 @@ class Solr implements IndexEngine
     public function alphabeticBrowse($source, $from, $page, $page_size = 20,
         $returnSolrError = false
     ) {
-        global $configArray;
-        $offset = (int) $page * $page_size;
-        $limit = (int) $page_size;
-        if ($offset < 0) {
-            $offset = 0;
-        }
-        $db = &DB::connect($configArray['Database']['database']);
-        $db->query("SET NAMES UTF8;");
-        $sql  = "SELECT display_text AS heading, count(id) AS count FROM browse"
-            . " WHERE sort_text >= ? AND type = ? GROUP BY sort_text"
-            . " ORDER BY sort_text LIMIT ? OFFSET ?";
-        $res = &$db->query($sql, array($from, $source, $limit, $offset));
-        $items = array();
-        while ($row = &$res->fetchRow()) {
-            $items[] = array("heading" => $row[0], "ids" => array("1", "2"), "count" => $row[1]);
-        }
-        $sql  = "SELECT COUNT(*) FROM (SELECT display_text AS heading FROM browse"
-            . " WHERE sort_text >= ? AND type = ? GROUP BY display_text"
-            . " ORDER BY sort_text) AS test";
-        $res = &$db->query($sql, array($from, $source));
-        $row = &$res->fetchRow();
-        $totalCount = $row[0] - $offset;
-        $result = array("totalCount" => $totalCount, "offset" => $offset, "startRow" => $from, "items" => $items);
-        return array("Browse" => $result);
-    }
-
-    public function _alphabeticBrowse($source, $from, $page, $page_size = 20,
-        $returnSolrError = false
-    ) {
         $this->client->setMethod('GET');
         $this->client->setURL($this->host . "/browse");
 
@@ -1758,6 +1728,7 @@ class Solr implements IndexEngine
             return $result;
         }
     }
+
     /**
      * Convert a terms array (where every even entry is a term and every odd entry
      * is a count) into an associate array of terms => counts.

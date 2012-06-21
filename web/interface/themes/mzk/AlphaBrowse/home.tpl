@@ -39,7 +39,11 @@
           {foreach from=$result.Browse.items item=item name=recordLoop}
             <div class="alphaBrowseEntry {if ($smarty.foreach.recordLoop.iteration % 2) == 0}alt {/if}">
             <div class="alphaBrowseHeading">
-                <a href="{$path}/Search/Results?type={$source|capitalize|escape:"url"}Browse&amp;lookfor={$item.heading|escape:"url"}">{$item.heading|escape:"html"}</a>
+                {if $item.count < 0}
+                    <a href="{$path}/Search/Results?type=ids&amp;lookfor={foreach from=$item.ids item=id}{$id}+{/foreach}">{$item.heading|escape:"html"}</a>
+                {else}
+                <a href="{$path}/Search/Results?lookfor={$item.source|escape:"url"}:{$item.lookfor|escape:"url"}&type=browse">{$item.heading|escape:"html"}</a>
+                {/if}
             </div>
             <div class="alphaBrowseCount">{if $item.count > 0}{$item.count}{/if}</div>
             <div class="clearer"><!-- empty --></div>

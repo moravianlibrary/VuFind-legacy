@@ -379,9 +379,9 @@ AuthorBrowse:
 
 TitleBrowse:
   QueryFields:
-    - title_full:
+    - title_browse:
       - [onephrase, ~]
-  FilterQuery: "mzk_visible_str_ns:visible"
+#  FilterQuery: "mzk_visible_str_ns:visible"
 
 DeweyBrowse:
   QueryFields:
@@ -391,6 +391,31 @@ DeweyBrowse:
 LccBrowse:
   QueryFields:
     - callnumber-a:
+      - [onephrase, ~]
+
+ISBNBrowse:
+  QueryFields:
+    - ISBN_browse:
+      - [onephrase, ~]
+
+ISSNBrowse:
+  QueryFields:
+    - ISSN_browse:
+      - [onephrase, ~]
+
+MDTBrowse:
+  QueryFields:
+    - MDT_browse:
+      - [onephrase, ~]
+
+PublisherBrowse:
+  QueryFields:
+    - publisher_browse:
+      - [onephrase, ~]
+
+CallnumberBrowse:
+  QueryFields:
+    - callnumber_browse:
       - [onephrase, ~]
 
 CallNumber:
