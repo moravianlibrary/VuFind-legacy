@@ -240,6 +240,9 @@ class Home extends Action
         if ($lang) {
             $this->_lang = $lang;
         }
+        if ($lang == 'cz') {
+            $this->_lang = "cs";
+        }
 
         $url = "http://$this->_lang.wikipedia.org/w/api.php" .
                '?action=query&prop=revisions&rvprop=content&format=php' .
