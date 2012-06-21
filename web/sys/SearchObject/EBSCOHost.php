@@ -36,7 +36,7 @@ require_once 'sys/SearchObject/Base.php';
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_search_object Wiki
  */
-class SearchObject_EBSCO extends SearchObject_Base
+class SearchObject_EBSCOHost extends SearchObject_Base
 {
     protected $_baseUrl = 'http://eit.ebscohost.com/Services/SearchService.asmx/Search';
     protected $_params = array();
@@ -45,9 +45,9 @@ class SearchObject_EBSCO extends SearchObject_Base
     public function __construct()
     {
         parent::__construct();
-        $this->resultsModule = 'EBSCO';
+        $this->resultsModule = 'EBSCOHost';
         $this->resultsAction = 'Search';
-        $config = getExtraConfigArray("EBSCO");
+        $config = getExtraConfigArray("EBSCOHost");
         foreach ($config['Facets'] as $key => $value) {
             $parts = explode(',', $key);
             $facetName = trim($parts[0]);
@@ -55,7 +55,7 @@ class SearchObject_EBSCO extends SearchObject_Base
         }
         // Set up search options
         $this->basicTypes = $config['Basic_Searches'];
-        $this->recommendIni = 'EBSCO';
+        $this->recommendIni = 'EBSCOHost';
         
         if (isset($config['General']['url'])) {
             $this->_baseUrl = $config['General']['url'];

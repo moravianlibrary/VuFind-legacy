@@ -48,11 +48,11 @@ class Base extends Action
     public function __construct()
     {
         global $interface;
-        $interface->assign('currentTab', 'EBSCO');
+        $interface->assign('currentTab', 'EBSCOHost');
 
         // Send Summon search types to the template so the basic search box can
         // function on all pages of the Summon UI.
-        $this->searchObject = SearchObjectFactory::initSearchObject('EBSCO');
+        $this->searchObject = SearchObjectFactory::initSearchObject('EBSCOHost');
         $interface->assign(
             'EBSCOSearchTypes', $this->searchObject->getBasicTypes()
         );

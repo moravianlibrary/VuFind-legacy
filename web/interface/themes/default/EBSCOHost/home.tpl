@@ -4,7 +4,7 @@
     <img src="{$path}/interface/themes/default/images/vufind_logo_large.gif" alt="VuFind">  
   
     <div class="searchHomeForm">
-      {include file="EBSCO/searchbox.tpl"}
+      {include file="EBSCOHost/searchbox.tpl"}
     </div>
 
   </div>
@@ -22,14 +22,14 @@
     <div>
       <ul>
           {foreach from=$formatList.counts item=format}
-          <li><a href="{$path}/EBSCO/Search?type=all&amp;filter[]={$formatList.displayName|escape:"url"}:{$format.value|escape:"url"}">{$format.value|escape}</a></li>
+          <li><a href="{$path}/EBSCOHost/Search?type=all&amp;filter[]={$formatList.displayName|escape:"url"}:{$format.value|escape:"url"}">{$format.value|escape}</a></li>
           {/foreach}
       </ul>
     </div>
     <div>
       <ul>
           {foreach from=$languageList.counts item=language}
-          <li><a href="{$path}/EBSCO/Search?type=all&amp;filter[]={$languageList.displayName|escape:"url"}:{$language.value|escape:"url"}">{$language.value|escape}</a></li>
+          <li><a href="{$path}/EBSCOHost/Search?type=all&amp;filter[]={$languageList.displayName|escape:"url"}:{$language.value|escape:"url"}">{$language.value|escape}</a></li>
           {/foreach}
       </ul>
     </div>

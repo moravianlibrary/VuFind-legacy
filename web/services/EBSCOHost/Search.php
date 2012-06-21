@@ -95,7 +95,7 @@ class Search extends Base
             // If our result set is larger than the number of records that
             // EDS will let us page through, we should cut off the number
             // before passing it to our paging mechanism:
-            $config = getExtraConfigArray('EBSCO');
+            $config = getExtraConfigArray('EBSCOHost');
             $pageLimit = isset($config['General']['result_limit']) ?
                 $config['General']['result_limit'] : 2000;
             $totalPagerItems = $summary['resultTotal'] < $pageLimit ?
@@ -111,7 +111,7 @@ class Search extends Base
 
             // Display Listing of Results
             $interface->setTemplate('list.tpl');
-            $interface->assign('subpage', 'EBSCO/list-list.tpl');
+            $interface->assign('subpage', 'EBSCOHost/list-list.tpl');
         } else {
             $interface->assign('recordCount', 0);
             // Was the empty result set due to an error?

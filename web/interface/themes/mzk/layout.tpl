@@ -82,7 +82,7 @@
 				<a href="{$url}"><img src="{$path}/interface/themes/mzk/images/logo-mzk.png" alt="MZK"></a>
 			  </div>
 			  {if $pageTemplate != 'advanced.tpl'}
-				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCO" || $module=="PCI"}
+				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCOHost" || $module=="PCI"}
 				  {include file="`$module`/searchbox.tpl"}
 				{else}
 				  {include file="Search/searchbox.tpl"}

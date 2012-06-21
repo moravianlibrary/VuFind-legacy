@@ -1,11 +1,11 @@
 <div class="searchform">
   {if $searchType == 'SummonAdvanced'}
-    <a href="{$path}/EBSCO/Advanced?edit={$searchId}" class="small">{translate text="Edit this Advanced Search"}</a> |
-    <a href="{$path}/EBSCO/Advanced" class="small">{translate text="Start a new Advanced Search"}</a> |
-    <a href="{$path}/EBSCO/Home" class="small">{translate text="Start a new Basic Search"}</a>
+    <a href="{$path}/EBSCOHost/Advanced?edit={$searchId}" class="small">{translate text="Edit this Advanced Search"}</a> |
+    <a href="{$path}/EBSCOHost/Advanced" class="small">{translate text="Start a new Advanced Search"}</a> |
+    <a href="{$path}/EBSCOHost/Home" class="small">{translate text="Start a new Basic Search"}</a>
     <br>{translate text="Your search terms"} : "<b>{$lookfor|escape:"html"}</b>"
   {else}
-    <form method="GET" action="{$path}/EBSCO/Search" name="searchForm" id="searchForm" class="search">
+    <form method="GET" action="{$path}/EBSCOHost/Search" name="searchForm" id="searchForm" class="search">
       <div class="hiddenLabel"><label for="lookfor">{translate text="Search For"}:</label></div>
       <input id="lookfor" type="text" name="lookfor" size="30" value="{$lookfor|escape:"html"}">
       <div class="hiddenLabel"><label for="type">{translate text="in"}:</label></div>
