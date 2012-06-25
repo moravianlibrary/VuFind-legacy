@@ -158,7 +158,7 @@ class JSON_Browse extends JSON
         $this->_searchObject->close();
 
         $facets = $result['facet_counts']['facet_fields'][$_GET['facet_field']];
-        if (isset($configArray['Browse']['alphabetical order']) && $configArray['Browse']['alphabetical order'] == true) {
+        if (isset($configArray['Browse']['alphabetical_order']) && $configArray['Browse']['alphabetical_order'] == true) {
             usort($facets, array("JSON_Browse", "compare_facets"));
         }
         $interface->assign('facets', $facets);
