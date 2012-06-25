@@ -101,13 +101,20 @@ class JSON_Browse extends JSON
     public function getAlphabetAsHTML()
     {
         global $interface;
+        global $configArray;
 
         $letters = array();
         if (isset($_GET['include_numbers']) && $_GET['include_numbers']) {
             $letters = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
         }
-        for ($i=0; $i<26; $i++) {
-            $letters[] = chr(65 + $i);
+        if (isset($configArray['Browse']['alphabet_letters'])) {
+            foreach (explode(',', $configArray['Browse']['alphabet_letters']) as $letter) {
+                $letters[] = trim($letter);
+            }
+        } else {
+            for ($i=0; $i<26; $i++) {
+                $letters[] = chr(65 + $i);
+            }
         }
         $interface->assign('letters', $letters);
         $interface->assign(
@@ -130,6 +137,7 @@ class JSON_Browse extends JSON
     private function _processSearch($template)
     {
         global $interface;
+        global $configArray;
 
         $this->_searchObject->initBrowseScreen();
         $this->_searchObject->disableLogging();
@@ -148,8 +156,11 @@ class JSON_Browse extends JSON
         $this->_searchObject->setQueryString($query);
         $result = $this->_searchObject->processSearch();
         $this->_searchObject->close();
-        
+
         $facets = $result['facet_counts']['facet_fields'][$_GET['facet_field']];
+        if (isset($configArray['Browse']['alphabetical order']) && $configArray['Browse']['alphabetical order'] == true) {
+            usort($facets, array("JSON_Browse", "compare_facets"));
+        }
         $interface->assign('facets', $facets);
         $interface->assign(
             'query_field', isset($_GET['query_field']) ? $_GET['query_field'] : null
@@ -161,5 +172,15 @@ class JSON_Browse extends JSON
 
         return $interface->fetch($template);
     }
+
+    static function compare_facets($a, $b)
+    {
+        global $configArray;
+        if (isset($configArray['Site']['locale'])) {
+            setlocale(LC_ALL, $configArray['Site']['locale'] . ".utf8");
+        }
+        return strcoll($a[0], $b[0]);
+    }
+
 }
 ?>
