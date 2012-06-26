@@ -16,8 +16,13 @@ a.jt {
 {/literal}
 </style>
 
-{if $itemLink != $id}
-   <a href="{$url}/Record/{$itemLink|escape:'url'}">{translate text='To place a hold, visit this record.'}<a/>
+{if $itemLink}
+   {if $itemLinkType == "LKR"}
+      <a href="{$url}/Record/{$itemLink|escape:'url'}">{translate text='To place a hold, visit this record.'}<a/>
+   {/if}
+   {if $itemLinkType == "norms"}
+      <a href="{$url}/Record/{$itemLink|escape:'url'}">{translate text='To see a valid version of this norm, visit this record.'}<a/>
+   {/if}
 {/if}
 {if $driverMode && !empty($holdings)}
   {if $showLoginMsg}

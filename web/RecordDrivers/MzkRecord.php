@@ -25,7 +25,15 @@ class MzkRecord extends MarcRecord
         global $interface;
         $result = parent::getHoldings(false);
         $interface->assign('id', $this->getUniqueID());
-        $interface->assign('itemLink', $this->fields['itemlink']);
+        $itemLink = $this->fields['itemlink'];
+        if ($this->getUniqueID() != $itemLink) {
+            $interface->assign('itemLink', $itemLink);
+            if (strpos($this->getUniqueID(), "MZK04-") === 0) {
+                $interface->assign('itemLinkType', "norms");
+            } else {
+                $interface->assign('itemLinkType', "LKR");
+            }
+        }
         return $result;
     }
 
@@ -50,6 +58,10 @@ class MzkRecord extends MarcRecord
         $interface->assign('summOCLC', $this->getOCLC());
         $interface->assign('summCallNo', $this->getCallNumber());
         // Begin of costumizations for MZK
+        // Norms in MZK04
+        if (strpos($this->getUniqueID(), "MZK04-") === 0) {
+            $interface->assign('validity', $this->_getFirstFieldValue('520', array('a')));
+        }
         $interface->assign('itemLink', $this->fields['itemlink']);
         $statuses = $this->fields['statuses'];
         if ($statuses == null) {

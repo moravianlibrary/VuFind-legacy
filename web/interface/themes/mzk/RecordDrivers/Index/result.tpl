@@ -63,8 +63,7 @@
       {translate text='by'}
       <a href="{$url}/Author/Home?author={$summAuthor|escape:"url"}">{if !empty($summHighlightedAuthor)}{$summHighlightedAuthor|highlight}{else}{$summAuthor|escape}{/if}</a>
       {/if}
-
-      {if $summDate}{translate text='Published'} {$summDate.0|escape}{/if}
+      {if $summDate}{translate text='Published'} {$summDate.0|escape}.{/if} {if $validity}{$validity|escape}{/if}
       </div>
 
       <div class="resultItemLine3">
