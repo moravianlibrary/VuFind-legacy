@@ -526,17 +526,17 @@ class Aleph implements DriverInterface
                               'reserve' => $reserve, // was 'reserve' => 'N'
                               'callnumber' => (string) $callnumber[0],
                               'duedate' => (string) $duedate,
-                              'number' => (string) $number[0],
+                              'number' => isset($number[0])?((string) $number[0]):null,
                               'collection' => (string) $collection[0],
                               'collection_desc' => (string) $collection_desc['desc'],
                               'barcode' => (string) $barcode[0],
-                              'description' => (string) $desc[0],
-                              'note' => (string) $note[0],
+                              'description' => isset($desc[0])?((string) $desc[0]):null,
+                              'note' => isset($note[0])?((string) $note[0]):null,
                               'is_holdable' => true, // ($reserve == 'Y')?true:false,
                               'holdtype' => 'hold',
                               /* below are optional attributes*/
                               'sig1' => (string) $sig1[0],
-                              'sig2' => (string) $sig2[0],
+                              'sig2' => isset($sig2[0])?((string) $sig2[0]):null,
                               'sub_lib_desc' => (string) $item_status['sub_lib_desc'],
                               'no_of_loans' => (integer) $no_of_loans[0],
                               'requested' => (string) $requested);
@@ -841,13 +841,20 @@ class Aleph implements DriverInterface
         $credit_sum = (string) $xml->z305->{'z305-sum'};
         $credit_sign = (string) $xml->z305->{'z305-credit-debit'};
         $name = (string) $xml->z303->{'z303-name'};
-        list($lastname, $firstname) = split(",", $name);
-        if ($credit_sing == null) {
+        if (strstr($name, ",")) {
+           list($lastname, $firstname) = split(",", $name);
+        } else {
+           $lastname = $name;
+           $firstname = "";
+        }
+        if ($credit_sign == null) {
            $credit_sign = "C";
         }
         $recordList['firstname'] = $firstname;
         $recordList['lastname'] = $lastname;
-        $recordList['email'] = $user['email'];
+        if (isset($user['email'])) {
+            $recordList['email'] = $user['email'];
+        }
         $recordList['address1'] = $address1;
         $recordList['address2'] = $address2;
         $recordList['zip'] = $zip;
@@ -918,7 +925,7 @@ class Aleph implements DriverInterface
        try {
             if ($this->xserver_enabled) {
                 $xml = $this->doXRequest('bor-auth', array('library' => $this->useradm, 'bor_id' => $user, 'verification' => $password), true);
-            } else {
+            } else { // TODO:
                 $xml = $this->doPDSRequest('authenticate', array('institute' => $this->useradm, 'bor_id' => $user,
                     'bor_verification' => $password, 'calling_system' => 'aleph'), true);
             }
