@@ -80,7 +80,6 @@ class AlephBrowse
         } else {
             $totalCount = $page_size;
         }
-         // $row[0] - $offset;
         $result = array("totalCount" => $totalCount, "offset" => $offset, "startRow" => $from, "items" => $items);
         return array("Browse" => $result);
     }
