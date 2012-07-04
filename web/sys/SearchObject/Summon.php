@@ -94,6 +94,12 @@ class SearchObject_Summon extends SearchObject_Base
             $this->advancedTypes = $config['Advanced_Searches'];
         }
 
+        // Account for "retain filters" setting:
+        if (isset($config['General']['retain_filters_by_default'])) {
+            $this->retainFiltersByDefault
+                = $config['General']['retain_filters_by_default'];
+        }
+
         // Set up recommendations options -- settings are found in Summon.ini:
         $this->recommendIni = 'Summon';
 
