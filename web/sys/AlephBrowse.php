@@ -68,13 +68,19 @@ class AlephBrowse
         $sql  = "SELECT sort_text AS sort_text, display_text AS display_text, "
               . " COUNT(id) AS count, GROUP_CONCAT(id) AS ids FROM browse"
               . " WHERE type = ? AND sort_text >= ? GROUP BY sort_text ORDER BY sort_text LIMIT ? OFFSET ?";
-        $res = $this->db->query($sql, array($type, $from, $limit, $offset));
+        $res = $this->db->query($sql, array($type, $from, $limit + 1, $offset));
         $items = array();
         while ($row = &$res->fetchRow()) {
             $heading = $this->getDisplayText($source, $row[1]);
             $items[] = array("heading" => $heading, "lookfor" => $row[0], "ids" => split(',', $row[3]), "count" => $row[2], "source" => $type);
-        }       
-        $totalCount = $offset + 50; // $row[0] - $offset;
+        }
+        if (count($items) == $limit + 1) {
+            array_pop($items);
+            $totalCount = $offset + $page_size + 1;
+        } else {
+            $totalCount = $page_size;
+        }
+         // $row[0] - $offset;
         $result = array("totalCount" => $totalCount, "offset" => $offset, "startRow" => $from, "items" => $items);
         return array("Browse" => $result);
     }
