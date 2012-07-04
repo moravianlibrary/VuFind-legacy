@@ -42,6 +42,9 @@ require_once 'Crypt/generateHMAC.php';
  */
 class Hold extends Record
 {
+    protected $gatheredDetails;
+    protected $logonURL;
+
     /**
      * Process incoming parameters and display the page.
      *
@@ -77,15 +80,28 @@ class Hold extends Record
 
             // User Must be logged In to Place Holds
             if (UserAccount::isLoggedIn()) {
-
                 if ($patron = UserAccount::catalogLogin()) {
+                    // Block invalid requests:
+                    if (!$this->catalog->checkRequestIsValid(
+                        $this->recordDriver->getUniqueID(),
+                        $this->gatheredDetails, $patron
+                    )) {
+                        header(
+                            'Location: ../../Record/' .
+                            urlencode($this->recordDriver->getUniqueID()) .
+                            "?errorMsg=hold_error_blocked#top"
+                        );
+                        return false;
+                    }
 
                     $interface->assign('formURL', $this->logonURL);
 
                     $interface->assign('gatheredDetails', $this->gatheredDetails);
 
                     // Get List of PickUp Libraries
-                    $libs = $this->catalog->getPickUpLocations($patron);
+                    $libs = $this->catalog->getPickUpLocations(
+                        $patron, $this->gatheredDetails
+                    );
                     $interface->assign('pickup', $libs);
                     $interface->assign('home_library', $user->home_library);
 
@@ -96,17 +112,29 @@ class Hold extends Record
                             : array();
                     $interface->assign('extraHoldFields', $extraHoldFields);
 
-                    $defaultPickUpLocation
-                        = $this->catalog->getDefaultPickUpLocation($patron);
-                    $interface->assign(
-                        'defaultPickUpLocation', $defaultPickUpLocation
+                    $defaultPickUpLoc = $this->catalog->getDefaultPickUpLocation(
+                        $patron, $this->gatheredDetails
                     );
+                    $interface->assign('defaultPickUpLocation', $defaultPickUpLoc);
 
-                    // Form Has Been Sucessfully Submitted
                     if (isset($_POST['placeHold'])) {
-                        $this->_placeHold($patron);
+                        // If the form contained a pickup location, make sure that
+                        // the value has not been tampered with:
+                        if (!$this->validatePickUpInput($extraHoldFields, $libs)) {
+                            $this->assignError(
+                                array('status' => 'error_inconsistent_parameters')
+                            );
+                        } else if ($this->_placeHold($patron)) {
+                            // If we made it this far, we're ready to place the hold;
+                            // if successful, we will redirect and can stop here.
+                            return;
+                        }
                     }
                 }
+                $interface->setPageTitle(
+                    translate('request_place_text') . ': ' .
+                    $this->recordDriver->getBreadcrumb()
+                );
                 // Display Hold Form
                 $interface->assign('subTemplate', 'hold-submit.tpl');
 
@@ -133,6 +161,49 @@ class Hold extends Record
     }
 
     /**
+     * Check if the user-provided pickup location is valid.
+     *
+     * @param array $extraHoldFields Hold form fields enabled by configuration/driver
+     * @param array $pickUpLibs      Pickup library list from driver
+     *
+     * @return bool
+     * @access protected
+     */
+    protected function validatePickUpInput($extraHoldFields, $pickUpLibs)
+    {
+        // Not having to care for pickUpLocation is equivalent to having a valid one.
+        if (!in_array('pickUpLocation', $extraHoldFields)) {
+            return true;
+        }
+
+        // Check the valid pickup locations for a match against user input:
+        return $this->validatePickUpLocation(
+            $this->gatheredDetails['pickUpLocation'], $pickUpLibs
+        );
+    }
+
+    /**
+     * Check if the provided pickup location is valid.
+     *
+     * @param string $location   Location to check
+     * @param array  $pickUpLibs Pickup locations list from driver
+     *
+     * @return bool
+     * @access protected
+     */
+    protected function validatePickUpLocation($location, $pickUpLibs)
+    {
+        foreach ($pickUpLibs as $lib) {
+            if ($location == $lib['locationID']) {
+                return true;
+            }
+        }
+
+        // If we got this far, something is wrong!
+         return false;
+    }
+
+    /**
      * Protected method for getting a default due date
      *
      * @return string A formatted default due date
@@ -156,6 +227,25 @@ class Hold extends Record
     }
 
     /**
+     * Send an error response to the view.
+     *
+     * @param array $results Place hold response containing an error.
+     *
+     * @return void
+     * @access protected
+     */
+    protected function assignError($results)
+    {
+        global $interface;
+
+        $interface->assign('results', $results);
+
+        // Fail: Display Form for Try Again
+        // Get as much data back as possible
+        $interface->assign('subTemplate', 'hold-submit.tpl');
+    }
+
+    /**
      * Private method for validating hold data
      *
      * @param array $linkData An array of keys to check
@@ -173,19 +263,33 @@ class Hold extends Record
         if ($_REQUEST['hashKey'] != $hashKey) {
             return false;
         } else {
+            // Initialize gatheredDetails with any POST values we find; this will
+            // allow us to repopulate the hold form with user-entered values if there
+            // is an error.  However, it is important that we load the POST data
+            // FIRST and then override it with GET values in order to ensure that
+            // the user doesn't bypass the hashkey verification by manipulating POST
+            // values.
+            $this->gatheredDetails = isset($_POST['gatheredDetails'])
+                ? $_POST['gatheredDetails'] : array();
+
+            // Make sure the bib ID is included, even if it's not loaded as part of
+            // the validation loop below.
+            $this->gatheredDetails['id'] = $_GET['id'];
+
             // Get Values Passed from holdings.php
             $i=0;
             foreach ($linkData as $details) {
                 $this->gatheredDetails[$details] = $_GET[$details];
                 // Build Logon URL
                 if ($i == 0) {
-                    $this->logonURL = "?".$details."=".$_GET[$details];
+                    $this->logonURL = "?".$details."=".urlencode($_GET[$details]);
                 } else {
-                    $this->logonURL .= "&".$details."=".$_GET[$details];
+                    $this->logonURL .= "&".$details."=".urlencode($_GET[$details]);
                 }
                 $i++;
             }
-            $this->logonURL .= "&hashKey=".$hashKey;
+            $this->logonURL .= ($i == 0 ? '?' : '&') .
+                "hashKey=".urlencode($hashKey);
         }
         return true;
     }
@@ -200,19 +304,12 @@ class Hold extends Record
      */
     private function _placeHold($patron)
     {
-        global $interface;
-
-        // Collect all gathered Details and assign them to variable incase hold
-        // fails
-        $this->gatheredDetails = $_POST['gatheredDetails'];
-        $interface->assign('gatheredDetails', $this->gatheredDetails);
-
         // Add Patron Data to Submitted Data
-        $this->gatheredDetails['patron'] = $patron;
-        $this->holdDetails = $this->gatheredDetails;
+        $holdDetails = $this->gatheredDetails + array('patron' => $patron);
 
+        // Attempt to place the hold:
         $function = (string)$this->checkHolds['function'];
-        $results = $this->catalog->$function($this->holdDetails);
+        $results = $this->catalog->$function($holdDetails);
         if (PEAR::isError($results)) {
             PEAR::raiseError($results);
         }
@@ -221,10 +318,7 @@ class Hold extends Record
             header('Location: ../../MyResearch/Holds?success=true');
             return true;
         } else {
-            // Fail: Display Form for Try Again
-            // Get as much data back as possible
-            $interface->assign('results', $results);
-            $interface->assign('subTemplate', 'hold-submit.tpl');
+            $this->assignError($results);
         }
         return false;
     }

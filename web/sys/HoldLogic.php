@@ -56,10 +56,64 @@ class HoldLogic
     {
         global $configArray;
 
-        $this->hideHoldings = $configArray['Record']['hide_holdings'];
+        $this->hideHoldings = isset($configArray['Record']['hide_holdings'])
+            ? $configArray['Record']['hide_holdings'] : array();
 
         $this->catalog = ($catalog == true)
             ? $catalog : ConnectionManager::connectToCatalog();
+    }
+
+    /**
+     * Support method to rearrange the holdings array for displaying convenience.
+     * VuFind is currently set up to display only the notes and summaries found
+     * in the first item for a location; this method gathers notes and summaries
+     * from other items and pushes them into the first for convenience.
+     *
+     * Note: This is not very elegant -- it would make more sense to have separate
+     * elements in the return array for holding collected notes and summaries rather
+     * than stuffing them into an arbitrary item; this will be addressed in VuFind
+     * 2.0.
+     *
+     * @param array $holdings An associative array of location => item array
+     *
+     * @return array          An associative array keyed by location with each
+     * entry being a list of items where the first holds the summary
+     * and notes for all.
+     * @access protected
+     */
+    protected function formatHoldings($holdings)
+    {
+        foreach ($holdings as $location => $items) {
+            $notes = array();
+            $summaries = array();
+            foreach ($items as $item) {
+                if (isset($item['notes'])) {
+                    if (!is_array($item['notes'])) {
+                        $item['notes'] = empty($item['notes'])
+                            ? array() : array($item['notes']);
+                    }
+                    foreach ($item['notes'] as $note) {
+                        if (!in_array($note, $notes)) {
+                            $notes[] = $note;
+                        }
+                    }
+                }
+                if (isset($item['summary'])) {
+                    if (!is_array($item['summary'])) {
+                        $item['summary'] = empty($item['summary'])
+                            ? array() : array($item['summary']);
+                    }
+                    foreach ($item['summary'] as $summary) {
+                        if (!in_array($summary, $summaries)) {
+                            $summaries[] = $summary;
+                        }
+                    }
+                }
+            }
+            $holdings[$location][0]['notes'] = $notes;
+            $holdings[$location][0]['summary'] = $summaries;
+        }
+        return $holdings;
     }
 
     /**
@@ -94,7 +148,7 @@ class HoldLogic
                 $holdings = $this->generateHoldings($result, $mode);
             }
         }
-        return $holdings;
+        return $this->formatHoldings($holdings);
     }
 
     /**
@@ -129,8 +183,6 @@ class HoldLogic
      */
     protected function driverHoldings($result)
     {
-        global $user;
-
         $holdings = array();
 
         // Are holds allows?
@@ -145,11 +197,15 @@ class HoldLogic
                         if ($copy['addLink']) {
                             // If the hold is blocked, link to an error page
                             // instead of the hold form:
-                            $copy['link'] = ($copy['addLink'] == 'block') 
+                            $copy['link'] = (strcmp($copy['addLink'], 'block') == 0)
                                 ? "?errorMsg=hold_error_blocked"
                                 : $this->_getHoldDetails(
                                     $copy, $checkHolds['HMACKeys']
                                 );
+                            // If we are unsure whether hold options are available,
+                            // set a flag so we can check later via AJAX:
+                            $copy['check'] = (strcmp($copy['addLink'], 'check') == 0)
+                                ? true : false;
                         }
                     }
                     $holdings[$copy['location']][] = $copy;
@@ -171,11 +227,13 @@ class HoldLogic
      */
     protected function generateHoldings($result, $type)
     {
-        global $user;
         global $configArray;
 
         $holdings = array();
         $any_available = false;
+
+        $holds_override = isset($configArray['Catalog']['allow_holds_override'])
+            ? $configArray['Catalog']['allow_holds_override'] : false;
 
         if (count($result)) {
             foreach ($result as $copy) {
@@ -198,8 +256,13 @@ class HoldLogic
                     // Loop through each holding
                     foreach ($holdings as $location_key => $location) {
                         foreach ($location as $copy_key => $copy) {
+                            // Override the default hold behavior with a value from
+                            // the ILS driver if allowed and applicable:
+                            $switchType
+                                = ($holds_override && isset($copy['holdOverride']))
+                                ? $copy['holdOverride'] : $type;
 
-                            switch($type) {
+                            switch($switchType) {
                             case "all":
                                 $addlink = true; // always provide link
                                 break;
