@@ -9,11 +9,16 @@ function obalky_display_thumbnail(element, bibinfo) {
 }
 
 function obalky_display_cover(element, bibinfo) {
-  href = bibinfo["cover_thumbnail_url"];
+  var href = bibinfo["cover_medium_url"];
+  var backlink = bibinfo["backlink_url"];
+  if (href == undefined) {
+    href = bibinfo["toc_thumbnail_url"];
+    backlink = bibinfo["toc_pdf_url"];
+  }
   if (href != undefined) {
     var img_format = '#' + $(element).attr('id') + "_format";
     $(img_format).remove();
-    $(element).prepend("<a href='" + bibinfo["backlink_url"] + "'><img align='left' src='" + bibinfo["cover_medium_url"] + "' alt='" + cover_text + "'></img></a>");
+    $(element).prepend("<a href='" + backlink + "'><img align='left' src='" + href + "' alt='" + cover_text + "'></img></a>");
   }
   toc = bibinfo["toc_pdf_url"];
   if (toc != undefined) {
