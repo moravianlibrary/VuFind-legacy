@@ -111,7 +111,10 @@ class I18N_Translator
                 $this->words = $this->_parseLanguageFile($file);
                 $file_override = $path . '/' . $this->langCode . '_override.ini';
                 if (is_file($file_override)) {
-                   $this->words = $this->_parseLanguageFile($file_override);
+                   $override = $this->_parseLanguageFile($file_override);
+                   foreach ($override as $key => $value) {
+                      $this->words[$key] = $value;
+                   }
                 }
             } else {
                 $this->error = "Unknown language file";
