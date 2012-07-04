@@ -1,6 +1,6 @@
 <?php
 /**
- * SwitchType Recommendations Module
+ * Costum Recommendations Module for Moravian Library
  *
  * PHP version 5
  *
@@ -21,7 +21,7 @@
  *
  * @category VuFind
  * @package  Recommendations
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Vaclav Rosecky <xrosecky@gmail.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_recommendations_module Wiki
  */
@@ -35,7 +35,7 @@ require_once 'sys/Recommend/Interface.php';
  *
  * @category VuFind
  * @package  Recommendations
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Vaclav Rosecky <xrosecky@gmail.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_recommendations_module Wiki
  */
@@ -54,6 +54,7 @@ class MZKNoResultsRecommend implements RecommendationInterface
      */
     public function __construct($searchObject, $params)
     {
+        // No action needed
     }
 
     /**
