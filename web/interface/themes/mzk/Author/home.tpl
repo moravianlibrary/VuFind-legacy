@@ -40,39 +40,6 @@
           {translate text='query time'}: {$qtime}s
         </div>
 
-        <!--
-        <div class="yui-u toggle">
-          {if $viewList|@count gt 1}
-            {foreach from=$viewList item=viewData key=viewLabel}
-              {if !$viewData.selected}<a href="{$viewData.viewUrl|escape}" title="{translate text='Switch view to'} {translate text=$viewData.desc}" >{/if}
-              <img src="{$path}/images/view_{$viewData.viewType}.png" {if $viewData.selected}title="{translate text=$viewData.desc} {translate text='view already selected'}"{/if}/>
-              {if !$viewData.selected}</a>{/if}
-            {/foreach}
-            <br />
-          {/if}
-          {if $limitList|@count gt 1}
-           <form action="{$path}/Search/LimitResults" method="post">
-            <label for="limit">{translate text='Results per page'}</label>
-            <select id="limit" name="limit" onChange="document.location.href = this.options[this.selectedIndex].value;">
-              {foreach from=$limitList item=limitData key=limitLabel}
-                <option value="{$limitData.limitUrl|escape}"{if $limitData.selected} selected="selected"{/if}>{$limitData.desc|escape}</option>
-              {/foreach}
-            </select>
-            <noscript><input type="submit" value="{translate text="Set"}" /></noscript>
-          </form>
-          {/if}
-          <form action="{$path}/Search/SortResults" method="post">
-            <label for="sort">{translate text='Sort'}</label>
-            <select id="sort" name="sort" onChange="document.location.href = this.options[this.selectedIndex].value;">
-              {foreach from=$sortList item=sortData key=sortLabel}
-                <option value="{$sortData.sortUrl|escape}"{if $sortData.selected} selected{/if}>{translate text=$sortData.desc}</option>
-              {/foreach}
-            </select>
-            <noscript><input type="submit" value="{translate text="Set"}" /></noscript>
-          </form>
-        </div>
-        -->
-
         <table>
           <tr align="left">
           {if $limitList|@count gt 1}
@@ -104,7 +71,7 @@
             {foreach from=$viewList item=viewData key=viewLabel}
               &nbsp;
               {if !$viewData.selected}<a href="{$viewData.viewUrl|escape}" title="{translate text='Switch view to'} {translate text=$viewData.desc}"  style="text-decoration:none">{/if}
-              <img src="{$path}/images/view_{$viewData.viewType}.png" {if $viewData.selected}title="{translate text=$viewData.desc} {translate text='view already selected'}"{/if}/>
+              <img src="{$path}/images/view_{$viewData.viewType}.png"/>
               {if !$viewData.selected}</a>{/if}&nbsp;
             {/foreach}
             <br />
