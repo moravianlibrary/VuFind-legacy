@@ -472,7 +472,9 @@ class Aleph implements DriverInterface
               $collection_desc = $this->translator->tab40_translate((string) $collection_code[0], (string) $location[0]);
            } else {
               $z30_collection = $item->xpath('z30/z30-collection/text()');
-              $collection_desc = array('desc' => $z30_collection[0]);
+              if (isset($z30_collection[0])) {
+                 $collection_desc = array('desc' => $z30_collection[0]);
+              }
            }
            $sig1 = $item->xpath('z30/z30-call-no/text()');
            $sig2 = $item->xpath('z30/z30-call-no-2/text()');
@@ -524,18 +526,18 @@ class Aleph implements DriverInterface
                               'status' => (string) $item_status['desc'],
                               'location' => (string) $location[0],
                               'reserve' => $reserve, // was 'reserve' => 'N'
-                              'callnumber' => (string) $callnumber[0],
+                              'callnumber' => isset($callnumber[0])?(string) $callnumber[0]:null,
                               'duedate' => (string) $duedate,
                               'number' => isset($number[0])?((string) $number[0]):null,
-                              'collection' => (string) $collection[0],
-                              'collection_desc' => (string) $collection_desc['desc'],
+                              'collection' => isset($collection[0])?(string) $collection[0]:null,
+                              'collection_desc' => isset($collection_desc['desc'])?(string) $collection_desc['desc']:null,
                               'barcode' => (string) $barcode[0],
                               'description' => isset($desc[0])?((string) $desc[0]):null,
                               'note' => isset($note[0])?((string) $note[0]):null,
                               'is_holdable' => true, // ($reserve == 'Y')?true:false,
                               'holdtype' => 'hold',
                               /* below are optional attributes*/
-                              'sig1' => (string) $sig1[0],
+                              'sig1' => isset($sig1[0])?(string) $sig1[0]:null,
                               'sig2' => isset($sig2[0])?((string) $sig2[0]):null,
                               'sub_lib_desc' => (string) $item_status['sub_lib_desc'],
                               'no_of_loans' => (integer) $no_of_loans[0],
