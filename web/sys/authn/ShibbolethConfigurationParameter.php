@@ -66,7 +66,6 @@ class ShibbolethConfigurationParameter
         $this->_filterFullSectionParameter();
         $this->_sortUserAttributes();
         $this->_checkIfAnyAttributeValueIsEmpty();
-        $this->_checkIfAtLeastOneUserAttributeIsSet();
         return $this->_userAttributes;
     }
 
@@ -173,22 +172,6 @@ class ShibbolethConfigurationParameter
                     "User attribute value of " . $key. " is missing!"
                 );
             }
-        }
-    }
-
-    /**
-     * Throw an exception if attribute configuration is empty.
-     *
-     * @return void
-     * @access private
-     */
-    private function _checkIfAtLeastOneUserAttributeIsSet()
-    {
-        if (count($this->_userAttributes) == 1) {
-            throw new UnexpectedValueException(
-                "You must at least set one user attribute in your configuration " .
-                "file '" . $this->_configurationFilePath  . "'.", 3
-            );
         }
     }
 }
