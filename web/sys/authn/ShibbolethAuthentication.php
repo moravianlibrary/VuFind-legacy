@@ -42,9 +42,6 @@ require_once 'services/MyResearch/lib/User.php';
 class ShibbolethAuthentication implements Authentication
 {
     private $_userAttributes;
-    // begin of modifications for MZK
-    private $_config;
-    // end of modifications for MZK
 
     /**
      * Constructor
@@ -59,10 +56,6 @@ class ShibbolethAuthentication implements Authentication
             = new ShibbolethConfigurationParameter($configurationFilePath);
         $this->_userAttributes
             = $shibbolethConfigurationParameter->getUserAttributes();
-        // begin of modifications for MZK
-        $configurationReader = new ConfigurationReader($configurationFilePath);
-        $this->_config = $configurationReader->readConfiguration("Shibboleth");
-        // end of modifications for MZK
     }
 
     /**
@@ -73,6 +66,8 @@ class ShibbolethAuthentication implements Authentication
      */
     public function authenticate()
     {
+        global $configArray;
+
         if (!$this->_isUsernamePartOfAssertions()) {
             return new PEAR_ERROR('authentication_error_admin');
         }
@@ -87,15 +82,22 @@ class ShibbolethAuthentication implements Authentication
         $user = new User();
         $user->username = $_SERVER[$this->_userAttributes['username']];
         $userIsInVufindDatabase = $this->_isUserInVufindDatabase($user);
-        /* begin of modification for MZK */
-        if ($this->_config['disable_ils_auth']) {
-           $user->cat_password = null;
-           $user->password = null;
-           $user->cat_username = $_SERVER['aleph-id'];
-           $user->email = $_SERVER['HTTP_MAIL'];
-           $user->firstname = $_SERVER['HTTP_CN'];
+
+        // Has the user configured attributes to use for populating the user table?
+        $attribsToCheck = array(
+            "cat_username", "email", "lastname", "firstname", "college", "major",
+            "home_library"
+        );
+        foreach ($attribsToCheck as $attribute) {
+            if (isset($configArray['Shibboleth'][$attribute])
+                && isset($_SERVER[$configArray['Shibboleth'][$attribute]])
+            ) {
+                $user->{$attribute}
+                    = $_SERVER[$configArray['Shibboleth'][$attribute]];
+            }
         }
-        /* end of modification for MZK */
+
+        // Save the new or updated user object:
         $this->_synchronizeVufindDatabase($userIsInVufindDatabase, $user);
 
         return $user;
