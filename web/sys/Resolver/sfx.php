@@ -69,7 +69,7 @@ class Resolver_Sfx implements ResolverInterface
     {
         // Make the call to SFX and load results
         $url = $this->_baseUrl . 
-            '?sfx.response_type=simplexml&ctx.service_type=svx:fulltext' . $openURL;
+            '?sfx.response_type=multi_obj_detailed_xml&svc.fulltext=yes&' . $openURL;
         $feed = file_get_contents($url);
         return $feed;
     }
@@ -93,13 +93,16 @@ class Resolver_Sfx implements ResolverInterface
         } catch (Exception $e) {
             return $records;
         }
-        $root = $xml->xpath("//targets");
+
+        $root = $xml->xpath("//ctx_obj_targets");
         $xml = $root[0];
         foreach ($xml->children() as $target) {
             $record = array();
             $record['title'] = (string)$target->target_public_name;
             $record['href'] = (string)$target->target_url;
             $record['service_type'] = (string)$target->service_type;
+            $record['coverage'] = (string)$target->coverage->coverage_text
+                ->threshold_text->coverage_statement;
             array_push($records, $record);
         }
         return $records;
