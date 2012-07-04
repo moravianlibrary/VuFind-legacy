@@ -1581,3 +1581,7 @@ td.format {
 a.jt {
   cursor: help;
 }
+
+.alternative_searches li {
+  margin-top: .25em;
+}
