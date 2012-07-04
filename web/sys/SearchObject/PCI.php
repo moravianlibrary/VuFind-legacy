@@ -441,11 +441,12 @@ class SearchObject_PCI extends SearchObject_Base
             
             $openurl = '';
             if (isset($configArray['OpenURL']['url']) && $configArray['OpenURL']['url']) {
+                $openurl = $configArray['OpenURL']['url'] . "?";
                 // Parse the OpenURL and extract parameters
                 $link = $item->xpath('.//sear:LINKS/sear:openurl');
                 if ($link) {
                     $params = explode('&', substr($link[0], strpos($link[0], '?') + 1));
-                    $openurl = 'rfr_id=' . urlencode($configArray['OpenURL']['rfr_id']);
+                    $openurl .= 'rfr_id=' . urlencode($configArray['OpenURL']['rfr_id']);
                     foreach ($params as $param) {
                         if (substr($param, 0, 7) != 'rfr_id=') {
                             $openurl .= '&' . $param;

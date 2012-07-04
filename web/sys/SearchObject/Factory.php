@@ -94,6 +94,10 @@ class SearchObjectFactory
         case 'AuthorityAdvanced':
             $type = 'SolrAuth';
             break;
+        case 'EBSCO':
+        case 'EBSCOAdvanced':
+            $type = 'EBSCO';
+            break;
         default:
             $type = 'Solr';
             break;
