@@ -1,12 +1,4 @@
 <dl class="biblio" title="{translate text='Description'}">
-  {if !empty($extendedDescription)}
-  {assign var=extendedContentDisplayed value=1}
-    <dt>{translate text='Description'}:</dt>
-    <dd>
-      {$extendedDescription|escape}
-    </dd>
-  {/if}
-
   {if !empty($extendedSummary)}
   {assign var=extendedContentDisplayed value=1}
 

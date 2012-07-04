@@ -6,7 +6,9 @@
       <li><a rel="external" href="{$path}/MyResearch/Logout">{translate text="Logout"}</a></li>
     {else}
       <li><a data-rel="dialog" href="#Language-dialog" data-transition="pop">{translate text="Language"}</a></li>
-      <li><a rel="external" href="{$path}/MyResearch/Home">{translate text="Account"}</a></li>
+      {if !$hideLogin}
+        <li><a rel="external" href="{$path}/MyResearch/Home">{translate text="Account"}</a></li>
+      {/if}
     {/if}
   </ul>
 </div>

@@ -7,8 +7,8 @@
     <p>{translate text='by'} {$summAuthor}</p>
   {/if}
   {if $summAjaxStatus}
-    <p><strong>{translate text='Call Number'}:</strong> <span class="ajax_availability hide callnumber{$summId|escape}">{translate text='Loading'}...</span></p>
-    <p><strong>{translate text='Located'}:</strong> <span class="ajax_availability hide location{$summId|escape}">{translate text='Loading'}...</span></p>
+    <p id="callnumAndLocation{$summId|escape}"><strong>{translate text='Call Number'}:</strong> <span class="ajax_availability hide callnumber{$summId|escape}">{translate text='Loading'}...</span><br/>
+    <strong>{translate text='Located'}:</strong> <span class="ajax_availability hide location{$summId|escape}">{translate text='Loading'}...</span></p>
   {elseif !empty($summCallNo)}
     <p><strong>{translate text='Call Number'}:</strong> {$summCallNo|escape}</p>
   {/if}

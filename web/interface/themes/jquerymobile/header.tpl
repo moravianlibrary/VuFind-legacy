@@ -1,5 +1,5 @@
 <div data-role="header" data-theme="b">
-  <h1>{$pageTitle|trim:':/'|escape}</h1>
+  <h1>{$pageTitle|trim:':/'}</h1>
     
   {* display the search button everywhere except /Search/Home *}
   {if !($module == 'Search' && $pageTemplate == 'home.tpl') }

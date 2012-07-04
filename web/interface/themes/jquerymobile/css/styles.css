@@ -167,7 +167,62 @@ div.footer-text {
     color:#cc0000;
     padding-left:18px
 }
+
+.holdPlace {
+    background-image:url(../images/fugue/holdPlace.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding-left:18px
+}
+.holdCancel {
+    background-image:url(../images/fugue/holdCancel.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding-left:18px
+}
+.holdCancelAll {
+    background-image:url(../images/fugue/holdCancelAll.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding-left:18px
+}
+.renew {
+    background-image:url(../images/fugue/renew.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding-left:18px
+}
+.renewAll {
+    background-image:url(../images/fugue/renewAll.png);
+    background-repeat:no-repeat;
+    background-position: left;
+    padding-left:18px
+}
+.unknown {
+    background-image:url(../images/silk/bullet_orange.png);
+    background-repeat:no-repeat;
+    color:#ff890f;
+    padding-left:18px
+}
 .add_to_book_bag {
     /* Hidden until fully implemented */
     display: none;
+}
+
+.error, .alert {color:#8a1f11;}
+.notice {color:#514721;}
+.success {color:#264409;}
+.info {color:#205791;}
+.error a, .alert a {color:#8a1f11;}
+.notice a {color:#514721;}
+.success a {color:#264409;}
+.info a {color:#205791;}
+
+
+.sysInfo {
+    margin: 0 auto;
+    padding: 1em;
+    background-color: #FFEF8F;
+    border: 2px solid #F9DD34;   
+    border-radius: 5px 5px 5px 5px;
 }

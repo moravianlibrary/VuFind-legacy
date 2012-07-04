@@ -14,6 +14,14 @@
 {if $coreSummary}<p>{$coreSummary|truncate:200:"..."|escape}</p>{/if}
 
 <dl class="biblio" title="{translate text='Bibliographic Details'}">
+{if !empty($coreContainerTitle)}
+  <dt>{translate text='Journal Title'}:</dt>
+  <dd>
+    <p><a rel="external" href="{$url}/Search/Results?lookfor=%22{$coreContainerTitle|escape:"url"}%22&amp;type=JournalTitle">{$coreContainerTitle|escape}</a>
+    {if !empty($coreContainerReference)}{$coreContainerReference|escape}{/if}</p>
+  </dd>
+{/if}
+
 {if !empty($coreNextTitles)}
   <dt>{translate text='New Title'}:</dt>
   <dd>

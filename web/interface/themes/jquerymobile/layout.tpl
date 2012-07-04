@@ -13,13 +13,14 @@
     //]]>
     </script>
 
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.css" />
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
+    {css filename="jquery.mobile-1.0rc2.min.css"}
+    {js filename="jquery-1.6.4.min.js"}
     {js filename="common.js"}
-    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.js"></script>
+    {js filename="jquery.mobile-1.0rc2.min.js"}
     {js filename="jquery.cookie.js"}
     {js filename="cart_cookie.js"}
-    {js filename="cart.js"}    
+    {js filename="cart.js"}
+    {js filename="scripts.js"}    
     {css filename="styles.css"}
     {css filename="formats.css"}
   </head> 
@@ -36,7 +37,7 @@
             <label for="langForm_mylang">{translate text="Language"}:</label>
             <select id="langForm_mylang" name="mylang">
               {foreach from=$allLangs key=langCode item=langName}
-                <option value="{$langCode}"{if $userLang == $langCode} selected="selected"{/if}>{translate text=$langName}</option>
+                <option value="{$langCode}"{if $userLang == $langCode} selected="selected"{/if}>{displayLanguageOption text=$langName}</option>
               {/foreach}
             </select>
             <input type="submit" value="{translate text='Set'}" />
