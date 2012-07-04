@@ -1,3 +1,7 @@
+var hathiOptions= new Array();
+var googleOptions = new Array();
+var olOptions = new Array();
+
 function toggleMenu(elemId)
 {
     var o = document.getElementById(elemId);
@@ -57,6 +61,17 @@ function getElementsByClassName(node,classname) {
   }
 }
 
+// these are setter methods called from list.tpl to set preview options
+function setHathiOptions(rightsString){
+    hathiOptions = rightsString.split(',');
+}
+function setGoogleOptions(rightsString){
+    googleOptions = rightsString.split(',');
+}
+function setOlOptions(rightsString){
+    olOptions = rightsString.split(',');
+}
+
 // Process Google Book Search json response & update the DOM.
 function ProcessGBSBookInfo(booksInfo) {
     ProcessBookInfo(booksInfo, 'gbs');
@@ -68,30 +83,37 @@ function ProcessOLBookInfo(booksInfo) {
 }
 
 // Function shared between GBS and Open Library
+// takes json response, checks view options and displays link
 function ProcessBookInfo(booksInfo, provider) {
     var expandedProvider = "";
+    // take the label and the options for the relevant provider
     if (provider == "gbs") {
         expandedProvider = "Google Book Search";
+        viewOptions = googleOptions;
     } else {
         expandedProvider = "the Open Library";
+        viewOptions = olOptions;
     }
     for (isbn in booksInfo) {
         var bookInfo = booksInfo[isbn];
         if (bookInfo) {
-            if (bookInfo.preview == "full" || bookInfo.preview == "partial") {
+            // if viewOptions contains preview type then show it
+            if (viewOptions.indexOf(bookInfo.preview) >= 0){
                 var classNameConcat = provider + isbn;
                 var elements = getElementsByClassName(document, classNameConcat), n = elements.length;
                 for (var i = 0; i < n; i++) {
                     var e = elements[i];
-                    if(e.style.display == 'none') {
+                    if (e.style.display == 'none') {
                         // set the link
                         e.href = bookInfo.preview_url;
 
                         // Set a tool-tip indicating the preview level
                         if (bookInfo.preview == "full") {
                             e.setAttribute('title', 'View online: Full view Book Preview from ' + expandedProvider);
-                        } else {
+                        } else if (bookInfo.preview == "partial") {
                             e.setAttribute('title', 'View online: Limited preview from ' + expandedProvider );
+                        } else {
+                            e.setAttribute('title','View online: Further information from ' + expandedProvider);
                         }
 
                         //show the element
@@ -103,7 +125,7 @@ function ProcessBookInfo(booksInfo, provider) {
     }
 }
 
-// Function to process Hathi Trust json response & update the DOM.
+//Function to process Hathi Trust json response & update the DOM.
 function ProcessHTBookInfo(booksInfo) {
     for (a in booksInfo) {
         var bookInfo = booksInfo[a];
@@ -112,7 +134,8 @@ function ProcessHTBookInfo(booksInfo) {
         if (e != null && e != undefined) {
             for (var i = 0; i < itemsArray.length; i++) {
                 if (e.style.display == 'none') {
-                    if (bookInfo.items[i].rightsCode == "pd" || bookInfo.items[i].rightsCode == "world") {
+                    // if the rights code matches our view options
+                    if (hathiOptions.indexOf(bookInfo.items[i].rightsCode)>= 0) {
                         e.href = bookInfo.items[i].itemURL;
                         e.style.display = '';
                     }

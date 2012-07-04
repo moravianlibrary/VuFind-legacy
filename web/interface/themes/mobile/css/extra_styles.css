@@ -48,3 +48,11 @@ li.form input[type=text],li.form input[type=password],li.form input[type=search]
   -webkit-border-bottom-right-radius: 6px;
   float: left;
 }
+
+.sysInfo {
+    margin: 5px;
+    padding: 1em;
+    background-color: #FFEF8F;
+    border: 2px solid #F9DD34;   
+    border-radius: 5px 5px 5px 5px;
+}

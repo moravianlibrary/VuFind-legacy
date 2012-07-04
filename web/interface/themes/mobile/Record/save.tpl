@@ -36,7 +36,7 @@
       </select>
       {/if}
       <a href="{$url}/MyResearch/ListEdit?id={$id|escape:"url"}"
-         onClick="getLightbox('MyResearch', 'ListEdit', '{$id|escape}', '', 'Create new list', 'Record', 'Save', '{$id|escape}'); return false;">{translate text="or create a new list"}</a>
+         onClick="getLightbox('MyResearch', 'ListEdit', '{$id|escape}', '', '{translate text='Create a List'}', 'Record', 'Save', '{$id|escape}'); return false;">{translate text="or create a new list"}</a>
     </td>
   </tr>
   {if $showLists}

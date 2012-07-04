@@ -15,6 +15,12 @@
     </li>
   {/if}
 
+  {if $noResultsRecommendations}
+    {foreach from=$noResultsRecommendations item="recommendations" key='key' name="noResults"}
+      {include file=$recommendations}
+    {/foreach}
+  {/if}
+
   {if $filterList}
     <li>
       <div class="filters">{translate text='nohit_filters'}:<br/>

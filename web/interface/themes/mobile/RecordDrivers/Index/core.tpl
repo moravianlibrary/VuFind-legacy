@@ -13,6 +13,16 @@
 
 {* Display Main Details *}
 <table>
+  {if !empty($coreContainerTitle)}
+  <tr valign="top">
+    <th>{translate text='Journal Title'}:</th>
+    <td>
+      <a href="{$url}/Search/Results?lookfor=%22{$coreContainerTitle|escape:"url"}%22&amp;type=JournalTitle">{$coreContainerTitle|escape}</a>
+      {if !empty($coreContainerReference)}{$coreContainerReference|escape}{/if}
+    </td>
+  </tr>
+  {/if}
+
   {if !empty($coreNextTitles)}
   <tr valign="top">
     <th>{translate text='New Title'}: </th>
