@@ -119,7 +119,7 @@
           {if $bookBag}
           <div id="cartSummary" class="cartSummary">
             <a id="cartItems" title="{translate text='View Book Bag'}" class="bookbag" href="{$url}/Cart/Home"><strong><span>{$bookBagItems|@count}</span></strong> {translate text='items'}{if $bookBag->isFull()}({translate text='bookbag_full'}){/if}</a>
-            <a id="viewCart" title="{translate text='View Book Bag'}" class="viewCart bookbag offscreen" href="{$url}/Cart/Home"><strong><span id="cartSize">{$bookBagItems|@count}</span></strong> {translate text='items in book bag'}{if $bookBag->isFull()}<span id="cartStatus">({translate text='bookbag_full'}){else}</span>{/if}</a>
+            <a id="viewCart" title="{translate text='View Book Bag'}" class="viewCart bookbag offscreen" href="{$url}/Cart/Home">{translate text='Number of items in book bag'}: <strong><span id="cartSize">{$bookBagItems|@count}</span></strong> {if $bookBag->isFull()}<span id="cartStatus">({translate text='bookbag_full'}){else}</span>{/if}</a>
           </div>
           {/if}
         </div> <!-- class="login-box" -->
