@@ -81,22 +81,19 @@ class Save extends Action
                 $interface->assign('followupAction', 'Save');
                 return $interface->fetch('AJAX/login.tpl');
             } else {
-                // begin of modifications for MZK
-                if ($configArray['Authentication']['guest_login']) {
-                    $interface->assign('guestLogin', true);
+                if ($configArray["Authentication"]["method"] == "Shibboleth") {
+                    $sessionInitiator = $interface->get_template_vars("sessionInitiator");
+                    header("Location: $sessionInitiator");
+                    die();
+                } else {
+                    $interface->assign('followup', true);
+                    $interface->assign('followupModule', 'Record');
+                    $interface->assign('followupAction', 'Save');
+                    $interface->setPageTitle('You must be logged in first');
+                    $interface->assign('subTemplate', '../MyResearch/login.tpl');
+                    $interface->setTemplate('view-alt.tpl');
+                    $interface->display('layout.tpl', 'RecordSave' . $_GET['id']);
                 }
-                // end of modifications for MZK
-                $interface->assign('followup', true);
-                $interface->assign('followupModule', 'Record');
-                $interface->assign('followupAction', 'Save');
-                $interface->setPageTitle('You must be logged in first');
-                $interface->assign('subTemplate', '../MyResearch/login.tpl');
-                $interface->setTemplate('view-alt.tpl');
-                $interface->display('layout.tpl', 'RecordSave' . $_GET['id']);
-                // modification for MZK
-                //$sessionInitiator = $interface->get_template_vars("sessionInitiator");
-                //header("Location: $sessionInitiator");
-                //die();
             }
             exit();
         }
@@ -173,7 +170,7 @@ class Save extends Action
             $list->id = $_GET['list'];
         } else {
             $list->user_id = $user->id;
-            $list->title = "My Favorites";
+            $list->title = translate("My Favorites");
             $list->insert();
         }
 
