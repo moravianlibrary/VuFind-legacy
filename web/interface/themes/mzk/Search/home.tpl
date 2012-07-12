@@ -46,7 +46,7 @@
 <div class="searchHome">
   <b class="btop"><b></b></b>
   <div class="searchHomeContent">
-    <div align="center"> <img src="{$path}/interface/themes/mzk/images/mzk_logo_large.gif" alt="VuFind"> </div>
+    <div align="center"> <a href="http://www.mzk.cz/"> <img src="{$path}/interface/themes/mzk/images/mzk_logo_large.gif" alt="VuFind"> </a> </div>
     
     <div class="searchHomeForm">
       {include file="Search/searchbox.tpl"}
