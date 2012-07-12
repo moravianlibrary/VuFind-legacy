@@ -14,6 +14,12 @@
         <filter class="solr.PatternReplaceFilterFactory" pattern="(?&lt;!\b[A-Z])[.\s]*$" replacement="" replace="first"/>
       </analyzer>
     </fieldType>
+    <fieldType name="textSort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.ICUCollationKeyFilterFactory" locale="cs" strength="secondary"/>
+      </analyzer>
+    </fieldType>
     <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.ICUTokenizerFactory"/>
@@ -127,7 +133,10 @@
    <field name="author-letter" type="string" indexed="true" stored="true"/>
    <field name="authorStr" type="textFacet" indexed="true" stored="false"/>
    <field name="title" type="text" indexed="true" stored="true"/>
-   <field name="title_sort" type="string" indexed="true" stored="true"/>
+   <!-- Begin of modifications for MZK -->
+   <field name="title_sort" type="textSort" indexed="true" stored="false"/>
+   <field name="author_sort" type="textSort" indexed="true" stored="false"/>
+   <!-- End of modifications for MZK -->
    <field name="title_sub" type="text" indexed="true" stored="true"/>
    <field name="title_short" type="text" indexed="true" stored="true"/>
    <field name="title_full" type="text" indexed="true" stored="true"/>
@@ -141,6 +150,7 @@
    <field name="publisherStr" type="string" indexed="true" stored="false" multiValued="true"/>
    <!--<field name="publishDate" type="string" indexed="true" stored="true" multiValued="false"/>-->
    <field name="publishDate" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="publishDateFacet" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="publishDateSort" type="string" indexed="true" stored="false" multiValued="false"/>
    <field name="edition" type="string" indexed="true" stored="true"/>
    <field name="description" type="text" indexed="true" stored="true"/>
@@ -205,6 +215,22 @@
    <field name="era" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="statuses"  type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="itemlink" type="string" indexed="false" stored="true" multiValued="false"/>  
+   <field name="title_display" type="string" indexed="false" stored="true" multiValued="false"/>
+   <field name="publishDate_display" type="string" indexed="false" stored="true" multiValued="true"/>
+   <!-- Dynamic fields for customization without schema modification -->
+   <dynamicField name="*_date" type="date" indexed="true" stored="true"/>
+   <dynamicField name="*_date_mv" type="date" indexed="true" stored="true" multiValued="true"/>
+   <dynamicField name="*_isn" type="isn" indexed="true" stored="true"/>
+   <dynamicField name="*_isn_mv" type="isn" indexed="true" stored="true" multiValued="true"/>
+   <dynamicField name="*_str" type="string" indexed="true" stored="true"/>
+   <dynamicField name="*_str_ns" type="string" indexed="true" stored="false"/><!-- costumization for MZK -->
+   <dynamicField name="*_str_mv" type="string" indexed="true" stored="true" multiValued="true"/>
+   <dynamicField name="*_txt" type="text" indexed="true" stored="true"/>
+   <dynamicField name="*_txt_mv" type="text" indexed="true" stored="true" multiValued="true"/>
+   <dynamicField name="*_txtF" type="textFacet" indexed="true" stored="true"/>
+   <dynamicField name="*_txtF_mv" type="textFacet" indexed="true" stored="true" multiValued="true"/>
+   <dynamicField name="*_txtP" type="textProper" indexed="true" stored="true"/>
+   <dynamicField name="*_txtP_mv" type="textProper" indexed="true" stored="true" multiValued="true"/>
  </fields>
  <uniqueKey>id</uniqueKey>
  <defaultSearchField>allfields</defaultSearchField>
@@ -229,7 +255,10 @@
  <copyField source="publisher" dest="publisherStr"/>
  <copyField source="topic" dest="topic_unstemmed"/>
  <copyField source="allfields" dest="allfields_unstemmed"/>
+ <!-- begin of costumization for MZK -->
+ <!-- end of costumization for MZK -->
  <copyField source="fulltext" dest="fulltext_unstemmed"/>
+ <copyField source="author" dest="author_sort"/>
  <!-- CopyFields for Alphabetic Browse -->
  <copyField source="topic"    dest="topic_browse"/>
  <copyField source="author"    dest="author_browse"/>
