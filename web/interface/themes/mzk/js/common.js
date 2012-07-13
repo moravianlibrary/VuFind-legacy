@@ -32,7 +32,8 @@ $(document).ready(function(){
 
     // assign action to the "select all checkboxes" class
     $('input[type="checkbox"].selectAllCheckboxes').change(function(){
-        $(this.form).find('input[type="checkbox"]').attr('checked', $(this).attr('checked'));
+        newValue = $(this).attr('checked') || false;
+        $(this.form).find('input[type="checkbox"]').attr('checked', newValue);
     });
     
     // attach mouseover event to grid view records
