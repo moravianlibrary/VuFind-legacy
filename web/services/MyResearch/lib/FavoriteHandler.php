@@ -114,6 +114,7 @@ class FavoriteHandler
         $interface->assign('recordCount', $summary['resultTotal']);
         $interface->assign('recordStart', $summary['startRecord']);
         $interface->assign('recordEnd',   $summary['endRecord']);
+        $interface->assign('listEditAllowed', $this->_allowEdit);
 
         $link = $searchObject->renderLinkPageTemplate();
         $options = array(
