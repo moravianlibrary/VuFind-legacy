@@ -22,14 +22,16 @@
     <!-- Begin of modifications for Obalky knih -->
       <!-- <span id="obalka_{$summId}"></span> -->
       <script>
-        var bibinfo = {literal}{{/literal} 
-          "authors": [ "{$summAuthor}" ],
-          "isbn": "{$summISBN}",
-          "issn": "{$summISSN}",
-          "title": "{$summTitle}"
-        {literal}}{/literal};
-        var permalink = "{$url}/Record/{$summId|escape:'url'}";
-        obalky.process("obalky_display_thumbnail", "obalka_{$summId}", permalink, bibinfo);
+        $(document).ready(function() {ldelim}
+          var bibinfo = {literal}{{/literal} 
+            "authors": [ "{$summAuthor}" ],
+            "isbn": "{$summISBN}",
+            "issn": "{$summISSN}",
+            "title": "{$summTitle}"
+          {rdelim};
+          var permalink = "{$url}/Record/{$summId|escape:'url'}";
+          obalky.process("obalky_display_thumbnail", "obalka_{$summId}", permalink, bibinfo);
+        {rdelim});
       </script>
       <!--<img src="{$path}/bookcover.php" class="alignleft" alt="{translate text='Cover Image'}" id="obalka_{$summId}" height="80" width="63"/>-->
     

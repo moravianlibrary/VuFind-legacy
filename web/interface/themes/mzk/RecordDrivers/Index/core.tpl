@@ -37,17 +37,19 @@
 {* Display Cover Image *}
       <!-- <span id="obalka_{$summId}"></span> -->
       <script>
-        var bibinfo = {literal}{{/literal} 
-          "authors": [ "{$summAuthor}" ],
-          "isbn": "{$isbn}",
-          //"issn": "{$summISSN}",
-          "title": "{$summTitle}"
-        {literal}}{/literal};
-        var permalink = "{$url}/Record/{$id|escape:'url'}";
-        obalky.process("obalky_display_cover", "obalka_{$id}", permalink, bibinfo);
+        $(document).ready(function() {ldelim}
+          var bibinfo = {literal}{{/literal} 
+            "authors": [ "{$summAuthor}" ],
+            "isbn": "{$isbn}",
+            //"issn": "{$summISSN}",
+            "title": "{$summTitle}"
+          {rdelim};
+          var permalink = "{$url}/Record/{$id|escape:'url'}";
+          obalky.process("obalky_display_cover", "obalka_{$id}", permalink, bibinfo);
+        {rdelim});
       </script>
 
-      <div class="alignright" _id="obalka_{$id}">
+      <div class="alignright">
       <table align="left">
       <tr>
       <td id="obalka_{$id}"><img id="obalka_{$id}_format" src="{$path}/interface/themes/mzk/images/formats/{$recordFormat[0]}.png"
