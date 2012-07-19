@@ -236,13 +236,17 @@ class Aleph implements DriverInterface
         $result = $this->doHTTPRequest($url, $method, $body);
         $replyCode = (string) $result->{'reply-code'};
         if ($replyCode != "0000") {
-           $replyText = (string) $result->{'reply-text'};
-           $this->handleError("DLF Request failed with error: $replyCode : $replyText, URL: $url");
+           $replyText = $result->{'reply-text'};
+           $note = $result->xpath("//note[@type='error']/text()");
+           if(!empty($note)) {
+               $replyText = (string) $note[0];
+           }
+           $this->handleError($replyText, $url, $replyCode);
         }
         return $result;
     }
 
-    protected function handleError($errorMessage)
+    protected function handleError($errorMessage, $url, $replyCode)
     {
         if ($this->debug_enabled) {
            $this->debug($errorMessage);
@@ -536,7 +540,7 @@ class Aleph implements DriverInterface
                               'note' => isset($note[0])?((string) $note[0]):null,
                               'is_holdable' => true, // ($reserve == 'Y')?true:false,
                               'holdtype' => 'hold',
-                              /* below are optional attributes*/
+                              // below are optional attributes
                               'sig1' => isset($sig1[0])?(string) $sig1[0]:null,
                               'sig2' => isset($sig2[0])?((string) $sig2[0]):null,
                               'sub_lib_desc' => (string) $item_status['sub_lib_desc'],
@@ -599,7 +603,7 @@ class Aleph implements DriverInterface
            $isbn = (string) $z13->{'z13-isbn-issn'};
            $barcode = (string) $z30->{'z30-barcode'};
            $transList[] = array('type' => $type,
-			       'id' => ($history)?null:$this->barcodeToID($barcode),
+                               'id' => ($history)?null:$this->barcodeToID($barcode),
                                'item_id' => $group,
                                'location' => $location,
                                'title' => $title,
@@ -626,7 +630,11 @@ class Aleph implements DriverInterface
     {
         $patron = $details['patron'];
         foreach ($details['details'] as $id) {
-           $xml = $this->doRestDLFRequest(array('patron', $patron['id'], 'circulationActions', 'loans', $id), null, 'POST', null);
+           try {
+               $xml = $this->doRestDLFRequest(array('patron', $patron['id'], 'circulationActions', 'loans', $id), null, 'POST', null);
+           } catch (Exception $ex) {
+               // ignore
+           }
         }
         return array('blocks' => false, 'details' => array());
     }
@@ -712,18 +720,13 @@ class Aleph implements DriverInterface
         $count = 0;
         $statuses = array();
         foreach ($details['details'] as $id) {
-           $result = $this->doRestDLFRequest(array('patron', $patronId, 'circulationActions', 'requests', 'holds', $id), null, HTTP_REQUEST_METHOD_DELETE);
-           $reply_code = $result->{'reply-code'};
-           if ($reply_code != "0000") {
-              $message = $result->{'del-pat-hold'}->{'note'};
-              if ($message == null) {
-                 $message = $result->{'reply-text'};
-              }
-              $statuses[$id] = array('success' => false, 'status' => 'cancel_hold_failed', 'sysMessage' => (string) $message);
-           } else {
-              $count++;
-              $statuses[$id] = array('success' => true, 'status' => 'cancel_hold_ok');
+           try {
+               $result = $this->doRestDLFRequest(array('patron', $patronId, 'circulationActions', 'requests', 'holds', $id), null, HTTP_REQUEST_METHOD_DELETE);
+           } catch (Exception $ex) {
+               $statuses[$id] = array('success' => false, 'status' => 'cancel_hold_failed', 'sysMessage' => (string) $ex->getMessage());
            }
+           $count++;
+           $statuses[$id] = array('success' => true, 'status' => 'cancel_hold_ok');
         }
         $statuses['count'] = $count;
         return $statuses;
@@ -1015,17 +1018,12 @@ class Aleph implements DriverInterface
            "   <last-interest-date>$requiredBy</last-interest-date>\n" .
            "   <note-1>$comment</note-1>\n".
            "</hold-request-parameters>\n";
-        $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $recordId, 'items', $itemId, 'hold'), null, HTTP_REQUEST_METHOD_PUT, $data);
-        $reply_code = $result->{'reply-code'};
-        if ($reply_code != "0000") {
-           $message = (string) $result->{'create-hold'}->{'note'};
-           if ($message == null) {
-              $message = (string) $result->{'reply-text'};
-           }
-           return array('success' => false, 'sysMessage' => $message); // new PEAR_Error($message);
-        } else {
-           return array('success' => true);
+        try {
+            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $recordId, 'items', $itemId, 'hold'), null, HTTP_REQUEST_METHOD_PUT, $data);
+        } catch (Exception $ex) {
+           return array('success' => false, 'sysMessage' => $ex->getMessage()); 
         }
+        return array('success' => true);
     }
 
     public function barcodeToID($bar)
