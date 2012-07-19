@@ -28,7 +28,7 @@ select { border: 1px solid #E0E0E0; font-family: Arial,sans-serif; font-size: 12
 select  option{ line-height: 20px; }
 select#mylang { width: 130px; }
 
-input.form-submit { font-family: 'Arial'; font-size: 11px; font-weight: bold; background: transparent url("/interface/themes/mzk/images/btn-submit.png") repeat-x left top; border: none; color: #fff; cursor: pointer; height: 35px; text-transform: uppercase; width: 100px; }
+input.form-submit { font-family: 'Arial'; font-size: 11px; font-weight: bold; background: transparent url("/images/mzk/btn-submit.png") repeat-x left top; border: none; color: #fff; cursor: pointer; height: 35px; text-transform: uppercase; width: 100px; }
 input:hover.form-submit { background-position: left -35px; }
 
 input.text { border: 1px solid #E0E0E0; font-family: Arial,sans-serif; font-size: 12px; font-weight: bold; margin-right: 20px; padding: 5px; width: 228px; float: left; }
@@ -180,7 +180,7 @@ b.bbot b, b.gbot b{background-position: 100% -30px}
 .homepage .searchcontent .login-box #logoutOptions { border: none; height: auto; position: static; width: auto; margin: 0 0 10px 0; }*/
 .homepage .searchheader { background: none; }
 .searchcontent .login-box a.register { background: #fff; border: medium none; color: #16969D; cursor: pointer; float: left; font-family: 'Arial'; font-size: 11px; font-weight: bold; height: 33px; line-height: 30px; vertical-align: middle; left: 0; padding: 0 0 0 12px; position: absolute; text-transform: uppercase; top: 0; width: 117px; text-decoration: none; }
-.searchcontent .login-box a.login { background: url('/interface/themes/mzk/images/btn-submit-shaped.png') no-repeat left top; border: none; color: #fff; cursor: pointer; display: block; float: left; font-family: 'Arial'; font-size: 11px; font-weight: bold; height: 35px; line-height: 35px; vertical-align: middle; padding: 0 0 0 30px; position: absolute; right: -1px; text-transform: uppercase; top: -1px; width: 80px; &width: 110px; text-decoration: none; }
+.searchcontent .login-box a.login { background: url('/images/mzk/btn-submit-shaped.png') no-repeat left top; border: none; color: #fff; cursor: pointer; display: block; float: left; font-family: 'Arial'; font-size: 11px; font-weight: bold; height: 35px; line-height: 35px; vertical-align: middle; padding: 0 0 0 30px; position: absolute; right: -1px; text-transform: uppercase; top: -1px; width: 80px; &width: 110px; text-decoration: none; }
 .searchcontent .login-box #logoutOptions a.login { padding: 0 0 0 25px; width: 85px; }
 .searchcontent .login-box a:hover.login { background-position: left -35px; }
 
@@ -190,7 +190,7 @@ b.bbot b, b.gbot b{background-position: 100% -30px}
 .searchcontent .top-search-box select.select { background: #d1eff1; border: 1px solid #929999; border-right: 1px solid #d1eff1; border-bottom: 1px solid #d1eff1; font-family: Arial,sans-serif; font-size: 12px; font-weight: bold; margin-right: 20px; height: 35px; padding: 9px; width: 238px; float: left; text-align: left; }
 .searchcontent .top-search-box input.input-text { float: none; }
 .searchcontent .top-search-box select.select { padding: 8px; width: 120px; }
-.searchcontent .top-search-box input.form-submit { font-family: 'Arial'; font-size: 11px; font-weight: bold; background: transparent url("/interface/themes/mzk/images/btn-submit.png") repeat-x left top; border: none; color: #fff; cursor: pointer; height: 35px; text-transform: uppercase; width: 100px; float: left; }
+.searchcontent .top-search-box input.form-submit { font-family: 'Arial'; font-size: 11px; font-weight: bold; background: transparent url("/images/mzk/btn-submit.png") repeat-x left top; border: none; color: #fff; cursor: pointer; height: 35px; text-transform: uppercase; width: 100px; float: left; }
 .searchcontent .top-search-box input:hover.form-submit { background-position: left -35px; }
 .searchcontent .top-search-box  .form-holder { width: 528px; }
 
