@@ -46,7 +46,7 @@
   </tr>
   </table>
   <div id="cal1Container">
-    <img src="/interface/themes/mzk/images/transparent.gif" onload="putHoldInit();"/>
+    {image src="transparent.gif" onload="putHoldInit();"}
   </div>
 </form>
 </div>

@@ -52,8 +52,7 @@
       <div class="alignright">
       <table align="left">
       <tr>
-      <td id="obalka_{$id}"><img id="obalka_{$id}_format" src="{$path}/interface/themes/mzk/images/formats/{$recordFormat[0]}.png"
-         align="left" title="{translate text=$recordFormat[0]}"/></td>
+      <td id="obalka_{$id}">{image id="obalka_`$id`_format" src="formats/$recordFormat[0].png" align="left" title="$recordFormat[0]"|translate}</td>
       </tr>
       <tr>
       <!--<td align='center'><span class="iconlabel">{translate text=$recordFormat[0]}</span></td>-->

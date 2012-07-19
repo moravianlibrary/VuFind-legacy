@@ -10,8 +10,8 @@
         <input type="hidden" name="idsAll[]" value="{$summId|escape}" />
       {/if}
     </td>
-    <td id="obalka_{$summId}"><img id="obalka_{$summId}_format" src="{$path}/interface/themes/mzk/images/formats/{$summFormats[0]}.png"
-    title="{translate text=$summFormats[0]}" align="left"/></td>
+    <td id="obalka_{$summId}">{image id="obalka_`$summId`_format" src="formats/`$summFormats[0]`.png"
+    title="$summFormats[0]"|translate align="left"}</td>
     </tr>
     <tr>
     <td></td>

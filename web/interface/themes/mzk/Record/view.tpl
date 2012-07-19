@@ -132,11 +132,9 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
         {foreach from=$similarRecords item=similar}
         <li>
           {if is_array($similar.format)}
-            {*<span class="{$similar.format[0]|lower|regex_replace:"/[^a-z0-9]/":""}">*}
-            <img src="{$path}/interface/themes/mzk/images/formats/small/{$similar.format[0]}.png" align="left"/>&nbsp;
+            {image src="/formats/small/`$similar.format[0]`.png" align="left"}&nbsp;
           {else}
-            <img src="{$path}/interface/themes/mzk/images/formats/small/{$similar.format}.png" align="left"/>&nbsp;
-            {*<span class="{$similar.format|lower|regex_replace:"/[^a-z0-9]/":""}">*}
+            {image src="/formats/small/`$similar.format`.png" align="left"}&nbsp;
           {/if}
           <a href="{$url}/Record/{$similar.id|escape:"url"}">{$similar.title|escape}</a>
           </span>

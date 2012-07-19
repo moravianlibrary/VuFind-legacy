@@ -79,7 +79,7 @@
         <!--{if $showTopSearchBox}-->
           <div class="top-search-box">
 			  <div class="logo">
-				<a href="{$url}"><img src="{$path}/interface/themes/mzk/images/logo-mzk.png" alt="MZK"></a>
+				<a href="{$url}">{image src="logo-mzk.png" alt="MZK" class="alignleft"}</a>
 			  </div>
 			  {if $pageTemplate != 'advanced.tpl'}
 				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCOHost" || $module=="PCI"}
@@ -98,9 +98,9 @@
 		</form>
                 {foreach from=$allLangs key=langCode item=langName}
                   {if $userLang != $langCode}
-                     <a href="javascript:switch_lang('{$langCode}')"><img src="{$path}/interface/themes/mzk/images/{$langCode}.png"/>{$langName}</a>
+                     <a href="javascript:switch_lang('{$langCode}')">{image src="$langCode.png"}{$langName}</a>
                   {else}
-                     <img src="{$path}/interface/themes/mzk/images/{$langCode}.png"/>{translate text=$langName}
+                     {image src="$langCode.png"}{translate text=$langName}
                   {/if}
                 {/foreach}
  	{/if}

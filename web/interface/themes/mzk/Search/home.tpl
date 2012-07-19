@@ -7,15 +7,14 @@
 		</form>
                 {foreach from=$allLangs key=langCode item=langName}
                   {if $userLang != $langCode}
-                     <a href="javascript:switch_lang('{$langCode}')"><img src="{$path}/interface/themes/mzk/images/{$langCode}.png"/>{translate text=$langName}</a>
+                     <a href="javascript:switch_lang('{$langCode}')">{image src="$langCode.png"}{translate text=$langName}</a>
                   {else}
-                     <img src="{$path}/interface/themes/mzk/images/{$langCode}.png"/>{translate text=$langName}
+                     {image src="$langCode.png"}{translate text=$langName}
                   {/if}
                 {/foreach}
  	{/if}
           <div id="logoutOptions"{if !$user} style="display: none;"{/if}>
             <a class="register" href="{$path}/MyResearch/Home">{translate text="Your Account"}</a> |
-            <!-- <a href="{$path}/MyResearch/Logout">{translate text="Log Out"}</a> -->
             <a class="login" href="{$path}/MyResearch/Logout">{translate text="Log Out"}</a>
           </div>
           <div id="loginOptions"{if $user} style="display: none;"{/if}>
@@ -46,7 +45,7 @@
 <div class="searchHome">
   <b class="btop"><b></b></b>
   <div class="searchHomeContent">
-    <div align="center"> <a href="http://www.mzk.cz/"> <img src="{$path}/interface/themes/mzk/images/mzk_logo_large.gif" alt="VuFind"> </a> </div>
+    <div align="center"> <a href="http://www.mzk.cz/"> {image src="mzk_logo_large.gif" alt="VuFind"} </a> </div>
     
     <div class="searchHomeForm">
       {include file="Search/searchbox.tpl"}
