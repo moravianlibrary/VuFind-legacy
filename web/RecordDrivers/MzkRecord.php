@@ -23,7 +23,7 @@ class MzkRecord extends MarcRecord
     public function getHoldings($patron = false)
     {
         global $interface;
-        $result = parent::getHoldings(false);
+        $result = parent::getHoldings($patron);
         $interface->assign('id', $this->getUniqueID());
         $itemLink = $this->fields['itemlink'];
         if ($this->getUniqueID() != $itemLink) {
