@@ -1,8 +1,8 @@
 <?php
 
-require_once 'Record.php';
+require_once 'Action.php';
 
-class AJAXStatus extends Record
+class MZKStatus extends Action
 {
     
     /**
@@ -16,7 +16,6 @@ class AJAXStatus extends Record
        $status = $_REQUEST['status'];
        $language = $_REQUEST['lang'];
        print $this->translateStatus($language, trim($status));
-       //print "Lze půjčit absenčně domů na měsíc. Požadavky se zadávají elektronickou cestou.";
     }
 
     public function translateStatus($language, $status) {

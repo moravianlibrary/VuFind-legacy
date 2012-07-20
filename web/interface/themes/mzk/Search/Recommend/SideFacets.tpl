@@ -77,7 +77,7 @@
               <dd>{$thisFacet.value|escape} <img src="{$path}/images/silk/tick.png" alt="Selected"></dd>
             {else}
               {if $thisFacet.untranslated == "available_for_eod"}
-              <dd><a class="jt" rel="/interface/themes/mzk/static/{$userLang}/eod.html" title="EOD" href="{$thisFacet.url|escape}">{$thisFacet.value|escape}</a> ({$thisFacet.count})</dd>
+              <dd><a class="jt" rel='{$url}/AJAX/MZKStatus?status=EOD&lang={$userLang|escape:url}' title="EOD" href="{$thisFacet.url|escape}">{$thisFacet.value|escape}</a> ({$thisFacet.count})</dd>
               {else}
               <dd><a href="{$thisFacet.url|escape}">{$thisFacet.value|escape}</a> ({$thisFacet.count})</dd>
               {/if}

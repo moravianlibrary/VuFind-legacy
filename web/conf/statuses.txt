@@ -5,6 +5,7 @@ Jen do studovny | cz |  Lze studovat pouze v knihovně. Objednávejte kliknutím
 Vol.výb.-měs. | cz | Lze půjčit domů na měsíc. Knihy hledejte v regálech ve Volném výběru (přízemí a 1. patro) podle pole <b>Umístění</b>. Půjčujte u výpůjčního pultu. Lze objednávat, pouze pokud jsou půjčené. 
 Ve zpracování | cz | Jde o novou publikaci, která se právě zpracovává, možnost půjčení bude určena až poté.
 Retro | cz | Jde o starší publikaci, do katalogu byl vytvořen pouze velmi stručný záznam, možnost půjčení bude určena po požádání. Objednávejte kliknutím na <b>Požadavek</b> (po přihlášení).
+EOD | cz | EOD (eBooks on Demand) - autorsky volné elektronické knihy na objednávku, více informací na <a href="http://www.mzk.cz/eod">www.mzk.cz/eod</a>.
 
 Month | en | Can be borrowed home for a month. The requests are handled electronically
 Study room | en | The item is available on a shelf in a study room. The study room is assigned in the Collection column and the books are shelved using the Location-2
@@ -13,3 +14,4 @@ Reference only | en | The item can be borrowed only to the study room (Humanitie
 Open St. Month | en | The item can be taken home for a month. Readers can search the books personally in the open stock on the 2nd floor and then pass it to the librarian who sends it to the circulation desk. The item cannot be requested using the electronic system except the item is borrowed.
 Processing | en | Bibliographic record processing. When it is finished the item is signed with the borrowing status and placed into a stock or into a study room.
 Retro | en | A bibliographic record for an old publication. The request can be placed using the electronic system. The borrowing status is not assigned. When the publication is found in the stock the status is assigned and the book is prepared in the circulation department or in the reading room.
+EOD | en | EOD (eBooks on Demand) - An EOD eBook is a single full text pdf file of a public domain book digitised at the user’s request. See <a href="http://www.mzk.cz/eod">www.mzk.cz/eod</a> for more information.
