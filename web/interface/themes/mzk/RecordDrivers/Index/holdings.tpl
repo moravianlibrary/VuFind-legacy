@@ -77,7 +77,7 @@ a.jt {
          <span class="checkedout">{$row.status|translate|escape}</span>
       {/if}
       </a>
-      {if $row.reserve == 'N' }
+      {if $row.link}
         <a class="request" href="{$url}/Record/{$id|escape:'url'}/ExtendedHold?barcode={$row.item_id|escape:'url'}">
            {translate text="Place a Hold"}
         </a>

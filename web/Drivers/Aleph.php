@@ -177,6 +177,11 @@ class Aleph implements DriverInterface
         $this->available_statuses = split(',', $configArray['Catalog']['available_statuses']);
         $this->quick_availability = $configArray['Catalog']['quick_availability'];
         $this->debug_enabled = $configArray['Catalog']['debug'];
+        if (isset($configArray['Catalog']['default_patron'])) {
+            $this->default_patron = $configArray['Catalog']['default_patron'];
+        } else {
+            $this->default_patron = null;
+        }
         if (isset($configArray['util']['tab40']) && isset($configArray['util']['tab15']) && isset($configArray['util']['tab_sub_library'])) {
             if (isset($configArray['Cache']['type'])) {
                 $cache = new VuFindCache($configArray['Cache']['type'], 'aleph');
@@ -439,6 +444,9 @@ class Aleph implements DriverInterface
         $params = array('view' => 'full');
         if ($patron) {
             $params['patron'] = $patron['id'];
+        } else {
+            $params['patron'] = $this->default_patron;
+            $patron = $this->default_patron;
         }
         try {
             $xml = $this->doRestDLFRequest(array('record', $resource, 'items'), $params);
@@ -529,7 +537,7 @@ class Aleph implements DriverInterface
                               'availability' => $availability, // was true
                               'status' => (string) $item_status['desc'],
                               'location' => (string) $location[0],
-                              'reserve' => $reserve, // was 'reserve' => 'N'
+                              //'reserve' => $reserve, // was 'reserve' => 'N'
                               'callnumber' => isset($callnumber[0])?(string) $callnumber[0]:null,
                               'duedate' => (string) $duedate,
                               'number' => isset($number[0])?((string) $number[0]):null,
@@ -538,7 +546,7 @@ class Aleph implements DriverInterface
                               'barcode' => (string) $barcode[0],
                               'description' => isset($desc[0])?((string) $desc[0]):null,
                               'note' => isset($note[0])?((string) $note[0]):null,
-                              'is_holdable' => true, // ($reserve == 'Y')?true:false,
+                              'is_holdable' => ($reserve == 'N')?true:false,
                               'holdtype' => 'hold',
                               // below are optional attributes
                               'sig1' => isset($sig1[0])?(string) $sig1[0]:null,
