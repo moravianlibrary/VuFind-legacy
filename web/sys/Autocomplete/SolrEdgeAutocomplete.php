@@ -145,9 +145,13 @@ class SolrEdgeAutocomplete implements AutocompleteInterface
         $json = json_decode(file_get_contents($url));
         $result = array();
         foreach($json->{'response'}->{'docs'} as $item) {
-            $result[] = (string) $item->{"key"};
+            $result[] = (string) $this->escape($item->{"key"});
         }
         return $result;
+    }
+
+    protected function escape($term) {
+        return str_replace(array(' :', ' -'), array(':', '-'), $term);
     }
 
     /**

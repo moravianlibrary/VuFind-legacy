@@ -1635,7 +1635,7 @@ class Solr implements IndexEngine
         $query = preg_replace('/"[^"]*"/', 'quoted', $query);
 
         // Check for field specifiers:
-        if (preg_match("/[^[\s]^\\\:[^\s]/", $query)) {
+        if (preg_match("/[^[\s]:[^\s]/", $query)) {
             return true;
         }
 
