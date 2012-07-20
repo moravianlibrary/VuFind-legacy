@@ -1179,7 +1179,7 @@ abstract class SearchObject_Base
     {
         return $this->autocompleteStatus;
     }
-    
+
     /**
      * Should filter settings be retained across searches by default?
      *
@@ -1847,9 +1847,11 @@ abstract class SearchObject_Base
         // includes any weird punctuation -- unlikely but possible):
         $from = addcslashes($from, '\^$.[]|()?*+{}/');
 
-        // If we are looking for a quoted phrase
-        // we can't use word boundaries
-        if (strpos($from, '"') === false) {
+        // If our "from" pattern contains non-word characters, we can't use word
+        // boundaries for matching.  We want to try to use word boundaries when
+        // possible, however, to avoid the replacement from affecting unexpected
+        // parts of the search query.
+        if (!preg_match('/.*[^\w].*/', $from)) {
             $pattern = "/\b$from\b/i";
         } else {
             $pattern = "/$from/i";
@@ -1873,6 +1875,23 @@ abstract class SearchObject_Base
                 $this->searchTerms[$i]['lookfor'] = preg_replace(
                     $pattern, $to, $this->searchTerms[$i]['lookfor']
                 );
+            }
+        }
+    }
+
+    /**
+     * Replace a search index ($old) with a different one ($new).
+     *
+     * @param string $old Search index to replace.
+     * @param string $new Replacement search index.
+     *
+     * @return void
+     */
+    protected function replaceSearchIndex($old, $new)
+    {
+        for ($i = 0; $i < count($this->searchTerms); $i++) {
+            if ($this->searchTerms[$i]['index'] == $old) {
+                $this->searchTerms[$i]['index'] = $new;
             }
         }
     }
@@ -1984,6 +2003,34 @@ abstract class SearchObject_Base
     }
 
     /**
+     * Return a url for the current search with a search index replaced
+     *
+     * @param string $oldTerm The old index to replace
+     * @param string $newTerm The new index to search
+     *
+     * @return string URL of new search
+     * @access public
+     */
+    public function renderLinkWithReplacedIndex($oldTerm, $newTerm)
+    {
+        //stash our old data
+        $oldTerms = $this->searchTerms;
+        $oldPage = $this->page;
+        //Switch to page 1 -- it doesn#t make sense t maintain the current
+        //page when changing the contents of the search
+        $this->page = 1;
+        //Replace the term
+        $this->replaceSearchIndex($oldTerm, $newTerm);
+        //get the new url
+        $url = $this->renderSearchUrl();
+        //Restore the old data
+        $this->searchTerms = $oldTerms;
+        $this->page = $oldPage;
+        //return the url
+        return $url;
+    }
+
+    /**
      * Get the templates used to display recommendations for the current search.
      *
      * @param string $location 'top' or 'side'
@@ -2049,6 +2096,16 @@ abstract class SearchObject_Base
                 = isset($searchSettings['General']['default_side_recommend']) ?
                 $searchSettings['General']['default_side_recommend'] : false;
         }
+        if ($searchType
+            && isset($searchSettings['NoResultsRecommendations'][$searchType])
+        ) {
+            $recommend['noresults']
+                = $searchSettings['NoResultsRecommendations'][$searchType];
+        } else {
+            $recommend['noresults']
+                = isset($searchSettings['General']['default_noresults_recommend']) ?
+                $searchSettings['General']['default_noresults_recommend'] : false;
+        }
 
         return $recommend;
     }
@@ -2069,7 +2126,9 @@ abstract class SearchObject_Base
         }
 
         // Process recommendations for each location:
-        $this->recommend = array('top' => array(), 'side' => array());
+        $this->recommend = array(
+            'top' => array(), 'side' => array(), 'noresults' => array()
+        );
         foreach ($settings as $location => $currentSet) {
             // If the current location is disabled, skip processing!
             if (empty($currentSet)) {
