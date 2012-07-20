@@ -193,8 +193,11 @@ class UInterface extends Smarty
 
             // begin of modification for MZK
             $url = urlencode($configArray['Shibboleth']['target'] . "?redirect=".
-               urlencode("https://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']));
+                urlencode("https://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']));
             $sessionInitiator = $configArray['Shibboleth']['login'] . "?target=$url";
+            if (isset($configArray['GoogleAnalytics'])) {
+                $this->assign('googleAnalytics', $configArray['GoogleAnalytics']);
+            }
             // end of modification for MZK
 
             if (isset($configArray['Shibboleth']['provider_id'])) {
