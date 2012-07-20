@@ -54,18 +54,13 @@ class ConnectionManager
         if ($catalog === false) {
             include_once 'CatalogConnection.php';
 
-            try {
-                $catalog = new CatalogConnection($configArray['Catalog']['driver']);
-            } catch (PDOException $e) {
-                // What should we do with this error?
-                if ($configArray['System']['debug']) {
-                    echo '<pre>';
-                    echo 'DEBUG: ' . $e->getMessage();
-                    echo '</pre>';
-                }
+            $catalog = new CatalogConnection($configArray['Catalog']['driver']);
+            $loadNoILS = isset($configArray['Catalog']['loadNoILSOnFailure'])
+                ? $configArray['Catalog']['loadNoILSOnFailure'] : false;
+            if ($catalog->status == false && $loadNoILS) {
+                $catalog = new CatalogConnection("NoILS");
             }
         }
-
         return $catalog;
     }
 
