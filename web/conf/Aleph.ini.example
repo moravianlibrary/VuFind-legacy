@@ -33,6 +33,7 @@ admlib       = MZK50
 available_statuses = "On Shelf,Open St.-Month,Vol.výb.-měs."
 ; If enabled and Xserver is disabled, Aleph driver will use slower RESTfull API for availability check.
 quick_availability = true
+disable_ils_auth   = true
 
 ; adm-lib / sub-library array
 ; This is a list of patron home libraries and the ADM the library belongs to

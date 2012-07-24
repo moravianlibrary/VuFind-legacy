@@ -174,6 +174,10 @@ class Aleph implements DriverInterface
         if (isset($configArray['duedates'])) {
             $this->duedates = $configArray['duedates'];
         }
+        $this->disable_ils_auth = false;
+        if (isset($configArray['Catalog']['disable_ils_auth'])) {
+            $this->disable_ils_auth = $configArray['Catalog']['disable_ils_auth'];
+        }
         $this->available_statuses = split(',', $configArray['Catalog']['available_statuses']);
         $this->quick_availability = $configArray['Catalog']['quick_availability'];
         $this->debug_enabled = $configArray['Catalog']['debug'];
@@ -930,7 +934,7 @@ class Aleph implements DriverInterface
      */
     public function patronLogin($user, $password)
     {
-       if ($password == NULL) {
+       if ($password == NULL && $this->disable_ils_auth) {
           $temp = array("id" => $user);
           $temp['college'] = $this->useradm;
           return $this->getMyProfile($temp);
