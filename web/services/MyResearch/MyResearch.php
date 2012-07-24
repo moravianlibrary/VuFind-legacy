@@ -92,7 +92,7 @@ class MyResearch extends Action
         if (isset($_POST['submit']) && !empty($_POST['submit']) && $this->catalog
             && isset($_POST['cat_username']) && isset($_POST['cat_password'])
         ) {
-            if (UserAccount::processCatalogLogin(
+            if ($_POST['cat_password'] != NULL && UserAccount::processCatalogLogin(
                 $_POST['cat_username'], $_POST['cat_password']
             )) {
                 $interface->assign('user', $user);
