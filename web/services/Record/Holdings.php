@@ -57,10 +57,15 @@ class Holdings extends Record
         // See if patron is logged in to pass details onto get holdings for 
         // holds / recalls
         $patron = UserAccount::isLoggedIn() ? UserAccount::catalogLogin() : false;
-
+        // begin of modifications for MZK
+        /*
         $interface->setPageTitle(
             translate('Holdings') . ': ' . $this->recordDriver->getBreadcrumb()
         );
+        */
+        $interface->setPageTitle($this->recordDriver->getBreadcrumb());
+        // end of modifications for MZK
+        
         $interface->assign(
             'holdingsMetadata', $this->recordDriver->getHoldings($patron)
         );
