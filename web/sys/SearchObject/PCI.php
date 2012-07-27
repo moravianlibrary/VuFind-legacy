@@ -469,13 +469,17 @@ class SearchObject_PCI extends SearchObject_Base
                 $key = (string) $facetValue->attributes()->KEY;
                 $count = (string) $facetValue->attributes()->VALUE;
                 $values[] = array('value'=> $key, 'count' => $count);
-            }       
-
+            }
+            usort(&$values, array($this, 'compareFacetsByCount'));
             $facets[] = array('id' => $tag, 'tag' => $tag, 'values' => $values);
 
         }
 
         return array('recordCount' => $hits, 'response' => array('numFound' => $hits, 'start' => 0, 'docs' => $results), 'facetFields' => $facets);
+    }
+
+    public function compareFacetsByCount($a, $b) {
+        return $b['count'] - $a['count'];
     }
     
     public function getRecord($id) {
