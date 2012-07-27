@@ -7,6 +7,7 @@
 <schema name="VuFind Bibliographic Index" version="1.2">
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="integer" class="solr.TrieField" type="integer"/>
     <fieldType name="textFacet" class="solr.TextField" sortMissingLast="true" omitNorms="true">
       <analyzer>
         <tokenizer class="solr.KeywordTokenizerFactory"/>
@@ -231,6 +232,8 @@
    <dynamicField name="*_txtF_mv" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <dynamicField name="*_txtP" type="textProper" indexed="true" stored="true"/>
    <dynamicField name="*_txtP_mv" type="textProper" indexed="true" stored="true" multiValued="true"/>
+   <dynamicField name="*_int"  type="integer"  indexed="true"  stored="true"/>
+   <dynamicField name="*_int_mv"  type="integer"  indexed="true"  stored="true" multiValued="true"/>
  </fields>
  <uniqueKey>id</uniqueKey>
  <defaultSearchField>allfields</defaultSearchField>
