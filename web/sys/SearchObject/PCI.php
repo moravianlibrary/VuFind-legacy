@@ -455,6 +455,9 @@ class SearchObject_PCI extends SearchObject_Base
                 }
             }
 
+            if ($url == null) {
+                $url = $openurl;
+            }
             $result = array('Author' => $authors, 'Title' => array($title), 'url' => $url, 
                 'PublicationTitle' => $publications, 'ID' => $ids, 'identifiers' => $identifiers,
                 'openUrl' => $openurl);
