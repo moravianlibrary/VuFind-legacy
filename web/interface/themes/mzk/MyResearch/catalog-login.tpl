@@ -2,8 +2,6 @@
 {if $loginError}
   <p class="error">{translate text=$loginError}</p>
 {/if}
-<p class="error">{translate text='You are logged as a guest'}</p> 
-<!--
 <p>{translate text='cat_establish_account'}</p>
 <form method="post">
   {translate text='Library Catalog Username'}:<br>
@@ -20,4 +18,3 @@
   {/if}
 
 </form>
--->
