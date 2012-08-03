@@ -18,6 +18,10 @@
     {css media="print" filename="print.css"}
     {css media="screen" filename="mzk.css"}
     {css media="screen" filename="thickbox.css"}
+    {if $module == 'EBSCO'}
+    {css media="screen" filename="discover.css"}
+    {css media="screen" filename="ebsco.css"}
+    {/if}
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script language="JavaScript" type="text/javascript">
       path = '{$url}';
@@ -46,6 +50,16 @@
     {js filename="jquery.cluetip.min.js"}
     {js filename="common.js"}
     {js filename="lightbox.js"}
+    {if module == 'EBSCO'}
+    {*
+    {js filename="discover.js"}
+    {js filename="element-min.js "}
+    {js filename="event-delegate-min.js"}
+    {js filename="discover.js"}
+    {js filename="selector-min.js"}
+    {js filename="slider-min.js"}
+    *}
+    {/if}
     {if $bookBag}
        {js filename="cart.js"}
        {assign var=bookBagItems value=$bookBag->getItems()}
@@ -98,7 +112,7 @@
 				<a href="{$url}">{image src="logo-mzk.png" alt="MZK" class="alignleft"}</a>
 			  </div>
 			  {if $pageTemplate != 'advanced.tpl'}
-				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCOHost" || $module=="PCI"}
+				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCOHost" || $module=="PCI" || $module=="EBSCO"}
 				  {include file="`$module`/searchbox.tpl"}
 				{else}
 				  {include file="Search/searchbox.tpl"}
