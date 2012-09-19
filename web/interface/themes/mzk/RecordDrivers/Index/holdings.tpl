@@ -70,7 +70,7 @@ a.jt {
     {if $row.barcode != ""}
   <tr>
     <td>
-      <a class='jt' rel='{$url}/AJAX/MZKStatus?status={$row.status|translate|escape:'url'}&lang={$userLang|escape:url}' title='{$row.status|translate|escape}'>
+      {hint title=$row.status translate=true}
       {if $row.availability} <!-- == "Y" -->
          <span class="available">{$row.status|translate|escape}</span>
       {else}
