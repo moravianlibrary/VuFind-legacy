@@ -133,7 +133,6 @@ class MzkRecord extends MarcRecord
                 $address = $url->getSubfield($addr_subfield);
                 if ($address) {
                     $address = $address->getData();
-
                     // Is there a description?  If not, just use the URL itself.
                     $desc = $url->getSubfield($desc_subfield);
                     if ($desc) {
@@ -141,8 +140,9 @@ class MzkRecord extends MarcRecord
                     } else {
                         $desc = $address;
                     }
-
-                    $retVal[$address] = $desc;
+                    if ($desc != 'index obsahu dokumentu') {
+                        $retVal[$address] = $desc;
+                    }
                 }
             }
         }
