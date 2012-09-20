@@ -6,6 +6,15 @@ Vol.výb.-měs. | cz | Lze půjčit domů na měsíc. Knihy hledejte v regálech
 Ve zpracování | cz | Jde o novou publikaci, která se právě zpracovává, možnost půjčení bude určena až poté.
 Retro | cz | Jde o starší publikaci, do katalogu byl vytvořen pouze velmi stručný záznam, možnost půjčení bude určena po požádání. Objednávejte kliknutím na <b>Požadavek</b> (po přihlášení).
 EOD | cz | EOD (eBooks on Demand) - autorsky volné elektronické knihy na objednávku, více informací na <a href="http://www.mzk.cz/eod">www.mzk.cz/eod</a>.
+STM | cz | Studovna technických a přírodních věd, 6. patro vpravo
+HSS | cz | Studovna humanitních věd, 4. patro vpravo
+SNC | cz | Studovna novin a časopisů, 2. patro vlevo
+STT | cz | Studovna rukopisů a starých tisků, 4. patro vlevo
+ZHR | cz | Zahraniční knihovny, 2. patro vpravo
+FOI | cz | Studovna firemní a obchodní literatury, 7. patro vpravo
+POP | cz | Popisovna - pro získání tohoto dokumentu kontaktujte knihovníka informátora v přízemí knihovny
+VV | cz | Volný výběr, 1. patro vpravo
+Umístění | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinného třídění. V příslušné studovně vyhledejte regál s daným číslem a dále knihu podle příjmení autora.
 
 Month | en | Can be borrowed home for a month. The requests are handled electronically
 Study room | en | The item is available on a shelf in a study room. The study room is assigned in the Collection column and the books are shelved using the Location-2
@@ -15,3 +24,10 @@ Open St. Month | en | The item can be taken home for a month. Readers can search
 Processing | en | Bibliographic record processing. When it is finished the item is signed with the borrowing status and placed into a stock or into a study room.
 Retro | en | A bibliographic record for an old publication. The request can be placed using the electronic system. The borrowing status is not assigned. When the publication is found in the stock the status is assigned and the book is prepared in the circulation department or in the reading room.
 EOD | en | EOD (eBooks on Demand) - An EOD eBook is a single full text pdf file of a public domain book digitised at the user’s request. See <a href="http://www.mzk.cz/eod">www.mzk.cz/eod</a> for more information.
+STM | en | Science, Technology and Medicine study room, 6. floor right
+HSS | en | Humanities and Social studies study room, 4. floor right
+SNC | en | Newspapers and Journal study room, 2. floor left
+STT | en | Manuscripts and Old prints study room, 4. floor left
+ZHR | en | Foreign libraries, 2. floor right
+FOI | en | Standards and Patents, 7. floor right
+VV | en | Access to shelves, 1. floor right

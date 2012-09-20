@@ -63,7 +63,7 @@ a.jt {
     <th>{translate text='due date'}</th>
     <th>{translate text='sublibrary'}</th>
     <th>{translate text='collection'}</th>
-    <th>{translate text='signature 2'}</th>
+    <th>{hint title='signature 2' text='signature 2' translate=true}{*{translate text='signature 2'}*}</th>
     <th>{translate text='description'}</th>
   </tr>
   {foreach from=$holding item=row}
@@ -76,7 +76,6 @@ a.jt {
       {else}
          <span class="checkedout">{$row.status|translate|escape}</span>
       {/if}
-      </a>
       {if $row.link}
         <a class="request" href="{$url}/Record/{$id|escape:'url'}/ExtendedHold?barcode={$row.item_id|escape:'url'}">
            {translate text="Place a Hold"}
@@ -90,13 +89,8 @@ a.jt {
         {$row.sub_lib_desc|escape}
     </td>
     <td>
-        {$row.collection_desc|escape}
+        {hint title=$row.collection_desc translate=false text=$row.collection_desc}
     </td>
-    <!--
-    <td>
-        {$row.sig1|escape}
-    </td>
-    -->
     <td>
         {$row.sig2|escape}
     </td>
@@ -107,8 +101,6 @@ a.jt {
     {/if}
   {/foreach}
 </table>
-
-{*{include file="RecordDrivers/Index/holdings_help_$userLang.tpl"}*}
 
 {/foreach}
 
