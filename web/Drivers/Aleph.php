@@ -1085,6 +1085,29 @@ class Aleph implements DriverInterface
         }
     }
 
+    public function getMyInterlibraryLoans($user) {
+        $userId = $user['id'];
+        $loans = array();
+        $params = array("view" => "full");
+        $count = 0;
+        $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'requests', 'ill'), $params);
+        foreach ($xml->xpath('//ill-request') as $item) {
+            $loan = array();
+            $z13 = $item->z13;
+            $loan['docno'] = (string) $z13->{'z13-doc-number'};
+            $loan['author'] = (string) $z13->{'z13-author'};
+            $loan['title'] = (string) $z13->{'z13-title'};
+            $loan['imprint'] = (string) $z13->{'z13-imprint'};
+            $loan['article_title'] = (string) $item->{'title-of-article'};
+            $loan['article_author'] = (string) $item->{'author-of-article'};
+            $loan['pickup_location'] = (string) $item->z410->{'z410-pickup-location'};
+            $loan['media'] = (string) $item->z410->{'z410-media'};
+            $loan['required_by'] = $this->parseDate((string) $item->z410->{'z410-last-interest-date'});
+            $loans[] = $loan;
+        }
+        return $loans; 
+    }
+
      /**
      * Get Purchase History
      *
