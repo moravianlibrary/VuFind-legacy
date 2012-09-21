@@ -1,24 +1,15 @@
 <div class="yui-b">
   <div class="sidegroup">
-    {if !preg_match('/@guest$/', $user->username)}
     <h4>{$user->firstname}</h4>
-    {else}
-    <h4>{translate text='Guest'}</h4>
-    {/if}
     <ul class="bulleted">
       <li{if $pageTemplate=="favorites.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Favorites">{translate text='Favorites'}</a></li>
-      {if !preg_match('/@guest$/', $user->username)}
       <li{if $pageTemplate=="checkedout.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/CheckedOut">{translate text='Checked Out Items'}</a></li>
       <li{if $pageTemplate=="checkedout_history.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/CheckedOutHistory">{translate text='Checkedout History'}</a></li>
       <li{if $pageTemplate=="holds.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Holds">{translate text='Holds and Recalls'}</a></li>
       <li{if $pageTemplate=="fines.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Fines">{translate text='Fines'}</a></li>
       <li{if $pageTemplate=="profile.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Profile">{translate text='Profile'}</a></li>
-      {/if}
       {* Only highlight saved searches as active if user is logged in: *}
       <li{if $user && $pageTemplate=="history.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/Search/History?require_login">{translate text='history_saved_searches'}</a></li>
-      {if preg_match('/@guest$/', $user->username)}
-          <li><a href="{$url}/MyResearch/Logout?redirect=/Shibboleth.sso/Login?target={$currentURL|escape}">{translate text='Login'}</a></li>
-      {/if}
     </ul>
   </div>
 
