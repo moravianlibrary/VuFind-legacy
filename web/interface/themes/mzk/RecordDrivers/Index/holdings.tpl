@@ -63,7 +63,7 @@ a.jt {
     <th>{translate text='due date'}</th>
     <th>{translate text='sublibrary'}</th>
     <th>{translate text='collection'}</th>
-    <th>{hint title='signature 2' text='signature 2' translate=true}{*{translate text='signature 2'}*}</th>
+    <th>{hint title='location' text='location' translate=true}</th>
     <th>{translate text='description'}</th>
   </tr>
   {foreach from=$holding item=row}
@@ -83,7 +83,13 @@ a.jt {
       {/if}
     </td>
     <td>
-        {$row.duedate|translate|escape}
+        {if $row.duedate}
+          {$row.duedate|translate|escape}
+        {else}
+          {if !$row.availability}
+          {translate text='On Hold Requested'}
+          {/if}
+        {/if}
     </td>
     <td>
         {$row.sub_lib_desc|escape}
