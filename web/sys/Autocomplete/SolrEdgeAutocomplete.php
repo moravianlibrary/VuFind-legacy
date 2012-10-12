@@ -70,7 +70,11 @@ class SolrEdgeAutocomplete implements AutocompleteInterface
         global $configArray;
         $searchSettings = getExtraConfigArray('searches');
         $core = $searchSettings["SolrEdgeAutocomplete"]["core"];
-        $this->url = $configArray["Index"]["url"] . "/" . $core;
+        if (isset($searchSettings["SolrEdgeAutocomplete"]["url"])) {
+            $this->url = $searchSettings["SolrEdgeAutocomplete"]["url"] . "/" . $core;
+        } else {
+            $this->url = $configArray["Index"]["url"] . "/" . $core;
+        }
     }
 
     /**
