@@ -48,6 +48,33 @@ require_once 'XML/Serializer.php';
 class MZKSolr extends Solr
 {
 
+    public function search($query, $handler = null, $filter = null, $start = 0,
+        $limit = 20, $facet = null, $spell = '', $dictionary = null,
+        $sort = null, $fields = null,
+        $method = HTTP_REQUEST_METHOD_POST, $returnSolrError = false
+    ) {
+        global $configArray;
+        $filters = array();
+        $default = true;
+        if ($filter != null) {
+            foreach ($filter as $element) {
+                $element = strtr($element, array('"' => '', "'" => ''));
+                foreach ($configArray['MultiSolr'] as $key => $value) {
+                    if ($element == $key) {
+                        $this->host = $value . '/' . $this->core;
+                        $default = false;
+                    } else {
+                        $filter[] = $element;
+                    }
+                }
+            }
+        }
+        if ($default) {
+            $this->host = $configArray['MultiSolr']['default'] . '/' . $this->core;
+        }
+        return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror);
+    }
+
     public function alphabeticBrowse($source, $from, $page, $page_size = 20,
         $returnSolrError = false
     ) {
