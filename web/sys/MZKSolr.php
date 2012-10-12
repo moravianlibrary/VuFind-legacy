@@ -58,14 +58,17 @@ class MZKSolr extends Solr
         $default = true;
         if ($filter != null) {
             foreach ($filter as $element) {
-                $element = strtr($element, array('"' => '', "'" => ''));
+                $element_norm = strtr($element, array('"' => '', "'" => ''));
+                $addFilter = true;
                 foreach ($configArray['MultiSolr'] as $key => $value) {
-                    if ($element == $key) {
+                    if ($element_norm == $key) {
                         $this->host = $value . '/' . $this->core;
                         $default = false;
-                    } else {
-                        $filter[] = $element;
+                        $addFilter = false;
                     }
+                }
+                if ($addFilter) {
+                    $filters[] = $element;
                 }
             }
         }
