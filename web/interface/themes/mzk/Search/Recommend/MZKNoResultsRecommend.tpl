@@ -1,6 +1,12 @@
 <div class="alternative_searches">
   <span class="usermsg">{translate text='You may also try'}:</span>
   <ul>
+    {* Costumization for blender *}
+    {if $expand}
+    <li>
+      <a href="{$expand}">{translate text='Search outside my library'}</a>
+    </li>
+    {/if}
     <li>
       <a href="https://listky.mzk.cz/">
         {translate text='Our digitized card catalogues'}

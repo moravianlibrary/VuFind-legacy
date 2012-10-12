@@ -54,7 +54,7 @@ class MZKNoResultsRecommend implements RecommendationInterface
      */
     public function __construct($searchObject, $params)
     {
-        // No action needed
+        $this->searchObject = $searchObject;
     }
 
     /**
@@ -100,6 +100,11 @@ class MZKNoResultsRecommend implements RecommendationInterface
      */
     public function getTemplate()
     {
+        global $interface;
+        /* Costumization for blender */
+        if (!$this->searchObject->hasFilter('source:ALL')) {
+            $interface->assign('expand', $this->searchObject->renderLinkWithFilter('source:ALL'));
+        }
         return 'Search/Recommend/MZKNoResultsRecommend.tpl';
     }
 
