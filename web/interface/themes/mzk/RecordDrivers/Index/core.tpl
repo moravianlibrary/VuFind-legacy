@@ -55,38 +55,15 @@
       <td id="obalka_{$id}">{image id="obalka_`$id`_format" src="formats/$recordFormat[0].png" align="left" title="$recordFormat[0]"|translate}</td>
       </tr>
       <tr>
-      <!--<td align='center'><span class="iconlabel">{translate text=$recordFormat[0]}</span></td>-->
       <td class="format">{translate text=$recordFormat[0]}</td>
       </tr>
       </table>
       </div>
-
-      {*
-      <div class="alignright" id="obalka_{$id}">
-        {if is_array($recordFormat)}
-        <img id="obalka_{$summId}_format" src="{$path}/interface/themes/mzk/images/formats/{$recordFormat[0]}.png"/>
-        {/if}
-        <!-- <img src="{$path}/bookcover.php" class="recordcover" alt="{translate text='Cover Image'}"  id="obalka_{$summId}"/> -->
-      </div>
-      *}
-    
-  {*
-  {if $coreThumbMedium}
-    <div class="alignright">
-      {if $coreThumbLarge}<a href="{$coreThumbLarge|escape}">{/if}
-        <img alt="{translate text='Cover Image'}" class="recordcover" src="{$coreThumbMedium|escape}">
-      {if $coreThumbLarge}</a>{/if}
-    </div>
-  {else}
-  <img src="{$path}/bookcover.php" alt="{translate text='No Cover Image'}">
-  {/if}
-  *}
-
-{* End Cover Image *}
 <!-- End of modifications for Obalky knih -->
 
 {* Display Title *}
-<h1>{$coreShortTitle|escape}
+<div itemscope itemtype="http://schema.org/Book">
+<h1 itemprop="name">{$coreShortTitle|escape}
 {if $coreSubtitle}{$coreSubtitle|escape}{/if}
 &nbsp;{if $coreTitleSection}{$coreTitleSection|escape}{/if}
 {* {if $coreTitleStatement}{$coreTitleStatement|escape}{/if} *}
@@ -122,14 +99,14 @@
   {if !empty($coreMainAuthor)}
   <tr valign="top">
     <th>{translate text='Main Author'}: </th>
-    <td><a href="{$url}/Author/Home?author={$coreMainAuthor|escape:"url"}">{$coreMainAuthor|escape}</a></td>
+    <td><a itemprop="author" href="{$url}/Author/Home?author={$coreMainAuthor|escape:"url"}">{$coreMainAuthor|escape}</a></td>
   </tr>
   {/if}
 
   {if !empty($coreCorporateAuthor)}
   <tr valign="top">
     <th>{translate text='Corporate Author'}: </th>
-    <td><a href="{$url}/Author/Home?author={$coreCorporateAuthor|escape:"url"}">{$coreCorporateAuthor|escape}</a></td>
+    <td><a itemprop="author" href="{$url}/Author/Home?author={$coreCorporateAuthor|escape:"url"}">{$coreCorporateAuthor|escape}</a></td>
   </tr>
   {/if}
 
@@ -138,7 +115,7 @@
     <th>{translate text='Other Authors'}: </th>
     <td>
       {foreach from=$coreContributors item=field name=loop}
-        <a href="{$url}/Author/Home?author={$field|escape:"url"}">{$field|escape}</a>{if !$smarty.foreach.loop.last}, {/if}
+        <a itemprop="contributor" href="{$url}/Author/Home?author={$field|escape:"url"}">{$field|escape}</a>{if !$smarty.foreach.loop.last}, {/if}
       {/foreach}
     </td>
   </tr>
@@ -180,7 +157,7 @@
   {if !empty($coreEdition)}
   <tr valign="top">
     <th>{translate text='Edition'}: </th>
-    <td>
+    <td itemprop="bookEdition">
       {$coreEdition|escape}
     </td>
   </tr>
@@ -197,14 +174,14 @@
            name.  We should account for both cases to maximize compatibility. *}
         {if is_array($field)}
           {if !empty($field.name)}
-            <a href="{$url}/Search/Results?lookfor=%22{$field.name|escape:"url"}%22&amp;type=Series">{$field.name|escape}</a>
+            <a href="{$url}/Search/Results?lookfor=%22{$field.name|escape:"url"}%22&amp;type=Series{$appendtoLinks|escape:"url"}">{$field.name|escape}</a>
             {if !empty($field.number)}
               {$field.number|escape}
             {/if}
             <br>
           {/if}
         {else}
-          <a href="{$url}/Search/Results?lookfor=%22{$field|escape:"url"}%22&amp;type=Series">{$field|escape}</a><br>
+          <a href="{$url}/Search/Results?lookfor=%22{$field|escape:"url"}%22&amp;type=Series{$appendtoLinks|escape:"url"}">{$field|escape}</a><br>
         {/if}
       {/foreach}
     </td>
@@ -220,7 +197,7 @@
         {foreach from=$field item=subfield name=subloop}
           {if !$smarty.foreach.subloop.first} &gt; {/if}
           {assign var=subject value="$subject $subfield"}
-          <a id="subjectLink_{$smarty.foreach.loop.index}_{$smarty.foreach.subloop.index}"
+          <a itemprop="keywords" id="subjectLink_{$smarty.foreach.loop.index}_{$smarty.foreach.subloop.index}"
             href="{$url}/Search/Results?lookfor=%22{$subject|escape:"url"}%22&amp;type=Subject"
           onmouseover="subjectHighlightOn({$smarty.foreach.loop.index}, {$smarty.foreach.subloop.index});"
           onmouseout="subjectHighlightOff({$smarty.foreach.loop.index}, {$smarty.foreach.subloop.index});">{$subfield|escape}</a>
@@ -313,6 +290,7 @@
    {/if}
 </div>
 
+</div>
 {literal}
 <!-- AddThis Button BEGIN -->
 <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
@@ -326,7 +304,7 @@
 <script type="text/javascript">var addthis_config =
 {"data_track_addressbar":true};</script>
 <script type="text/javascript"
-src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ffed26866462853"></script>
+src="https://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ffed26866462853"></script>
 <!-- AddThis Button END -->
 {/literal}
 
