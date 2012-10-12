@@ -4,7 +4,7 @@
     {* Costumization for blender *}
     {if $expand}
     <li>
-      <a href="{$expand}">{translate text='Search outside my library'}</a>
+      <a href="{$expand}">{translate text='Search also in central index'}</a>
     </li>
     {/if}
     <li>
