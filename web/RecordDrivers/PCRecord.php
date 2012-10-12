@@ -20,8 +20,6 @@ class PCRecord extends IndexRecord
         $interface->assign('filter', 'source:"ALL"');
         $interface->assign('summURLs', $this->getURLs());
         return 'RecordDrivers/Index/result-pc-' . $view . '.tpl';
-        //return $result;
-        //return 'RecordDrivers/Index/core-pc.tpl';
     }
 }
 ?>
