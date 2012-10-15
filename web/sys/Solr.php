@@ -1817,8 +1817,7 @@ class Solr implements IndexEngine
 
     // begin of costumization for MZK
     private function _normalize ($string) {
-        $pos = strpos($string, "*");
-        if ($pos === false) {
+        if (strpos($string, "*") === false && strpos($string, "?") === false) {
            return $string;
         }
         $table = array(
