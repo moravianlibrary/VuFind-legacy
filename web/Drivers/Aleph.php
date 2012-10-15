@@ -669,6 +669,7 @@ class Aleph implements DriverInterface
         foreach ($details['details'] as $id) {
            try {
                $xml = $this->doRestDLFRequest(array('patron', $patron['id'], 'circulationActions', 'loans', $id), null, 'POST', null);
+               $result[$id] = array("sysMessage" => "", "success" => true);
            } catch (Exception $ex) {
                $message = $ex->getMessage();
                $xml = $ex->getXML();
