@@ -139,6 +139,27 @@ class AlephTranslator
 }
 
 /**
+ * Aleph Exception
+ *
+ */
+class AlephException extends Exception
+{
+
+    public function __construct($message, $code = 0) {
+        parent::__construct($message, $code);
+        $this->xml = null;
+    }
+
+    public function setXML($xml) {
+        $this->xml = $xml;
+    }
+
+    public function getXML() {
+        return $this->xml;
+    }
+}
+
+/**
  * Aleph ILS driver
  *
  * @category VuFind
@@ -200,6 +221,7 @@ class Aleph implements DriverInterface
         } else {
             $this->translator = false;
         }
+        $this->ill_fields = $configArray['ILL'];
     }
 
     protected function doXRequest($op, $params, $auth=false)
@@ -250,17 +272,19 @@ class Aleph implements DriverInterface
            if(!empty($note)) {
                $replyText = (string) $note[0];
            }
-           $this->handleError($replyText, $url, $replyCode);
+           $this->handleError($replyText, $url, $replyCode, $result);
         }
         return $result;
     }
 
-    protected function handleError($errorMessage, $url, $replyCode)
+    protected function handleError($errorMessage, $url, $replyCode, $xml)
     {
         if ($this->debug_enabled) {
            $this->debug($errorMessage);
         }
-        throw new Exception($errorMessage);
+        $ex = new AlephException($errorMessage);
+        $ex->setXML($xml);
+        throw $ex;
     }
 
     protected function appendQueryString($url, $params)
@@ -641,14 +665,20 @@ class Aleph implements DriverInterface
     public function renewMyItems($details)
     {
         $patron = $details['patron'];
+        $result = array();
         foreach ($details['details'] as $id) {
            try {
                $xml = $this->doRestDLFRequest(array('patron', $patron['id'], 'circulationActions', 'loans', $id), null, 'POST', null);
            } catch (Exception $ex) {
-               // ignore
+               $message = $ex->getMessage();
+               $xml = $ex->getXML();
+               if ($xml != null) {
+                   $message = (string) $xml->{"renewals"}->{"institution"}->{"loan"}->{"status"};
+               }
+               $result[$id] = array("sysMessage" => trim($message), "success" => false);
            }
         }
-        return array('blocks' => false, 'details' => array());
+        return array('blocks' => false, 'details' => $result);
     }
 
     /**
@@ -1013,7 +1043,7 @@ class Aleph implements DriverInterface
         $pickup_location = $details['pickup_location'];
         $patron = $details['patron'];
         $requiredBy = $details['requiredBy'];
-	$comment = $details['comment'];
+        $comment = $details['comment'];
         list($month, $day, $year) = split("-", $requiredBy);
         $requiredBy = $year . str_pad($month, 2, "0", STR_PAD_LEFT) . str_pad($day, 2, "0", STR_PAD_LEFT);
         $patronId = $patron['id'];
@@ -1106,6 +1136,66 @@ class Aleph implements DriverInterface
             $loans[] = $loan;
         }
         return $loans; 
+    }
+
+    public function getInterlibraryLoanFields($user, $type) {
+        $userId = $user['id'];
+        $xml = $this->doRestDLFRequest(array('patron', $userId, 'record', 'MN', 'ill'), null);
+        $result = array();
+        $fields = $this->ill_fields[$type];
+        foreach($fields as $field) {
+            $attrs = explode(':', $field);
+            $title = $attrs[0];
+            $name = $attrs[1];
+            $type = $attrs[2];
+            if ($type == 'section') {
+                $result[] = array('type' => 'section', title => $title);
+            } else if ($type == 'string') {
+                $required = $xml->xpath("/get-rec-ill/ill-information/$name/@usage");
+                $required = $required[0] == 'Mandatory';
+                $result[] = array('type' => 'text', 'required' => $required, title => $title, id => $name);
+            } else if ($type == 'option') {
+                $element = $attrs[3];
+                $inner_element = $attrs[4];
+                $options = array();
+                foreach($xml->xpath("/get-rec-ill/ill-information/$name/$element") as $part) {
+                    $code = (string) $part->{$inner_element . '-code'};
+                    $desc = (string) $part->{$inner_element . '-text'};
+                    $options[$code] = $desc;
+                }
+                $result[] = array('type' => 'select', 'required' => true, id => $name, title => $title, 'options' => $options);
+            } else if ($type == 'boolean') {
+                $required = $xml->xpath("/get-rec-ill/ill-information/$name/@usage");
+                $required = $required[0] == 'Mandatory';
+                $result[] = array('type' => 'checkbox', 'required' => $required, id => $name, title => $title);
+            } else if ($type == 'date') {
+                $required = $xml->xpath("/get-rec-ill/ill-information/$name/@usage");
+                $required = $required[0] == 'Mandatory';
+                $result[] = array('type' => 'date', 'required' => $required, id => $name, title => $title);
+            } else if ($type =='hidden') {
+                $result[] = array('type' => 'hidden', id => $name, value => $title);
+            }
+        }
+        return $result;
+    }
+
+    public function createInterlibraryLoan($user, $attrs) {
+        $patronId = $user['id'];
+        $xml = "";
+        //$xml = "post_xml=";
+        $xml .= "<ill-parameters>";
+        foreach ($attrs as $key => $value) {
+            $xml .= "<$key>" . htmlentities($value) . "</$key>";
+        }
+        $xml.="</ill-parameters>";
+        print "$xml";
+        try {
+            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', 'MN', 'ill'), null, HTTP_REQUEST_METHOD_PUT, $xml);
+        } catch (Exception $ex) {
+           print "error:" . $ex->getMessage() . "\n";
+           return array('success' => false, 'sysMessage' => $ex->getMessage()); 
+        }
+        return array('success' => true);
     }
 
      /**
