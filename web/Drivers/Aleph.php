@@ -612,6 +612,7 @@ class Aleph implements DriverInterface
            $params["type"] = "history";
         }
         $count = 0;
+        $unreturned_books = 0;
         $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'loans'), $params);
         foreach ($xml->xpath('//loan') as $item) {
            $z36 = $item->z36;
@@ -638,7 +639,12 @@ class Aleph implements DriverInterface
            $author = (string) $z13->{'z13-author'};
            $isbn = (string) $z13->{'z13-isbn-issn'};
            $barcode = (string) $z30->{'z30-barcode'};
-           $transList[] = array('type' => $type,
+           /* Check if item is loaned after due date */
+           $current_date = strtotime(date('d.m.Y'));
+           $due_date = strtotime($this->parseDate($due));
+           $return_in_days = ($due_date - $current_date) / (60*60*24);
+           $renewable = ($renew[0] == 'Y');
+           $transListItem = array('type' => $type,
                                'id' => ($history)?null:$this->barcodeToID($barcode),
                                'item_id' => $group,
                                'location' => $location,
@@ -651,8 +657,18 @@ class Aleph implements DriverInterface
                                'returned' => $this->parseDate($returned),
                                'holddate' => $holddate,
                                'delete' => $delete,
-                               'renewable' => true,
+                               'renewable' => $renewable,
                                'create' => $this->parseDate($create));
+           if ($return_in_days < 0) {
+               $transListItem['message'] = "Unreturned book after due date, renewing is disabled. You can't renew items until you return this book.";
+               $unreturned_books++;
+           }
+           $transList[] = $transListItem;
+        }
+        if ($unreturned_books > 0) {
+           foreach ($transList as &$transListItem) {
+               $transListItem['renewable'] = false;
+           }
         }
         return $transList;
     }
@@ -910,6 +926,10 @@ class Aleph implements DriverInterface
         $recordList['group'] = $group;
         $recordList['barcode'] = $barcode;
         $recordList['expire'] = $this->parseDate($expiry);
+        $will_expire_in_days = ((strtotime($this->parseDate($recordList['expire'])) - strtotime(date('d.m.Y'))) / (60*60*24));
+        if ($will_expire_in_days < 30) {
+            $recordList['checkedout_message'] = "Your library card will expire in 30 days. Some loans thus can't be renewed.";
+        }
         $recordList['credit'] = $expiry;
         $recordList['credit_sum'] = $credit_sum;
         $recordList['credit_sign'] = $credit_sign;

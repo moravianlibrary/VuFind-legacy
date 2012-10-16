@@ -4,13 +4,16 @@
     <b class="btop"><b></b></b>
         {if $user->cat_username}          
           <div class="page">
-		  <h3>{translate text='Your Checked Out Items'}</h3>
+            <h3>{translate text='Your Checked Out Items'}</h3>
           {if $blocks}
             {foreach from=$blocks item=block}
               <p class="info">{translate text=$block}</p>
             {/foreach}
           {/if}
-
+          {*{$patron|@print_r}*}
+          {if $patron.checkedout_message}
+             <p class="error">{$patron.checkedout_message|translate}</p>
+          {/if}
           {if $transList}
 
             {if $renewForm}
