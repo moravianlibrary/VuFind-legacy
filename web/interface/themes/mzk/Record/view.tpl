@@ -158,6 +158,7 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
       <div id="ltfl_related" class="ltfl"></div>
       <div id="ltfl_similars" class="ltfl"></div>
       <div id="ltfl_tagbrowse" class="ltfl"></div>
+      <div class="ltfl_reviews ltfl"></div>
     </div>
     {/if}
 
