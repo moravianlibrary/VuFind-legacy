@@ -577,13 +577,19 @@ class Aleph implements DriverInterface
                               'is_holdable' => ($reserve == 'N')?true:false,
                               'holdtype' => 'hold',
                               // below are optional attributes
-                              'sig1' => isset($sig1[0])?(string) $sig1[0]:null,
-                              'sig2' => isset($sig2[0])?((string) $sig2[0]):null,
+                              'sig1' => isset($sig1[0])?((string) $this->unescapeXMLText($sig1[0])):null,
+                              'sig2' => isset($sig2[0])?((string) $this->unescapeXMLText($sig2[0])):null,
                               'sub_lib_desc' => (string) $item_status['sub_lib_desc'],
                               'no_of_loans' => (integer) $no_of_loans[0],
                               'requested' => (string) $requested);
         }
         return $holding;
+    }
+
+    public function unescapeXMLText($text) {
+        $text = str_replace(array('&#38;', '&apos;'), array('&', "'"), $text);
+        return html_entity_decode($text);
+        
     }
 
     public function getMyHistory($user)
