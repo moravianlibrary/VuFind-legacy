@@ -665,7 +665,7 @@ class Aleph implements DriverInterface
                                'delete' => $delete,
                                'renewable' => $renewable,
                                'create' => $this->parseDate($create));
-           if ($return_in_days < 0) {
+           if ($return_in_days < 0 && !$history) {
                $transListItem['message'] = "Unreturned book after due date, renewing is disabled. You can't renew items until you return this book.";
                $unreturned_books++;
            }
