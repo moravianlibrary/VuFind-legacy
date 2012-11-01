@@ -70,6 +70,24 @@ class Advanced extends Action
 
         // Process the facets for appropriate display on the Advanced Search screen:
         $facets = $this->_processFacets($facetList, $savedSearch);
+        $sortedFacets = $searchObject->getFacetSetting('Advanced_Settings', 'sorted_facets');
+        if (isset($sortedFacets)) {
+            foreach ($sortedFacets as $facetSetting) {
+                $top = array();
+                list($facetName, $facetTopValues) = explode(':', $facetSetting);
+                $facetTopValues = explode(',', $facetTopValues);
+                foreach ($facets[$facetName] as $key => $element) {
+                    list($field, $value) = explode(':', ($element['filter']));
+                    $value = str_replace('"', '', $value);
+                    if (in_array($value, $facetTopValues)) {
+                        $top[$key] = $element;
+                    }
+                }
+                ksort(&$facets[$facetName], SORT_LOCALE_STRING);
+                $top['---------------'] = array( filter => '*:*');
+                $facets[$facetName] = array_merge($top, $facets[$facetName]);
+            }
+        }
         $interface->assign('facetList', $facets);
 
         // Integer for % width of each column (be careful to avoid divide by zero!)
