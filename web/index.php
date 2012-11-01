@@ -133,6 +133,10 @@ $translator = new I18N_Translator(
     'lang', $language, $configArray['System']['debug']
 );
 $interface->setLanguage($language);
+// Locale settings
+if (isset($configArray['Site']['locale'])) {
+    setLocale(LC_ALL, $configArray['Site']['locale']);
+}
 
 // Setup Local Database Connection
 ConnectionManager::connectToDatabase();
