@@ -119,11 +119,11 @@ class MzkRecord extends MarcRecord
 
     protected function getURLs()
     {
-        $result = array_merge($this->getURLsBySpec('856', 'u', 'y'), $this->getURLsBySpec('996', 'u', 'y'));
+        $result = array_merge($this->getURLsBySpec('856', 'u',  array('y', '3')), $this->getURLsBySpec('996', 'u', array('y')));
         return $result;
     }
 
-    protected function getURLsBySpec($field, $addr_subfield, $desc_subfield)
+    protected function getURLsBySpec($field, $addr_subfield, $desc_subfields)
     {
         $retVal = array();
         $urls = $this->marcRecord->getFields($field);
@@ -134,7 +134,11 @@ class MzkRecord extends MarcRecord
                 if ($address) {
                     $address = $address->getData();
                     // Is there a description?  If not, just use the URL itself.
-                    $desc = $url->getSubfield($desc_subfield);
+                    $desc = null;
+                    foreach ($desc_subfields as $desc_subfield) {
+                        $desc = $url->getSubfield($desc_subfield);
+                        if ($desc) break;
+                    }
                     if ($desc) {
                         $desc = $desc->getData();
                     } else {
@@ -146,7 +150,6 @@ class MzkRecord extends MarcRecord
                 }
             }
         }
-
         return $retVal;
     }
 
