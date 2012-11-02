@@ -141,7 +141,7 @@
           </div>
           <div id="loginOptions"{if $user} style="display: none;"{/if}>
             {if $authMethod == 'Shibboleth'}
-              <a class="register" href="https://aleph.mzk.cz/cgi-bin/predregistrace/predregistrace.pl">{translate text="Registration"}</a>
+              <a class="register" href="https://www.mzk.cz/registration_mzk">{translate text="Registration"}</a>
               <a class="login" href="{$sessionInitiator}">{translate text="Login"}</a>
             {else}
               <a href="{$path}/MyResearch/Home">{translate text="Login"}</a>
