@@ -302,7 +302,7 @@
 <a class="addthis_counter addthis_bubble_style"></a>
 </div>
 <script type="text/javascript">var addthis_config =
-{"data_track_addressbar":true};</script>
+{"data_track_addressbar":false};</script>
 <script type="text/javascript"
 src="https://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ffed26866462853"></script>
 <!-- AddThis Button END -->
