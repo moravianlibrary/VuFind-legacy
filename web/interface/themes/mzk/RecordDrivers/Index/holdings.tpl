@@ -86,9 +86,7 @@ a.jt {
         {if $row.duedate}
           {$row.duedate|translate|escape}
         {else}
-          {if !$row.availability}
-          {translate text='On Hold Requested'}
-          {/if}
+          {mzk_holdings_status status=$row.status duedate_status=$row.duedate_status}
         {/if}
     </td>
     <td>

@@ -522,8 +522,9 @@ class Aleph implements DriverInterface
            $note = $item->xpath('z30/z30-note-opac/text()'); 
            $no_of_loans = $item->xpath('z30/z30-no-loans/text()');
            $requested = false;
-           $duedate = '';
            $status = $status[0];
+           $duedate = null;
+           $duedate_status = $status;
            if (in_array($status, $this->available_statuses)) {
                $availability = true;
            }
@@ -542,23 +543,6 @@ class Aleph implements DriverInterface
                $duedate = $this->parseDate($matches[1]);
            } else {
                $duedate = null;
-           }
-           // process duedate
-           if ($availability) {
-               if ($this->duedates) {
-                  foreach ($this->duedates as $key => $value) {
-                     if (preg_match($value, $item_status['desc'])) {
-                        $duedate = $key;
-                        break;
-                     }
-                  }
-               } else {
-                  $duedate = $item_status['desc'];
-               }
-           } else {
-               if ($status == "On Hold" || $status == "Requested") {
-                 $duedate = "requested";
-              }
            }
            $holding[] = array('id' => $id,
                               'item_id' => $item_id,
@@ -581,6 +565,7 @@ class Aleph implements DriverInterface
                               'sig2' => isset($sig2[0])?((string) $this->unescapeXMLText($sig2[0])):null,
                               'sub_lib_desc' => (string) $item_status['sub_lib_desc'],
                               'no_of_loans' => (integer) $no_of_loans[0],
+                              'duedate_status' => (string) $status,
                               'requested' => (string) $requested);
         }
         return $holding;
