@@ -1585,3 +1585,12 @@ a.jt {
 .alternative_searches li {
   margin-top: .25em;
 }
+
+.button:hover {
+  text-decoration: none;
+}
+
+.button {
+  color: #16969D;
+  text-decoration: underline;
+}
