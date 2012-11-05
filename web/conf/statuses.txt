@@ -1,5 +1,5 @@
 Měsíc | cz | Lze půjčit domů na měsíc. Objednávejte kliknutím na Požadavek. Vyzvedávejte do hodiny (max. do 4 prac. dnů) v Připravených výpůjčkách / přízemí - v regálu dle posledního dvojčíslí na vaší průkazce.
-Studovna | cz | Lze studovat pouze v knihovně. Kniha je umístěna ve studovně /upřesněno v poli "Sbírka/Doba vyhledání"/, v regálech hledejte knihy podle Signatury-2.
+Studovna | cz | Lze studovat pouze v knihovně. Kniha je umístěna ve studovně /upřesněno v poli "Sbírka/Doba vyhledání"/, v regálech hledejte knihy podle UMÍSTĚNÍ.
 Příručka | cz | Lze studovat pouze v knihovně. Kniha je v příruční knihovně určitého pracoviště. Obraťte se na Informace / přízemí.
 Jen do studovny | cz |  Lze studovat pouze v knihovně. Objednávejte kliknutím na Požadavek. Vyzvedávejte do 1 hodiny v Prezenčních výpůjčkách ve Studovně humanitních věd / 4. patro (max. do 4 prac. dnů) . Pokud se jedná o letošní ročník časopisu, je dostupný ve Studovně novin a časopisů / 2. patro, nelze o něj žádat.
 Vol.výb.-měs. | cz | Lze půjčit domů na měsíc. Knihy hledejte v regálech ve Volném výběru (přízemí a 1. patro) podle pole <b>Umístění</b>. Půjčujte u výpůjčního pultu. Lze objednávat, pouze pokud jsou půjčené. 
@@ -14,7 +14,7 @@ ZHR | cz | Zahraniční knihovny, 2. patro vpravo
 FOI | cz | Studovna firemní a obchodní literatury, 7. patro vpravo
 POP | cz | Popisovna - pro získání tohoto dokumentu kontaktujte knihovníka informátora v přízemí knihovny
 VV | cz | Volný výběr, 1. patro vpravo
-Umístění | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinného třídění. V příslušné studovně vyhledejte regál s daným číslem a dále knihu podle příjmení autora.
+umístění | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinného třídění. V příslušné studovně vyhledejte regál s daným číslem a dále knihu podle příjmení autora.
 
 Month | en | Can be borrowed home for a month. The requests are handled electronically
 Study room | en | The item is available on a shelf in a study room. The study room is assigned in the Collection column and the books are shelved using the Location-2
