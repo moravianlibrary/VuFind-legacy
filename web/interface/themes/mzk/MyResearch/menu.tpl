@@ -6,6 +6,7 @@
       <li{if $pageTemplate=="checkedout.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/CheckedOut">{translate text='Checked Out Items'}</a></li>
       <li{if $pageTemplate=="checkedout_history.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/CheckedOutHistory">{translate text='Checkedout History'}</a></li>
       <li{if $pageTemplate=="holds.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Holds">{translate text='Holds and Recalls'}</a></li>
+      <li{if $pageTemplate=="holds-history.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Holds?history=true">{translate text='Holds and Recalls History'}</a></li>
       <li{if $pageTemplate=="fines.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Fines">{translate text='Fines'}</a></li>
       <li{if $pageTemplate=="ills.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/InterlibraryLoans">{translate text='Interlibrary loans'}</a></li>
       <li{if $pageTemplate=="profile.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Profile">{translate text='Profile'}</a></li>

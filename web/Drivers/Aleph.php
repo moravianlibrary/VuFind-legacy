@@ -700,11 +700,15 @@ class Aleph implements DriverInterface
      * otherwise.
      * @access public
      */
-    public function getMyHolds($user)
+    public function getMyHolds($user, $history=false)
     {
         $userId = $user['id'];
         $holdList = array();
-        $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'requests', 'holds'), array('view' => 'full'));
+        $params = array("view" => "full");
+        if ($history) {
+           $params["type"] = "history";
+        }
+        $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'requests', 'holds'), $params);
         foreach ($xml->xpath('//hold-request') as $item) {
            $z37 = $item->z37;
            $z13 = $item->z13;
@@ -752,6 +756,10 @@ class Aleph implements DriverInterface
            }
         }
         return $holdList;
+    }
+
+    public function getMyHoldsHistory($user) {
+        return $this->getMyHolds($user, true);
     }
 
     public function getCancelHoldDetails($holdDetails)

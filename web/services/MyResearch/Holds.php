@@ -76,7 +76,16 @@ class Holds extends MyResearch
                 $interface->assign('cancelResults', $this->cancelResults);
             }
 
-            $result = $this->catalog->getMyHolds($patron);
+            
+            $history = false;
+            if (isset($_GET['history']) && $_GET['history'] == 'true') {
+                $history = true;
+            }
+            if ($history) {
+                $result = $this->catalog->getMyHoldsHistory($patron);
+            } else {
+                $result = $this->catalog->getMyHolds($patron);
+            }
             if (!PEAR::isError($result)) {
                 if (count($result)) {
                     $recordList = array();
@@ -103,7 +112,11 @@ class Holds extends MyResearch
             }
         }
 
-        $interface->setTemplate('holds.tpl');
+        if ($history) {
+            $interface->setTemplate('holds.tpl');
+        } else {
+            $interface->setTemplate('holds-history.tpl');
+        }
         $interface->setPageTitle('My Holds');
         $interface->display('layout.tpl');
     }
