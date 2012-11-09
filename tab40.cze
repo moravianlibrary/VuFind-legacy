@@ -37,13 +37,13 @@
 !          up to 80 characters;
 !
 ! 1     2   3     4
-!!!!!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!>
+!!!!!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
 SKL   ##### L Sklad / do 1 hodiny
-VV    ##### L VV
+VV    ##### L Volný výbìr
 DEN   ##### L Sklad / do 24 hodin
-VVB   ##### L VV beletrie
-HSS   ##### L HSS
-STM   ##### L STM
+VVB   ##### L Volný výbìr beletrie
+HSS   ##### L Humanitní studovna
+STM   ##### L Studovna pøír. a technických vìd / 6.patro
 SNP   ##### L SNP
 PST   ##### L PST
 !PAK   ##### L Pøíruèka AK
@@ -57,10 +57,10 @@ AUT   ##### L AUT
 !AVM   ##### L AVM
 KN    ##### L KN 
 DEP   ##### L DEP / do 10 dnù
-ZHR   ##### L ZHR
-SNC   ##### L SNC
-SNC1  ##### L SNC
-SNC2  ##### L SNC
+ZHR   ##### L Zahranièní knihovny / 2.patro
+SNC   ##### L Stud. novin a èasop./2.patro
+SNC1  ##### L Stud. novin a èasop./2.patro
+SNC2  ##### L Stud. novin a èasop./2.patro
 !ŽER   ##### L ŽER / do 10 dnù
 !HOS   ##### L HOS / Za mìsíc
 TR1   ##### L TR1

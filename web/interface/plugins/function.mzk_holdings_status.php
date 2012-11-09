@@ -14,6 +14,8 @@ function mzk_translate_statuses($status, $duedate_status) {
             return "reference";
         } else if ($status == 'Ve zpr') {
             return "";
+        } else if ($status == 'Aktuál') {
+            return "Newspapers and Journals - at the desk";
         }
     }
     if ($status == '0 po r') {
