@@ -17,6 +17,7 @@ class MzkRecord extends MarcRecord
         $interface->assign('itemLink', $this->fields['itemlink']);
         $interface->assign('EOD', $this->getEOD());
         $interface->assign('callNumber', $this->getCallNumber());
+        $interface->assign('physical', $this->getPhysicalDescriptions());
         return $result;
     }
 

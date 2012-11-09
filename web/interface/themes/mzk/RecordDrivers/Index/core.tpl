@@ -262,6 +262,17 @@
     </tr>
   {/if}
 
+  {if $physical}
+    <tr valign="top">
+      <th>{translate text='Physical Description'}: </th>
+      <td>
+        {foreach from=$physical item=field name=loop}
+          {$field|escape}<br>
+        {/foreach}
+      </td>
+    </tr>
+  {/if}
+
   <tr valign="top">
     <th>{translate text='Link to catalog'}: </th>
     <td>
