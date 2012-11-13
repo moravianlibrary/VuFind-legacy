@@ -4,9 +4,13 @@
     <b class="btop"><b></b></b>
         {if $user->cat_username}          
           <div class="page">
-		  <h3>{translate text='Interlibrary loans'}</h3>
-
-          {if $ills}
+            <h3>{translate text='Interlibrary loans'}</h3>
+            {*
+            {translate text='Create new request for'}
+            <a href="{$path}/MyResearch/InterlibraryLoans?new=book">{translate text='Book'}</a> |
+            <a href="{$path}/MyResearch/InterlibraryLoans?new=serial">{translate text='Newspaper'}</a>
+            *}
+            {if $ills}
 
               <ul class="filters">
               {foreach from=$ills item=resource name="recordLoop"}
@@ -15,15 +19,6 @@
                 {else}
                 <li class="result">
                 {/if}
-                {*
-                {if $renewForm}
-                  {if $resource.ils_details.renewable && $resource.ils_details.renew_details}
-                    <div class="hiddenLabel"><label for="checkbox_{$resource.id|regex_replace:'/[^a-z0-9]/':''|escape}">{translate text="Select this record"}</label></div>
-                    <input type="checkbox" name="renewSelectedIDS[]" value="{$resource.ils_details.renew_details}" class="ui_checkboxes" id="checkbox_{$resource.id|regex_replace:'/[^a-z0-9]/':''|escape}" />
-                    <input type="hidden" name="renewAllIDS[]" value="{$resource.ils_details.renew_details}" />
-                  {/if}
-                {/if}
-                *}
                   <div class="yui-ge">
                     <div class="yui-u first" style="background-color:transparent">
                       <img src="{$path}/bookcover.php?isn={$resource.isbn|@formatISBN}&amp;size=small" class="alignleft" alt="{$resource.title|escape}">
@@ -45,12 +40,9 @@
                 </li>
               {/foreach}
               </ul>
-            {if $renewForm}
-              </form>
+            {else}
+              {translate text='You do not have any interlibrary loans'}.
             {/if}
-          {else}
-            {translate text='You do not have any interlibrary loans'}.
-          {/if}
         {else}
           <div class="page">
           {include file="MyResearch/catalog-login.tpl"}
