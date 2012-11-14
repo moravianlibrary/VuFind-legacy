@@ -79,6 +79,11 @@ class ShibbolethAuthentication implements Authentication
             }
         }
 
+        if (!isset($_SERVER[$this->_userAttributes['username']])
+            || $_SERVER[$this->_userAttributes['username']] == ''
+        ) {
+            return new PEAR_ERROR('user_not_authenticated');
+        }
         $user = new User();
         $user->username = $_SERVER[$this->_userAttributes['username']];
         $userIsInVufindDatabase = $this->_isUserInVufindDatabase($user);
