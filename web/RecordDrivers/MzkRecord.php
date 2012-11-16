@@ -45,7 +45,7 @@ class MzkRecord extends MarcRecord
 
         $interface->assign('summId', $this->getUniqueID());
         $interface->assign('summFormats', $this->getFormats());
-        //$interface->assign('summHighlightedTitle', $this->getHighlightedTitle());
+        $interface->assign('summHighlightedTitle', $this->getHighlightedTitle());
         $interface->assign('summTitle', $this->getTitle());
         $interface->assign('summHighlightedAuthor', $this->getHighlightedAuthor());
         $interface->assign('summAuthor', $this->getPrimaryAuthor());
