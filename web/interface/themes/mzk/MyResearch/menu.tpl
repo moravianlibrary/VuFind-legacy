@@ -21,7 +21,7 @@
         <h4>{translate text=User}</h4>
         <ul class="bulleted">
           <li><a href="https://aleph.mzk.cz/F/?func=file&file_name=bor-update-password" target="_new">{translate text="Change password"}</a></li>
-          <li><a href="https://aleph.mzk.cz/F/?func=bor-update" target="_new">{translate text="Change address"}</a></li>
+          <li><a href="https://aleph.mzk.cz/F/?func=bor-update" target="_new">{translate text="Change email address"}</a></li>
         </ul>
      </div>
   {/if}
