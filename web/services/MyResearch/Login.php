@@ -71,26 +71,13 @@ class Login extends Action
             header('Location: Home');
             die();
         }
-        // begin of modifications for MZK
-        if ($module == 'MyResearch' && $action == 'GuestLogin' && $configArray['Authentication']['guest_login']) {
-            include_once 'GuestLogin.php';
-            GuestLogin::launch();
-            die();
-        }
-        // end of modifications for MZK
 
         // Assign the followup task to come back to after they login -- note that
         //     we need to check for a pre-existing followup task in case we've
         //     looped back here due to an error (bad username/password, etc.).
         $followup = isset($_REQUEST['followup']) ? $_REQUEST['followup'] : $action;
-        if ($followup != 'Home' && $action != 'GuestLogin') { // modification for MZK
-            $sessionInitiator = $interface->get_template_vars("sessionInitiator");
-            header("Location: $sessionInitiator");
-            die();
-        }
  
         // Don't go to the trouble if we're just logging in to the Home action
-        /*
         if ($followup != 'Home') {
             $interface->assign('followup', $followup);
             $interface->assign(
@@ -132,10 +119,6 @@ class Login extends Action
             if (isset($_REQUEST['comment'])) {
                 $interface->assign('comment', $_REQUEST['comment']);
             }
-        }
-        */
-        if ($configArray['Authentication']['guest_login']) {
-            $interface->assign('guestLogin', true);
         }
         $interface->assign('message', $msg);
         if (isset($_REQUEST['username'])) {
