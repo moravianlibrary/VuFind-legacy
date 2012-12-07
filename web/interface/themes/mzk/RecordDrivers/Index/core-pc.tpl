@@ -262,14 +262,6 @@
     </tr>
   {/if}
 
-  <tr valign="top">
-    <th>{translate text='Link to Aleph'}: </th>
-    <td>
-      <a href="{$fullViewURL}">{translate text='full view'}</a>,
-      <a href="{$holdingsURL}">{translate text='holdings'}</a>
-    </td>
-  </tr>
-
   <!-- end of costumization for MZK -->
 </table>
 
