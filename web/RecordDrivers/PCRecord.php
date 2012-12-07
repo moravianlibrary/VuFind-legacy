@@ -18,6 +18,8 @@ class PCRecord extends IndexRecord
         global $interface;
         $result = parent::getSearchResult($view);
         $interface->assign('filter', 'source:"ALL"');
+        $interface->assign('coreEdition', $this->getEdition());
+        $interface->assign('coreSeries', $this->getSeries());
         $interface->assign('summURLs', $this->getURLs());
         return 'RecordDrivers/Index/result-pc-' . $view . '.tpl';
     }
