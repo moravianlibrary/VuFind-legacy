@@ -5,11 +5,9 @@
         {if $user->cat_username}          
           <div class="page">
             <h3>{translate text='Interlibrary loans'}</h3>
-            {*
-            {translate text='Create new request for'}
-            <a href="{$path}/MyResearch/InterlibraryLoans?new=book">{translate text='Book'}</a> |
-            <a href="{$path}/MyResearch/InterlibraryLoans?new=serial">{translate text='Newspaper'}</a>
-            *}
+            {translate text='Create new ILL request for'}:
+            <a href="https://aleph.mzk.cz/F/?func=new-ill-request-l&request_type=BOOK">{translate text='Book'}</a>&nbsp;|&nbsp;
+            <a href="https://aleph.mzk.cz/F/?func=new-ill-request-l&request_type=JOURNAL">{translate text='Journal/Article'}</a>
             {if $ills}
 
               <ul class="filters">
@@ -41,7 +39,9 @@
               {/foreach}
               </ul>
             {else}
+              <ul class="filters">
               {translate text='You do not have any interlibrary loans'}.
+              </ul>
             {/if}
         {else}
           <div class="page">
