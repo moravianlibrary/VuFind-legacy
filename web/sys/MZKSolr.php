@@ -78,6 +78,9 @@ class MZKSolr extends Solr
         if ($default && isset($configArray['MultiSolr']['default'])) {
             $this->host = $configArray['MultiSolr']['default'] . '/' . $this->core;
         }
+        if ($fields == "*") {
+            $fields = array("score");
+        }
         return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror);
     }
 
