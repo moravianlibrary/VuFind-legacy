@@ -29,6 +29,7 @@ class ExtendedHold extends Record
     function __construct()
     {
         $this->userInfo = UserAccount::isLoggedIn();
+        parent::__construct();
     }
     
     function launch()
@@ -37,6 +38,11 @@ class ExtendedHold extends Record
         global $user;
 
         $interface->assign('id', $_GET['id']);
+        $interface->assign('recordId', $this->recordDriver->getUniqueID());
+        $interface->setPageTitle(
+            translate('request_place_text') . ': ' .
+            $this->recordDriver->getBreadcrumb()
+        );
 
         if (!UserAccount::isLoggedIn()) {
             // Needed for "back to record" link in view-alt.tpl:
