@@ -58,12 +58,6 @@ class ExtendedHold extends Record
             exit();
         }
 
-        if (preg_match('/@guest$/', $user->username)) {
-            $target = urlencode($interface->get_template_vars("currentURL"));
-            header("Location: https://vufind-trunk.mzk.cz/MyResearch/Logout?redirect=/Shibboleth.sso/Login?target=$target");
-            die();
-        }
-
         if (isset($_POST['submit'])) {
             $result = $this->placeHold();
             if (!$result['success']) {
