@@ -2,6 +2,9 @@
 {if ( $order > 1)}
     <div class="error">{translate text="Item is requested. Your request sequence for this item is:"} {$order|escape}</div>
 {/if}
+{if $duedate}
+    <div class="error">{translate text="On loan until"}: {$duedate|escape}</div>
+{/if}
 <div class="yui-skin-sam">
 {if $error}
     <div class="error">{translate text=$error}</div>

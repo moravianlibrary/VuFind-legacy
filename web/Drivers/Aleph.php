@@ -245,7 +245,6 @@ class Aleph implements DriverInterface
     {
         $url = "http://$this->host/pds?func=$op";
         $url = $this->appendQueryString($url, $params);
-        print "$url<BR>";
         $result = $this->doHTTPRequest($url);
         if ($result->error) {
            if ($this->debug_enabled) {
@@ -1033,6 +1032,21 @@ class Aleph implements DriverInterface
         $resource = $bib . $sys_no;
         $xml = $this->doRestDLFRequest(array('patron', $patronId, 'record', $resource, 'items', $group));
         $locations = array();
+        $status = $xml->xpath('//status/text()');
+        $status = (string) $status[0];
+        $availability = true;
+        $duedate = null;
+        if (!in_array($status, $this->available_statuses)) {
+           $availability = false;
+           $matches = array();
+           if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*);([a-zA-Z ]*)/", $status, &$matches)) {
+              $duedate = $this->parseDate($matches[1]);
+           } else if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*)/", $status, &$matches)) {
+              $duedate = $this->parseDate($matches[1]);
+           } else {
+              $duedate = null;
+           }
+        }
         $part = $xml->xpath('//pickup-locations');
         if ($part) {
            foreach ($part[0]->children() as $node) {
@@ -1051,8 +1065,14 @@ class Aleph implements DriverInterface
         }
         $date = $xml->xpath('//last-interest-date/text()');
         $date = $date[0];
-        $date = "" . substr($date, 6, 2) . "." . substr($date, 4, 2) . "." . substr($date, 0, 4); 
-        return array('pickup-locations' => $locations, 'last-interest-date' => $date, 'order' => $requests + 1);
+        $date = "" . substr($date, 6, 2) . "." . substr($date, 4, 2) . "." . substr($date, 0, 4);
+        $result = array(
+           'pickup-locations' => $locations,
+           'last-interest-date' => $date,
+           'order' => $requests + 1,
+           'duedate' => $duedate,
+        );
+        return $result;
     }
 
     function placeHold($details)
@@ -1211,7 +1231,6 @@ class Aleph implements DriverInterface
             $xml .= "<$key>" . htmlentities($value) . "</$key>";
         }
         $xml.="</ill-parameters>";
-        print "$xml";
         try {
             $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', 'MN', 'ill'), null, HTTP_REQUEST_METHOD_PUT, $xml);
         } catch (Exception $ex) {

@@ -91,7 +91,6 @@ class ExtendedHold extends Record
             return;
         }
         $group = $_REQUEST['barcode'];
-        // var_dump($_GET);
         if (strpos($id, ",") !== false) {
            list($id, $group) = split(",", $id); 
         }
@@ -99,6 +98,7 @@ class ExtendedHold extends Record
         try {
            $info = $catalog->getHoldingInfoForItem($patron['id'], $id, $group);
            $interface->assign('order', $info['order']);
+           $interface->assign('duedate', $info['duedate']);
            $interface->assign('locations', $info['pickup-locations']);
            $interface->assign('last_interest_date', $info['last-interest-date']);
         } catch (Exception $e) {
