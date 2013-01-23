@@ -1,5 +1,5 @@
 <div class="sidegroup">
-  {if $recordCount > 0}<h4>{translate text='Narrow Search'}</h4>{/if}
+  {if $recordCount > 0}<h4>{translate text='Expand Search'}</h4>{/if}
   {if isset($checkboxFilters) && count($checkboxFilters) > 0}
   <p>
     <table>
@@ -11,13 +11,15 @@
                 onclick="document.location.href='{$current.toggleUrl|escape}';" />
             </td>
             <td>
-              <label for="checkFilter{$smarty.foreach.boxes.index}">{translate text=$current.desc}</label><br />
+              <!--<label for="checkFilter{$smarty.foreach.boxes.index}">{translate text=$current.desc}</label><br />-->
+              <label for="checkFilter{$smarty.foreach.boxes.index}">{hint title=$current.desc text=$current.desc href=$thisFacet.url translate=true}</label>
             </td>
           </tr>
       {/foreach}
     </table>
   </p>
   {/if}
+  {if $recordCount > 0}<h4>{translate text='Narrow Search'}</h4>{/if}
   {if $filterList}
     <strong>{translate text='Remove Filters'}</strong>
     <ul class="filters">
