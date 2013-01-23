@@ -28,7 +28,7 @@
 		  </select>
 		  <input type="submit" name="submit" class="form-submit" value="{translate text="Find"}">
 	  </div>
-      <a href="{$path}/Search/Advanced" class="advanced small">{translate text="Advanced"}</a>
+      <a href="{$path}/Search/Advanced" class="advanced small">{translate text="Advanced Search"}</a>
 
       {* Do we have any checkbox filters? *}
       {assign var="hasCheckboxFilters" value="0"}
