@@ -71,6 +71,8 @@ class SearchObject_Solr extends SearchObject_Base
     protected $searchSubType  = '';
     // Used to pass hidden filter queries to Solr
     protected $hiddenFilters = array();
+    // Multiselect facets
+    protected $multiSelectFacets = array();
 
     // Spelling
     protected $spellingLimit = 3;
@@ -100,6 +102,9 @@ class SearchObject_Solr extends SearchObject_Base
         if (is_numeric($facetLimit)) {
             $this->facetLimit = $facetLimit;
         }
+        $this->multiSelectFacets = explode(',', $this->getFacetSetting(
+            'Results_Settings', 'multiselect_facets'
+        ));
         $translatedFacets = $this->getFacetSetting(
             'Advanced_Settings', 'translated_facets'
         );
@@ -1011,16 +1016,31 @@ class SearchObject_Solr extends SearchObject_Base
 
         // Define Filter Query
         $filterQuery = $this->hiddenFilters;
+        $orFilterQuery = array();
         foreach ($this->filterList as $field => $filter) {
             foreach ($filter as $value) {
                 // Special case -- allow trailing wildcards and ranges:
                 if (substr($value, -1) == '*'
                     || preg_match('/\[[^\]]+\s+TO\s+[^\]]+\]/', $value)
                 ) {
-                    $filterQuery[] = "$field:$value";
+                    if (in_array($field, $this->multiSelectFacets)) {
+                        $orFilterQuery[$field][] = "$field:$value";
+                    } else {
+                        $filterQuery[] = "$field:$value";
+                    }
                 } else {
-                    $filterQuery[] = "$field:\"$value\"";
+                    if (in_array($field, $this->multiSelectFacets)) {
+                        $orFilterQuery[$field][] = "$field:\"$value\"";
+                    } else {
+                        $filterQuery[] = "$field:\"$value\"";
+                    }
                 }
+            }
+        }
+        if(!empty($orFilterQuery)) {
+            foreach ($orFilterQuery as $field => $filter) {
+                $filterQuery[] = '{!tag=' . $field . '_filter}' 
+                    . '('. implode(" OR ", $filter) . ')';
             }
         }
 
@@ -1035,7 +1055,11 @@ class SearchObject_Solr extends SearchObject_Base
         if (!empty($this->facetConfig)) {
             $facetSet['limit'] = $this->facetLimit;
             foreach ($this->facetConfig as $facetField => $facetName) {
-                $facetSet['field'][] = $facetField;
+                if (in_array($facetField, $this->multiSelectFacets)) {
+                    $facetSet['field'][] = '{!ex=' . $facetField . '_filter}' . $facetField;
+                } else {
+                    $facetSet['field'][] = $facetField;    
+                }
             }
             if ($this->facetOffset != null) {
                 $facetSet['offset'] = $this->facetOffset;
