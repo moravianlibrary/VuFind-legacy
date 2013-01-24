@@ -79,10 +79,12 @@
       
       <div class="resultItemLine4">
       {if $summOpenUrl || !empty($summURLs)}
+        {*
         {if $summOpenUrl}
           <br>
           {include file="Search/openurl.tpl" openUrl=$summOpenUrl}
         {/if}
+        *}
         {foreach from=$summURLs key=recordurl item=urldesc}
           <br><a href="{if $proxy}{$proxy}/login?qurl={$recordurl|escape:"url"}{else}{$recordurl|escape}{/if}" class="fulltext" target="new">{if $recordurl == $urldesc}{translate text='Online'}{else}{$urldesc|escape}{/if}</a>
         {/foreach}

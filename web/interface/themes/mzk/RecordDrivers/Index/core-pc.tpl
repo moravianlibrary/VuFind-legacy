@@ -208,19 +208,15 @@
   </tr>
   {/if}
 
-  {if !empty($coreURLs) || $coreOpenURL}
   <tr valign="top">
     <th>{translate text='Online Access'}: </th>
     <td>
-      {foreach from=$coreURLs item=desc key=currentUrl name=loop}
-        <a href="{if $proxy}{$proxy}/login?qurl={$currentUrl|escape:"url"}{else}{$currentUrl|escape}{/if}">{$desc|escape}</a><br/>
+      {foreach from=$summURLs item=desc key=currentUrl name=loop}
+        <a href="{$currentUrl|escape}">{translate text="Online"}</a><br/>
       {/foreach}
-      {if $coreOpenURL}
-        {include file="Search/openurl.tpl" openUrl=$coreOpenURL}<br/>
-      {/if}
     </td>
   </tr>
-  {/if}
+  
 
   {if !empty($coreRecordLinks)}
   {foreach from=$coreRecordLinks item=coreRecordLink}

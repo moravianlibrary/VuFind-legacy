@@ -10,6 +10,10 @@ class PCRecord extends IndexRecord
         global $interface;
         $result = parent::getCoreMetadata();
         $interface->assign('filter', 'source:"ALL"');
+        $urls = $this->getURLs();
+        if (!empty($urls)) {
+            $interface->assign('summURLs', $urls);
+        }
         return 'RecordDrivers/Index/core-pc.tpl';
     }
 
