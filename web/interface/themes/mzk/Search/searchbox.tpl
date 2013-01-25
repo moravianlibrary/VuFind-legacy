@@ -29,12 +29,20 @@
 		  <input type="submit" name="submit" class="form-submit" value="{translate text="Find"}">
 	  </div>
       <a href="{$path}/Search/Advanced" class="advanced small">{translate text="Advanced Search"}</a>
-
+      {foreach from=$checkboxFilters item=current}
+          {if $current.filter and $current.filter == "source:ALL" && $current.selected}
+               {assign var="pciEnabled" value="1"}
+          {/if}
+      {/foreach}
+      <div class="keepFilters">
+          <input type="checkbox" id="PCI" name="filter[]" value="source:ALL" {if $pciEnabled}checked="checked"{/if}/>{* {$current.filter|escape} *}
+          <label for="retainAll">{hint title="Search also in central index" text="Search also in central index" translate=true}</label>
+      </div>
       {* Do we have any checkbox filters? *}
       {assign var="hasCheckboxFilters" value="0"}
       {if isset($checkboxFilters) && count($checkboxFilters) > 0}
         {foreach from=$checkboxFilters item=current}
-          {if $current.selected}
+          {if $current.filter and $current.filter != "source:ALL"}
             {assign var="hasCheckboxFilters" value="1"}
           {/if}
         {/foreach}

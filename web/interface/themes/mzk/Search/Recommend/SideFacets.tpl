@@ -1,24 +1,4 @@
 <div class="sidegroup">
-  {if $recordCount > 0}<h4>{translate text='Expand Search'}</h4>{/if}
-  {if isset($checkboxFilters) && count($checkboxFilters) > 0}
-  <p>
-    <table>
-      {foreach from=$checkboxFilters item=current name=boxes}
-          <tr{if $recordCount < 1 && !$current.selected && !$current.alwaysVisible} style="display: none;"{/if}>
-            <td style="vertical-align:top; padding: 3px;">
-              <input type="checkbox" id="checkFilter{$smarty.foreach.boxes.index}" name="filter[]" value="{$current.filter|escape}"
-                {if $current.selected}checked="checked"{/if}
-                onclick="document.location.href='{$current.toggleUrl|escape}';" />
-            </td>
-            <td>
-              <!--<label for="checkFilter{$smarty.foreach.boxes.index}">{translate text=$current.desc}</label><br />-->
-              <label for="checkFilter{$smarty.foreach.boxes.index}">{hint title=$current.desc text=$current.desc href=$thisFacet.url translate=true}</label>
-            </td>
-          </tr>
-      {/foreach}
-    </table>
-  </p>
-  {/if}
   {if $recordCount > 0}<h4>{translate text='Narrow Search'}</h4>{/if}
   {if $filterList}
     <strong>{translate text='Remove Filters'}</strong>
