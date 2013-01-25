@@ -71,6 +71,7 @@ div.yui-b.first { background-color:#fff; }
 .searchHomeForm select.select { border: none; font-family: Arial,sans-serif; font-size: 12px; font-weight: bold; margin: 0 20px 0 0; height: 35px; padding: 9px; width: 248px; float: left; background: #fff; /*border: 1px solid #929999; border-right: 1px solid #d1eff1; border-bottom: 1px solid #d1eff1;*/ }
 .searchHomeForm select.select { padding: 9px; width: 120px; }
 .searchHomeForm input.form-submit { float: left; }
+.searchHomeForm label { color:#fff; }
 .form-holder { margin: 0 0 8px 0; text-align: left; }
 .form-holder select { margin: 0 20px 0 0 !important; }
 
