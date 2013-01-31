@@ -16,7 +16,7 @@
   <td>{if $summDate}{$summDate[0]}{/if}</td>
   <td>
   {foreach from=$summURLs key=recordurl item=urldesc}
-     <a href="{$recordurl|escape}" class="fulltext" target="new">{if $recordurl == $urldesc}{translate text='Online'}{else}{$urldesc|escape}{/if}</a>
+     <a href="https://proxy.mzk.cz/login?auth=shibboleth&url={$recordurl|escape}" class="fulltext" target="new">{if $recordurl == $urldesc}{translate text='Online'}{else}{$urldesc|escape}{/if}</a>
   {/foreach}
   </td>
 </tr>

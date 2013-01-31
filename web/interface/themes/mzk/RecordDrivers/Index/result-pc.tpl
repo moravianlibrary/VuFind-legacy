@@ -86,7 +86,7 @@
         {/if}
         *}
         {foreach from=$summURLs key=recordurl item=urldesc}
-          <br><a href="{if $proxy}{$proxy}/login?qurl={$recordurl|escape:"url"}{else}{$recordurl|escape}{/if}" class="fulltext" target="new">{if $recordurl == $urldesc}{translate text='Online'}{else}{$urldesc|escape}{/if}</a>
+          <br><a href="https://proxy.mzk.cz/login?auth=shibboleth&url={$recordurl|escape}" class="fulltext" target="new">{if $recordurl == $urldesc}{translate text='Online'}{else}{$urldesc|escape}{/if}</a>
         {/foreach}
       {elseif $summAjaxStatus}
         <div class="status">

@@ -212,7 +212,7 @@
     <th>{translate text='Online Access'}: </th>
     <td>
       {foreach from=$summURLs item=desc key=currentUrl name=loop}
-        <a href="{$currentUrl|escape}">{translate text="Online"}</a><br/>
+        <a href="https://proxy.mzk.cz/login?auth=shibboleth&url={$currentUrl|escape}" target="new">{translate text="Online"}</a><br/>
       {/foreach}
     </td>
   </tr>
