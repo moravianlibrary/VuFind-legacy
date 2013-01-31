@@ -27,8 +27,8 @@ class MZKStatus extends Action
     {
        global $configArray;
        $result = array();
-       $statuses = $configArray['Statuses']['File'];
-       $contents = file($statuses);
+       $file = trim('conf/' . $configArray['Statuses']['File']);
+       $contents = file($file);
        foreach($contents as $line) {
           list($status, $lang, $desc) = split('\\|', $line, 3);
           if ($language == trim($lang)) {
