@@ -190,10 +190,19 @@ class UInterface extends Smarty
                     'the parameters login and target are set.'
                 );
             }
-
-            $url = urlencode($configArray['Shibboleth']['target'] . "?redirect=".
+            $site_url = $configArray['Site']['url'];
+            $shib_target = $configArray['Shibboleth']['target'];
+            if ($shib_target[0] == '/') {
+                $shib_target = $site_url . $shib_target;
+            }
+            $url = urlencode($shib_target . "?redirect=".
                 urlencode("https://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']));
-            $sessionInitiator = $configArray['Shibboleth']['login'] . "?target=$url";
+            $shib_login = $configArray['Shibboleth']['login'];
+            if ($shib_login[0] == '/') {
+                $sessionInitiator = $site_url . $shib_login . "?target=$url";
+            } else {
+                $sessionInitiator = $configArray['Shibboleth']['login'] . "?target=$url";
+            }
             if (isset($configArray['Shibboleth']['provider_id'])) {
                 $sessionInitiator = $sessionInitiator . '&providerId=' .
                     $configArray['Shibboleth']['provider_id'];

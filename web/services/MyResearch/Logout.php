@@ -52,6 +52,11 @@ class Logout extends Action
         Logout::performLogout();
         // Notify shibboleth about logout
         if ($configArray['Authentication']['method'] == 'Shibboleth' && isset($configArray['Shibboleth']['logout'])) {
+            $logout_url = $configArray['Shibboleth']['logout'];
+            if ($logout_url[0] == '/') {
+                $site_url = $configArray['Site']['url'];
+                $logout_url = $site_url . $logout_url;
+            }
             $logout = $configArray['Shibboleth']['logout'] . "?return=" . urlencode($configArray['Site']['url']);
             header('Location: ' . $logout);
         } else {
