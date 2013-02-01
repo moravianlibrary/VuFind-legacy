@@ -25,8 +25,7 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
       <b class="btop"><b></b></b>
         <div class="toolbar">
         <ul>
-            <li><a href="{$url}/Record/{$id|escape:"url"}/Cite" class="cite" onClick="getLightbox('Record', 'Cite', '{$id|escape}', null, '{translate text="Cite this"}'); return false;">{translate text="Cite this"}</a></li>
-            {*<li><a href="{$url}/Record/{$id|escape:"url"}/SMS" class="sms" onClick="getLightbox('Record', 'SMS', '{$id|escape}', null, '{translate text="Text this"}'); return false;">{translate text="Text this"}</a></li> *}
+            <li><a href="{$url}/Record/{$id|escape:"url"}/Citace#tabnav" class="cite">{translate text="Cite this"}</a></li>
             <li><a href="{$url}/Record/{$id|escape:"url"}/Email" class="mail" onClick="getLightbox('Record', 'Email', '{$id|escape}', null, '{translate text="Email this"}'); return false;">{translate text="Email this"}</a></li>
             {if is_array($exportFormats) && count($exportFormats) > 0}
               <li>
