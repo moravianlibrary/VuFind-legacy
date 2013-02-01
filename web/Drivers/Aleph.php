@@ -1139,8 +1139,8 @@ class Aleph implements DriverInterface
            return substr($date, 6, 2) . "." .substr($date, 4, 2) . "." . substr($date, 0, 4);
         } else {
            list($day, $month, $year) = split("/", $date, 3);
-           $translate_month = array ( 'jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4, 'may' => 5, 'jun' => 6,
-              'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12);
+           $translate_month = array ( 'jan' => '01', 'feb' => '02', 'mar' => '03', 'apr' => '04', 'may' => '05', 'jun' => '06',
+              'jul' => '07', 'aug' => '08', 'sep' => '09', 'oct' => '10', 'nov' => '11', 'dec' => '12');
            return $day . "." . $translate_month[strtolower($month)] . "." . $year;
         }
     }
