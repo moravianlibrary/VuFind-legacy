@@ -1,7 +1,7 @@
 Měsíc | cz | Lze půjčit domů na měsíc. Objednávejte kliknutím na Požadavek. Vyzvedávejte do hodiny (max. do 4 prac. dnů) v Připravených výpůjčkách / přízemí - v regálu dle posledního dvojčíslí na vaší průkazce.
 Studovna | cz | Lze studovat pouze v knihovně. Kniha je umístěna ve studovně /upřesněno v poli "Sbírka/Doba vyhledání"/, v regálech hledejte knihy podle UMÍSTĚNÍ.
 Příručka | cz | Lze studovat pouze v knihovně. Kniha je v příruční knihovně určitého pracoviště. Obraťte se na Informace / přízemí.
-Jen do studovny | cz |  Lze studovat pouze v knihovně. Objednávejte kliknutím na Požadavek. Vyzvedávejte do 1 hodiny v Prezenčních výpůjčkách ve Studovně humanitních věd / 4. patro (max. do 4 prac. dnů) . Pokud se jedná o letošní ročník časopisu, je dostupný ve Studovně novin a časopisů / 2. patro, nelze o něj žádat.
+Jen do studovny | cz | Prezenční půjčování pouze na studovnu, vyzvedávejte v půjčovně v přízemí. Požadavky se zadávají elektronickou cestou. Noviny a časopisy se vyzvedávají ve Studovně novin a časopisů / 2. patro. Aktuální ročník novin a časopisů nelze objednat elektronicky, je dostupný u pultu ve Studovně novin a časopisů.
 Vol.výb.-měs. | cz | Lze půjčit domů na měsíc. Knihy hledejte v regálech ve Volném výběru (přízemí a 1. patro) podle pole <b>Umístění</b>. Půjčujte u výpůjčního pultu. Lze objednávat, pouze pokud jsou půjčené. 
 Ve zpracování | cz | Jde o novou publikaci, která se právě zpracovává, možnost půjčení bude určena až poté.
 Retro | cz | Jde o starší publikaci, do katalogu byl vytvořen pouze velmi stručný záznam, možnost půjčení bude určena po požádání. Objednávejte kliknutím na <b>Požadavek</b> (po přihlášení).
@@ -18,7 +18,7 @@ umístění | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinn
 Hledat i v centrálním indexu | cz |  Centrální index zahrnuje také obsah předplacených databází, které má knihovna k dispozici.
 
 Month | en | Can be borrowed home for a month. The requests are handled electronically
-Study room | en | The item is available on a shelf in a study room. The study room is assigned in the Collection column and the books are shelved using the Location-2
+Study room | en | The item is available on a shelf in a study room. The study room is assigned in the Collection column and the books are shelved using the Location.
 Ref. shelf | en | The item is on a reference shelf in a particular department and the information staff will guide you to get the item.
 Reference only | en | The item can be borrowed only to the study room (Humanities and Social Studies Study Room on the 4th floor). The requests are handled electronically. If the item is an annual volume of a newspaper or of a magazine which is available on the Reading Room the request cannot be placed.
 Open St. Month | en | The item can be taken home for a month. Readers can search the books personally in the open stock on the 2nd floor and then pass it to the librarian who sends it to the circulation desk. The item cannot be requested using the electronic system except the item is borrowed.
