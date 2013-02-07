@@ -15,7 +15,7 @@ FOI | cz | Studovna firemní a obchodní literatury, 7. patro vpravo
 POP | cz | Popisovna - pro získání tohoto dokumentu kontaktujte knihovníka informátora v přízemí knihovny
 VV | cz | Volný výběr, 1. patro vpravo
 umístění | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinného třídění. V příslušné studovně vyhledejte regál s daným číslem a dále knihu podle příjmení autora.
-Hledat i v centrálním indexu | cz |  Centrální index zahrnuje také obsah předplacených databází, které má knihovna k dispozici.
+Hledat i v zahraničních zdrojích | cz | Prohledat: <ul>  <li>EBSCOhost Academic Search Complete</li> <li>EBSCOhost Business Source Complete</li> <li>EBSCOhost Regional Business News</li> <li>EBSCOhost Library, Information Science & Technology Abstracts with Fulltexts</li> <li>EBSCOhost Computers & Applied Sciences Complete</li> <li>EBSCOhost GreenFILE (OpenAccess)</li> <li>Elsevier Science Direct</li> <li>ISI Web of Science</li> </ul>
 
 Month | en | Can be borrowed home for a month. The requests are handled electronically
 Study room | en | The item is available on a shelf in a study room. The study room is assigned in the Collection column and the books are shelved using the Location.
@@ -32,4 +32,4 @@ STT | en | Manuscripts and Old prints study room, 4. floor left
 ZHR | en | Foreign libraries, 2. floor right
 FOI | en | Standards and Patents, 7. floor right
 VV | en | Access to shelves, 1. floor right
-Search also in central index | en | Central index contains also content of subscribed electronic resources.
+Search also in foreign databases | en | Search also in content of subscribed electronic resources.
