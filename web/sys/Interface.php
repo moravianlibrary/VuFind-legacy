@@ -213,7 +213,23 @@ class UInterface extends Smarty
         }
 
         if (isset($configArray['GoogleAnalytics'])) {
-                $this->assign('googleAnalytics', $configArray['GoogleAnalytics']);
+            $this->assign('googleAnalytics', $configArray['GoogleAnalytics']);
+            /* begin of costumization for MZK */
+            $ips = array(
+                '195.113.155.102' => 'employee',
+                '195.113.155.3' => 'inside',
+                '195.113.155.9' => 'inside',
+                '195.113.155.33' => 'inside',
+            );
+            $visitorType = $ips[$_SERVER['REMOTE_ADDR']];
+            if (!isset($visitorType)) {
+                $visitorType = 'outside';
+            }
+            $googleAnalyticsVariables = array(
+                "visitorType" => array ("value" => $visitorType, "type" => 1),
+            );
+            $this->assign('googleAnalyticsVariables', $googleAnalyticsVariables);
+            /* end of costumizaton for MZK */
         }
 
         $this->assign(

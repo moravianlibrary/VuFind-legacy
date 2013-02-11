@@ -83,6 +83,9 @@
       {foreach from=$googleAnalytics key=key item=value}
       _gaq.push(['{$key}', {$value}]);
       {/foreach}
+      {foreach from=$googleAnalyticsVariables key=key item=val}
+      _gaq.push(['_setCustomVar', 1, '{$key}', '{$val.value}', {$val.type}]);
+      {/foreach}
       _gaq.push(['_trackPageview']);
       {literal}
       (function() {
