@@ -20,9 +20,12 @@ function obalky_display_cover(element, bibinfo) {
     $(img_format).remove();
     $(element).prepend("<a href='" + backlink + "'><img align='left' src='" + href + "' alt='" + cover_text + "'></img></a>");
   }
-  toc = bibinfo["toc_pdf_url"];
-  if (toc != undefined) {
-    $("#bibliographic_details").append("<tr valign='top'><th>"+ content_text + ":</th><td><a href='" + toc + "'</td>obalkyknih.cz</tr>");
+  toc_url = bibinfo["toc_pdf_url"];
+  if (toc_url != undefined) {
+    $("#bibliographic_details").append("<tr valign='top'><th>"+ content_text + ":</th><td><a href='" + toc_url + "'</td>obalkyknih.cz</tr>");
+    var toc = '#' + $(element).attr('id') + "_toc";
+    toc_thumbnail_url = bibinfo["toc_thumbnail_url"];
+    $(toc).append("<a href='" + toc_url + "'><img align='left' src='" + toc_thumbnail_url + "' alt='" + cover_text + "'></img></a>");
   }
 }
 
