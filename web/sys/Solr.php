@@ -274,8 +274,8 @@ class Solr implements IndexEngine
             $results = Horde_Yaml::load(file_get_contents($fullPath));
             if ($local) {
                 $localResults = Horde_Yaml::load(file_get_contents($local));
-                foreach ($localResults as $key => $value) {
-                    $results[$key] = $value;
+                foreach ($localResults as $localKey => $localValue) {
+                    $results[$localKey] = $localValue;
                 }
             }
             $cache->save($results, $key);
