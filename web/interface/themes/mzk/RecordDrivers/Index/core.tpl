@@ -33,33 +33,27 @@
   </script>
 {/literal}
 
-<!-- Begin of modifications for Obalky knih -->
-{* Display Cover Image *}
-      <!-- <span id="obalka_{$summId}"></span> -->
+{* Begin of modifications for Obalky knih *}
       <script>
         $(document).ready(function() {ldelim}
-          var bibinfo = {literal}{{/literal} 
-            "authors": [ "{$summAuthor}" ],
-            "isbn": "{$isbn}",
-            //"issn": "{$summISSN}",
-            "title": "{$summTitle}"
-          {rdelim};
-          var permalink = "{$url}/Record/{$id|escape:'url'}";
-          obalky.process("obalky_display_cover", "obalka_{$id}", permalink, bibinfo);
+          obalky.process("obalky_display_cover", "obalka_{$id}", "{$obalkyknih_permalink}", {$obalkyknih_bibinfo});
         {rdelim});
       </script>
 
       <div class="alignright">
-      <table align="left">
-      <tr>
-      <td id="obalka_{$id}">{image id="obalka_`$id`_format" src="formats/$recordFormat[0].png" align="left" title="$recordFormat[0]"|translate}</td>
-      </tr>
-      <tr>
-      <td class="format">{translate text=$recordFormat[0]}</td>
-      </tr>
-      </table>
+        <table align="left">
+          <tr>
+            <td id="obalka_{$id}">{image id="obalka_`$id`_format" src="formats/$recordFormat[0].png" align="left" title="$recordFormat[0]"|translate}</td>
+          </tr>
+          <tr>
+            <td class="format">{translate text=$recordFormat[0]}</td>
+          </tr>
+          <tr>
+            <td id="obalka_{$id}_toc"></td>
+          </tr>
+        </table>
       </div>
-<!-- End of modifications for Obalky knih -->
+{* End of modifications for Obalky knih *}
 
 {* Display Title *}
 <div itemscope itemtype="http://schema.org/Book">

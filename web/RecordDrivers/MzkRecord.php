@@ -18,6 +18,7 @@ class MzkRecord extends MarcRecord
         $interface->assign('EOD', $this->getEOD());
         $interface->assign('callNumber', $this->getCallNumber());
         $interface->assign('physical', $this->getPhysicalDescriptions());
+        $this->addBibinfoForObalkyKnih();
         return $result;
     }
 
@@ -101,6 +102,7 @@ class MzkRecord extends MarcRecord
         // records exist in the ILS.  Child classes can override this setting
         // to turn on AJAX as needed:
         $interface->assign('summAjaxStatus', true);
+        $this->addBibinfoForObalkyKnih();
         // Send back the template to display:
         return 'RecordDrivers/Index/result-' . $view . '.tpl';
     }
@@ -159,6 +161,10 @@ class MzkRecord extends MarcRecord
         $eod = $this->_getFirstFieldValue('EOD', array('a'));
         return ($eod == 'Y')?true:false;
     }
+    
+    protected function getCNB() {
+        return $this->_getFirstFieldValue('015', array('a'));
+    }
 
     protected function getTitle()
     {
@@ -180,6 +186,30 @@ class MzkRecord extends MarcRecord
     protected function getCallNumber()
     {
         return isset($this->fields['callnumber']) ? $this->fields['callnumber'] : '';
+    }
+    
+    protected function addBibinfoForObalkyKnih()
+    {
+        global $configArray, $interface;
+        $bibinfo = array(
+            "authors" => array($this->getPrimaryAuthor()),
+            "title" => $this->getTitle(),
+        );
+        $isbn = $this->getCleanISBN();
+        if (!empty($isbn)) {
+            $bibinfo['isbn'] = $isbn;
+        }
+        $year = $this->getPublicationDates();
+        if (!empty($year)) {
+            $bibinfo['year'] = $year[0];
+        }
+        $cnb = $this->getCNB();
+        if (!empty($cnb)) {
+            $bibinfo['nbn'] = $cnb;
+        }
+        $permalink = $configArray['Site']['url'] . '/Record/' . urlencode($this->getUniqueID());
+        $interface->assign('obalkyknih_permalink', $permalink);
+        $interface->assign('obalkyknih_bibinfo', json_encode($bibinfo));
     }
 
 }

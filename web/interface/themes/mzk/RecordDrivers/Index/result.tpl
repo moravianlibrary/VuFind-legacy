@@ -19,30 +19,13 @@
     </tr>
     </table>
 
-    <!-- Begin of modifications for Obalky knih -->
-      <!-- <span id="obalka_{$summId}"></span> -->
+    {* Begin of modifications for Obalky knih *}
       <script>
         $(document).ready(function() {ldelim}
-          var bibinfo = {literal}{{/literal} 
-            "authors": [ "{$summAuthor}" ],
-            "isbn": "{$summISBN}",
-            "issn": "{$summISSN}",
-            "title": "{$summTitle}"
-          {rdelim};
-          var permalink = "{$url}/Record/{$summId|escape:'url'}";
-          obalky.process("obalky_display_thumbnail", "obalka_{$summId}", permalink, bibinfo);
+          obalky.process("obalky_display_thumbnail", "obalka_{$summId}", "{$obalkyknih_permalink}", {$obalkyknih_bibinfo});
         {rdelim});
       </script>
-      <!--<img src="{$path}/bookcover.php" class="alignleft" alt="{translate text='Cover Image'}" id="obalka_{$summId}" height="80" width="63"/>-->
-    
-    {*
-    {if $summThumb}
-    <img src="{$summThumb|escape}" class="alignleft" alt="{translate text='Cover Image'}"/>
-    {else}
-    <img src="{$path}/bookcover.php" class="alignleft" alt="{translate text='No Cover Image'}"/>
-    {/if}
-    *}
-    <!-- End of modifications for Obalky knih -->
+    {* End of modifications for Obalky knih *}
     {if $summFormats[0] == "WEB"}
     <div class="resultitem">
       <div class="resultItemLine1">
