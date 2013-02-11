@@ -268,7 +268,7 @@
   {/if}
 
   <tr valign="top">
-    <th>{translate text='Link to catalog'}: </th>
+    <th>{translate text='Link to aleph'}: </th>
     <td>
       <a href="{$fullViewURL}">{translate text='full view'}</a>,
       <a href="{$holdingsURL}">{translate text='holdings'}</a>
