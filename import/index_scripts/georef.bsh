@@ -1,0 +1,62 @@
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+
+public static final int LONGITUDE = 0;
+public static final int LATITUDE = 1;
+public static final double UNDEFINED = Double.MAX_VALUE;
+public static final double EPSILON = 0.000001d;
+
+private double getRealNumberFromDegrees(String value, boolean longitude) {
+    int degrees = Integer.valueOf(value.substring(0, 3));
+    int minutes = Integer.valueOf(value.substring(3, 5));
+    int seconds = Integer.valueOf(value.substring(5, 7));
+    if ((longitude && degrees > 180) || (!longitude && degrees > 90)
+        || minutes > 59 || seconds > 59) {
+            return UNDEFINED;
+    }
+    double number = degrees + minutes / 60.0 + seconds / 3600.0;
+    int foo = (int) (number * 10000.0);
+    double rounded = ((double) foo) / 10000.0;
+    return rounded;
+}
+
+private double getRealNumberFromString(String coord) {
+    if (coord == null || coord.length() != 8) {
+        return UNDEFINED;
+    }
+    String prefix = coord.substring(0, 1);
+    String value = coord.substring(1);
+    String negator = "";
+    boolean longitude = false;
+    if (prefix.equals("N") || prefix.equals("S")) {
+        negator = "S";
+        longitude = false;
+    } else if (prefix.equals("W") || prefix.equals("E")) {
+        negator = "W";
+        longitude = true;
+    }
+    double number = getRealNumberFromDegrees(value, longitude);
+    if (number == UNDEFINED) {
+        return UNDEFINED;
+    }
+    if (prefix.endsWith(negator)) {
+        number *= -1;
+    }
+    return number;
+}
+
+org.solrmarc.index.SolrIndexer indexer = null;
+
+public String getBoundingBox(Record record) {
+    String north = indexer.getFirstFieldVal(record, "034d");
+    String south = indexer.getFirstFieldVal(record, "034e");
+    String west = indexer.getFirstFieldVal(record, "034f");
+    String east = indexer.getFirstFieldVal(record, "034g");
+    northReal = getRealNumberFromString(north);
+    southReal = getRealNumberFromString(south);
+    westReal = getRealNumberFromString(west);
+    eastReal = getRealNumberFromString(east);
+    String result = northReal + " " + eastReal + " " + southReal + " " + westReal;
+    return result;
+}
