@@ -212,26 +212,6 @@ class UInterface extends Smarty
             $this->assign('currentURL', "https://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']); // modification for MZK
         }
 
-        if (isset($configArray['GoogleAnalytics'])) {
-            $this->assign('googleAnalytics', $configArray['GoogleAnalytics']);
-            /* begin of costumization for MZK */
-            $ips = array(
-                '195.113.155.102' => 'employee',
-                '195.113.155.3' => 'inside',
-                '195.113.155.9' => 'inside',
-                '195.113.155.33' => 'inside',
-            );
-            $visitorType = $ips[$_SERVER['REMOTE_ADDR']];
-            if (!isset($visitorType)) {
-                $visitorType = 'outside';
-            }
-            $googleAnalyticsVariables = array(
-                "visitorType" => array ("value" => $visitorType, "type" => 1),
-            );
-            $this->assign('googleAnalyticsVariables', $googleAnalyticsVariables);
-            /* end of costumizaton for MZK */
-        }
-
         $this->assign(
             'sidebarOnLeft',
             !isset($configArray['Site']['sidebarOnLeft'])
@@ -363,6 +343,39 @@ class UInterface extends Smarty
                 $pageURL .= "?ui=mobile";
             }
             $this->assign("mobileViewLink", $pageURL);
+        }
+        if (isset($configArray['GoogleAnalytics'])) {
+            $this->assign('googleAnalytics', $configArray['GoogleAnalytics']);
+            /* begin of costumization for MZK */
+            $firstload = true;
+            if (!isset($_SESSION['firstload'])) {
+                if ($_GET['logout']) {
+                    $firstload = false;
+                }
+                $_SESSION['firstload'] = false;
+            } else {
+                $firstload = false;
+            }
+            $gaVars = array();
+            if ($firstload) {
+                $ips = array(
+                    '195.113.155.102' => 'employee',
+                    '195.113.155.3' => 'inside',
+                    '195.113.155.9' => 'inside',
+                    '195.113.155.33' => 'inside',
+                );
+                $visitorType = $ips[$_SERVER['REMOTE_ADDR']];
+                if (!isset($visitorType)) {
+                    $visitorType = 'outside';
+                }
+                $gaVars['visitorType'] = array('index' => 1, 'value' => $visitorType, 'type' => 1);
+                $gaVars['visitorStatus'] = array('index' => 2, 'value' => 'anonymous', 'type' => 1);
+            }
+            if (UserAccount::isLoggedIn()) {
+                $gaVars['visitorStatus'] = array('index' => 2, 'value' => 'logged-in', 'type' => 1);
+            }
+            $this->assign('googleAnalyticsVariables', $gaVars);
+            /* end of costumizaton for MZK */
         }
     }
 

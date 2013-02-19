@@ -84,8 +84,21 @@
       _gaq.push(['{$key}', {$value}]);
       {/foreach}
       {foreach from=$googleAnalyticsVariables key=key item=val}
-      _gaq.push(['_setCustomVar', 1, '{$key}', '{$val.value}', {$val.type}]);
+      _gaq.push(['_setCustomVar', {$val.index}, '{$key}', '{$val.value}', {$val.type}]);
       {/foreach}
+      {foreach from=$googleAnalyticsEvents key=key item=val}
+      _gaq.push(['_trackEvent', '{$key}', '{$val.action}', '{$val.label}', '{$val.value}']);
+      {/foreach}
+      {if $pageTemplate == 'list-none.tpl'}
+        _gaq.push(['_trackEvent','Search','No results','{$lookfor}', 0]);
+      {/if}
+      {if $subTemplate == 'extended-hold-status.tpl'}
+        {if $error}
+          _gaq.push(['_trackEvent', 'Request', 'Failed', '{$error_str}', 0]);
+        {else}
+          _gaq.push(['_trackEvent', 'Request', 'Success', '{$coreMainAuthor|escape}: {$coreShortTitle|escape} ({$id})', 0]);
+        {/if}
+      {/if}
       _gaq.push(['_trackPageview']);
       {literal}
       (function() {

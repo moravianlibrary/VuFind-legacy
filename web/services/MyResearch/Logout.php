@@ -57,10 +57,12 @@ class Logout extends Action
                 $site_url = $configArray['Site']['url'];
                 $logout_url = $site_url . $logout_url;
             }
-            $logout = $configArray['Shibboleth']['logout'] . "?return=" . urlencode($configArray['Site']['url']);
+            $logout = $configArray['Shibboleth']['logout'] . "?return=" . urlencode($configArray['Site']['url'] . '?logout=1');
+            session_write_close();
             header('Location: ' . $logout);
         } else {
-            header('Location: ' . $configArray['Site']['url']);
+            session_write_close();
+            header('Location: ' . $configArray['Site']['url'] . '?logout=1');
         }
     }
 
