@@ -52,7 +52,7 @@ class Home extends Action
         global $configArray;
 
         // Cache homepage
-        $interface->caching = 1; 
+        $interface->caching = 0; 
         $cacheId = 'homepage|' . $interface->lang . '|' .
             (UserAccount::isLoggedIn() ? '1' : '0') . '|' .
             (isset($_SESSION['lastUserLimit']) ? $_SESSION['lastUserLimit'] : '') .
