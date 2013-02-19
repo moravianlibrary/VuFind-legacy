@@ -38,6 +38,7 @@
         $(document).ready(function() {ldelim}
           obalky.process("obalky_display_cover", "obalka_{$id}", "{$obalkyknih_permalink}", {$obalkyknih_bibinfo});
         {rdelim});
+         $(document).ready(function() {ldelim}addthis.init(){rdelim});
       </script>
 
       <div class="alignright">
@@ -309,7 +310,7 @@
 <script type="text/javascript">var addthis_config =
 {"data_track_addressbar":false};</script>
 <script type="text/javascript"
-src="https://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ffed26866462853"></script>
+src="https://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ffed26866462853&async=1"></script>
 <!-- AddThis Button END -->
 {/literal}
 
