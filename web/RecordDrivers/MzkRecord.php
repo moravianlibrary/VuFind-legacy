@@ -163,7 +163,7 @@ class MzkRecord extends MarcRecord
     }
     
     protected function getCNB() {
-        return $this->_getFirstFieldValue('015', array('a'));
+        return isset($this->fields['nbn']) ? $this->fields['nbn'] : NULL;
     }
 
     protected function getTitle()
@@ -204,8 +204,11 @@ class MzkRecord extends MarcRecord
             $bibinfo['year'] = $year[0];
         }
         $cnb = $this->getCNB();
-        if (!empty($cnb)) {
+        if (isset($cnb)) {
             $bibinfo['nbn'] = $cnb;
+        } else {
+            $prefix = 'BOA001';
+            $bibinfo['nbn'] = $prefix . '-' . str_replace('-', '', $this->getUniqueID());
         }
         $permalink = $configArray['Site']['url'] . '/Record/' . urlencode($this->getUniqueID());
         $interface->assign('obalkyknih_permalink', $permalink);
