@@ -23,9 +23,9 @@ function smarty_function_hint($params, &$smarty)
         $element = 'a';
     }
     if (isset($params['text'])) {
-        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$title&lang=$lang' title='$title' $href>$text</$element>";
+        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$title&lang=$lang' title='$title' $append>$text</$element>";
     } else {
-        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$title&lang=$lang' title='$title' $href/>";
+        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$title&lang=$lang' title='$title' $append/>";
     }
 }
 ?>

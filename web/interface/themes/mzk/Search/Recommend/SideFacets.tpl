@@ -59,7 +59,7 @@
               <dd>{$thisFacet.value|escape} <img src="{$path}/images/silk/tick.png" alt="Selected"></dd>
             {else}
               {if $thisFacet.untranslated == "available_for_eod"}
-              <dd>{hint title='EOD' text=$thisFacet.value href=$thisFacet.url}({$thisFacet.count})</dd>
+              <dd>{hint title='EOD' text=$thisFacet.value href=$thisFacet.url} ({$thisFacet.count})</dd>
               {else}
               <dd><a href="{$thisFacet.url|escape}">{$thisFacet.value|escape}</a> ({$thisFacet.count})</dd>
               {/if}
