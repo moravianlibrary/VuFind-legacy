@@ -189,9 +189,11 @@ if (UserAccount::isLoggedIn() && $configArray['Authentication']['method'] == 'Sh
     if ($shibLoginNeeded || $standardLoginNeeded) {
         $user = UserAccount::login();
         if (PEAR::isError($user)) {
+            $error = $user;
+            $user = false;
             $interface->initGlobals();
             include_once 'services/MyResearch/Login.php';
-            Login::launch($user->getMessage());
+            Login::launch($error->getMessage());
             exit();
         }
     }
