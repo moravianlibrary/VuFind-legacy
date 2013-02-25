@@ -443,7 +443,7 @@ class MarcRecord extends IndexRecord
      * @return array
      * @access protected
      */
-    private function _getFieldArray($field, $subfields = null, $concat = true)
+    protected function _getFieldArray($field, $subfields = null, $concat = true)
     {
         // Default to subfield a if nothing is specified.
         if (!is_array($subfields)) {
