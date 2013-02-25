@@ -16,6 +16,13 @@ a.jt {
 {/literal}
 </style>
 
+{if !empty($holdingsRestrictions)}
+  <div class="warning">
+  {foreach from=$holdingsRestrictions item=restriction}
+    {$restriction|escape}
+  {/foreach}
+  </div>
+{/if}
 {if $itemLink}
    {if $itemLinkType == "LKR"}
       <a href="{$url}/Record/{$itemLink|escape:'url'}">{translate text='To place a hold, visit this record.'}<a/>

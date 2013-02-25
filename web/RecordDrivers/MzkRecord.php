@@ -36,6 +36,7 @@ class MzkRecord extends MarcRecord
                 $interface->assign('itemLinkType', "LKR");
             }
         }
+        $interface->assign('holdingsRestrictions', $this->getRestrictions());
         return $result;
     }
 
@@ -162,8 +163,14 @@ class MzkRecord extends MarcRecord
         return ($eod == 'Y')?true:false;
     }
     
-    protected function getCNB() {
+    protected function getCNB()
+    {
         return isset($this->fields['nbn']) ? $this->fields['nbn'] : NULL;
+    }
+    
+    protected function getRestrictions()
+    {
+        return $this->_getFieldArray('540', array('a'));
     }
 
     protected function getTitle()
