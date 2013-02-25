@@ -68,7 +68,6 @@ class ExtendedHold extends Record
             $result = $this->placeHold();
             if (!$result['success']) {
                 $interface->assign('error', true);
-                //print $result['sysMessage'] . "<BR>";
                 $interface->assign('error_str', $result['sysMessage']);
             }
             $interface->assign('subTemplate', 'extended-hold-status.tpl');
@@ -112,7 +111,7 @@ class ExtendedHold extends Record
         }
         $interface->assign('item', $group); // interface->assign('item', $_GET['barcode']);
         $interface->assign('formTargetPath',
-            '/Record/' . urlencode($id) . '/ExtendedHold');
+            '/Record/' . urlencode($id) . '/ExtendedHold?barcode=' . urlencode($group));
         if (isset($_GET['lightbox'])) {
             // Use for lightbox
             $interface->assign('title', $_GET['message']);
