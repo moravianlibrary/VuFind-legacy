@@ -64,6 +64,8 @@ class MzkRecord extends MarcRecord
         // Norms in MZK04
         if (strpos($this->getUniqueID(), "MZK04-") === 0) {
             $interface->assign('validity', $this->_getFirstFieldValue('520', array('a')));
+        } else {
+            $interface->assign('validity', null);
         }
         $interface->assign('itemLink', $this->fields['itemlink']);
         $statuses = $this->fields['statuses'];
