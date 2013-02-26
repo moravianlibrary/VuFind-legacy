@@ -441,9 +441,11 @@ class Aleph implements DriverInterface
             $ids[$bib][] = $sys_no;
         }
         foreach ($ids as $key => $values) {
-            $holds = $this->getStatusesX($key, $values);
-            foreach ($holds as $hold) {
-               $holdings[] = $hold;
+            if (in_array($key, $this->bib)) {
+                $holds = $this->getStatusesX($key, $values);
+                foreach ($holds as $hold) {
+                    $holdings[] = $hold;
+                }
             }
         }
         return $holdings;
