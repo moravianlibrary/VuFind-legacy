@@ -15,9 +15,6 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
 {/if}
 {js filename="ajax_common.js"}
 {js filename="record.js"}
-{if !empty($addThis)}
-<script type="text/javascript" src="https://s7.addthis.com/js/250/addthis_widget.js?pub={$addThis|escape:"url"}"></script>
-{/if}
 
 <div id="bd">
   <div id="yui-main" class="content">
