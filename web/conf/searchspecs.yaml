@@ -132,6 +132,8 @@ Author:
     - author_fuller^50
     - author2
     - author_additional
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - author:
       - [onephrase, 350]
@@ -155,6 +157,8 @@ ISN:
   DismaxFields:
     - isbn
     - issn
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - issn:
       - [and, 100]
@@ -170,6 +174,8 @@ Subject:
     - geographic^50
     - genre^50
     - era
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - topic_unstemmed:
       - [onephrase, 350]
@@ -203,6 +209,8 @@ JournalTitle:
     - title_old
     - series^100
     - series2
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - title_short:
       - [onephrase, 500]
@@ -239,6 +247,8 @@ Title:
     - title_old
     - series^100
     - series2
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - title_short:
       - [onephrase, 500]
@@ -268,6 +278,8 @@ Series:
   DismaxFields:
     - series^100
     - series2
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - series:
       - [onephrase, 500]
@@ -300,7 +312,9 @@ AllFields:
     - allfields
     - fulltext
   # modification for MZK
-    - publishDateFacet
+  #  - publishDateFacet
+  DismaxParams:
+    - [bq, "relevancy:default"^2]
   QueryFields:
     - 
       - [OR, 50]
@@ -351,7 +365,7 @@ AllFields:
       - [or, ~]
     fulltext:
       - [or, ~]
-  FilterQuery: "mzk_visible_str_ns:visible"
+  #FilterQuery: "mzk_visible_str_ns:visible"
 
 # These are advanced searches that never use Dismax:
 id:
