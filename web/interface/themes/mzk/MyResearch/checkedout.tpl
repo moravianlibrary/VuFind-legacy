@@ -94,7 +94,7 @@
                         {if $renewResult[$resource.ils_details.item_id]}
                           {if $renewResult[$resource.ils_details.item_id].success}
                             {assign var="showStatus" value="hide"}
-                            <strong>{translate text='Due Date'}: {$renewResult[$resource.ils_details.item_id].new_date} {if $renewResult[$resource.ils_details.item_id].new_time}{$renewResult[$resource.ils_details.item_id].new_time|escape}{/if}</strong>
+                            <strong>{translate text='Due Date'}: {$resource.ils_details.duedate|escape} {if $resource.ils_details.dueTime} {$resource.ils_details.dueTime|escape}{/if}</strong>
                             <div class="userMsg">{translate text='renew_success'}</div>
                           {else}
                             <strong>{translate text='Due Date'}: {$resource.ils_details.duedate|escape} {if $resource.ils_details.dueTime} {$resource.ils_details.dueTime|escape}{/if}</strong>
