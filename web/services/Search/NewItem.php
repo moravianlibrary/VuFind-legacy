@@ -123,7 +123,9 @@ class NewItem extends Action
                 for ($i=0; $i<count($newItems['results']); $i++) {
                     $bibIDs[] = $newItems['results'][$i]['id'];
                 }
-                $searchObject->setQueryIDs($bibIDs);
+                if (!$searchObject->setQueryIDs($bibIDs)) {
+                    $interface->assign('infoMsg', 'too_many_new_items');
+                }
 
                 // Build RSS Feed for Results (if requested)
                 if ($searchObject->getView() == 'rss') {
