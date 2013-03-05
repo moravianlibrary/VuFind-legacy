@@ -135,7 +135,7 @@
 
   <tr valign="top">
     <th>{translate text='Language'}: </th>
-    <td>{foreach from=$recordLanguage item=lang}{$lang|escape}<br>{/foreach}</td>
+    <td>{foreach from=$recordLanguage item=lang}{$lang|translate|escape}<br>{/foreach}</td>
   </tr>
 
   {if !empty($corePublications)}
