@@ -312,7 +312,7 @@ AllFields:
     - allfields
     - fulltext
   # modification for MZK
-  #  - publishDateFacet
+    - publishDateFacet
   DismaxParams:
     - [bq, "relevancy:default"^2]
   QueryFields:
