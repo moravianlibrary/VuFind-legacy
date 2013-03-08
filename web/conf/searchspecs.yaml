@@ -365,7 +365,7 @@ AllFields:
       - [or, ~]
     fulltext:
       - [or, ~]
-  #FilterQuery: "mzk_visible_str_ns:visible"
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 # These are advanced searches that never use Dismax:
 id:
@@ -395,7 +395,7 @@ TitleBrowse:
   QueryFields:
     - title_browse:
       - [onephrase, ~]
-#  FilterQuery: "mzk_visible_str_ns:visible"
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 DeweyBrowse:
   QueryFields:
@@ -471,6 +471,9 @@ publisher:
 year:
   QueryFields:
     - publishDate:
+      - [and, 100]
+      - [or, ~]
+    - publishDateFacet:
       - [and, 100]
       - [or, ~]
   FilterQuery: "mzk_visible_str_ns:visible"
