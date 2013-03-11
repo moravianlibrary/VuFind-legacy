@@ -1565,7 +1565,8 @@ td.format {
 	text-align: center;
 	font-size: 8pt;
 	font-weight: bold;
-	padding: 8px 0 0 0;
+	padding: 6px 0 0 0;
+	width: 50px;
 }
 
 
