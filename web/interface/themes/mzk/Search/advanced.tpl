@@ -168,8 +168,8 @@
       {/foreach}
     {/foreach}
   {else}
-    var new_group = addGroup();
-    addSearch(new_group);
-    addSearch(new_group);
+    var new_group = addGroup('', 'Title');
+    addSearch(new_group, '', 'Author');
+    addSearch(new_group, '', 'year');
   {/if}
 </script>
