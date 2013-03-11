@@ -70,6 +70,9 @@ class MZKSolr extends Solr
                         }
                     }
                 }
+                if ($element == 'format:"Journal"' || $element == 'format:"Newspaper"') {
+                    $element = 'format:"NewspaperOrJournal"';
+                }
                 if ($addFilter) {
                     $filters[] = $element;
                 }
