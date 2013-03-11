@@ -176,12 +176,12 @@ class Advanced extends Action
         // Check to see if there is an existing range in the search object:
         if ($savedSearch) {
             $filters = $savedSearch->getFilters();
-            if (isset($filters['publishDate'])) {
-                foreach ($filters['publishDate'] as $current) {
+            if (isset($filters['publishDateFacet'])) {
+                foreach ($filters['publishDateFacet'] as $current) {
                     if ($range = VuFindSolrUtils::parseRange($current)) {
                         $from = $range['from'] == '*' ? '' : $range['from'];
                         $to = $range['to'] == '*' ? '' : $range['to'];
-                        $savedSearch->removeFilter('publishDate:' . $current);
+                        $savedSearch->removeFilter('publishDateFacet:' . $current);
                         break;
                     }
                 }
