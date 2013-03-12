@@ -8,6 +8,7 @@ class MzkRecord extends MarcRecord
     public function __construct($record)
     {
         parent::__construct($record);
+        array_push($this->forbiddenSnippetFields, "relevancy");
     }
 
     public function getCoreMetadata()
@@ -150,7 +151,7 @@ class MzkRecord extends MarcRecord
                     } else {
                         $desc = $address;
                     }
-                    if ($desc != 'index obsahu dokumentu') {
+                    if (strpos($desc, 'index obsahu dokumentu') === FALSE) {
                         $retVal[$address] = $desc;
                     }
                 }
