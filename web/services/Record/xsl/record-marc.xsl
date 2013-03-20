@@ -42,5 +42,9 @@
 	<xsl:template match="marc:subfield">
       <strong>|<xsl:value-of select="@code"/></strong>&#160;<xsl:value-of select="."/>&#160;
 	</xsl:template>
+	
+  <xsl:template match='//marc:datafield[@tag="SGA"]'>
+    <b>test</b>
+  </xsl:template>
 
 </xsl:stylesheet>
