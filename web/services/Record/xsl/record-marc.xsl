@@ -43,8 +43,7 @@
       <strong>|<xsl:value-of select="@code"/></strong>&#160;<xsl:value-of select="."/>&#160;
 	</xsl:template>
 	
-  <xsl:template match='//marc:datafield[@tag="SGA"]'>
-    <b>test</b>
+  <xsl:template match='//marc:datafield[@tag="SGA" or @tag="IST" or @tag="CAT" or @tag="MZK"]'>
   </xsl:template>
 
 </xsl:stylesheet>
