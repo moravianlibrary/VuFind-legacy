@@ -7,7 +7,7 @@
   {translate text='Library Catalog Username'}:<br>
   <input type="text" name="cat_username" value="" size="25"><br>
   {translate text='Library Catalog Password'}:<br>
-  <input type="text" name="cat_password" value="" size="25"><br>
+  <input type="password" name="cat_password" value="" size="25"><br>
   <input type="submit" name="submit" value="{translate text="Save"}">
 
   {if $followup}
