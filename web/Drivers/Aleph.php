@@ -259,7 +259,7 @@ class Aleph implements DriverInterface
     {
         $path = '';
         foreach ($path_elements as $path_element) {
-           $path .= $path_element . "/";
+           $path .= urlencode($path_element) . "/";
         }
         $url = "http://$this->host:$this->dlfport/rest-dlf/" . $path;
         $url = $this->appendQueryString($url, $params);
