@@ -101,7 +101,15 @@
                             <div class="error">{translate text='renew_fail'}{if $renewResult[$resource.ils_details.item_id].sysMessage}: {$renewResult[$resource.ils_details.item_id].sysMessage|translate|escape}{/if}</div>
                           {/if}
                         {else}
-                          <p><strong>{translate text='Due Date'}: {$resource.ils_details.duedate|escape} {if $resource.ils_details.dueTime} {$resource.ils_details.dueTime|escape}{/if}</strong></p>
+                          <p>
+                             <strong>
+                               {translate text='Due Date'}: {$resource.ils_details.duedate|escape}
+                               {if $resource.ils_details.dueTime} {$resource.ils_details.dueTime|escape}{/if}
+                               {if $resource.ils_details.no_of_renewals > 0}
+                               | {translate text='No of renewals'}: {$resource.ils_details.no_of_renewals|escape}
+                               {/if}
+                             </strong>
+                          </p>
                           {if $showStatus == "show"}
                             {if $resource.ils_details.dueStatus == "overdue"}
                               <div class="error">{translate text="renew_item_overdue"}</div>
