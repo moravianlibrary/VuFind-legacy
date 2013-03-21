@@ -13,7 +13,7 @@
   <head>
     <title>{$pageTitle|truncate:64:"..."}</title>
     {if $addHeader}{$addHeader}{/if}
-    <link rel="search" type="application/opensearchdescription+xml" title="Library Catalog Search" href="{$url}/Search/OpenSearch?method=describe">
+    <link rel="search" type="application/opensearchdescription+xml" title="{translate text='MZK catalogue search'}" href="{$url}/Search/OpenSearch?method=describe">
     {css media="screen" filename="styles.css"}
     {css media="print" filename="print.css"}
     {css media="screen" filename="mzk.css"}
