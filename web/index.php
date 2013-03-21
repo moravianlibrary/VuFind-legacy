@@ -155,7 +155,7 @@ $loggedInModule = isset($configArray['Site']['defaultLoggedInModule'])
     ? $configArray['Site']['defaultLoggedInModule'] : 'MyResearch';
 $loggedOutModule = isset($configArray['Site']['defaultModule'])
     ? $configArray['Site']['defaultModule'] : 'Search';
-$module = ($user = UserAccount::isLoggedIn()) ? $loggedInModule : $loggedOutModule;
+$module = ($user = UserAccount::isLoggedIn()) ? $loggedOutModule : $loggedOutModule;
 $module = (isset($_GET['module'])) ? $_GET['module'] : $module;
 $module = preg_replace('/[^\w]/', '', $module);
 $action = (isset($_GET['action'])) ? $_GET['action'] : 'Home';
