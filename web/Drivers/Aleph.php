@@ -222,6 +222,10 @@ class Aleph implements DriverInterface
             $this->translator = false;
         }
         $this->ill_fields = $configArray['ILL'];
+        $this->statuses_limit = 50;
+        if (isset($configArray['Catalog']['statuses_limit'])) {
+            $this->statuses_limit = $configArray['Catalog']['statuses_limit'];
+        }
     }
 
     protected function doXRequest($op, $params, $auth=false)
@@ -442,9 +446,12 @@ class Aleph implements DriverInterface
         }
         foreach ($ids as $key => $values) {
             if (in_array($key, $this->bib)) {
-                $holds = $this->getStatusesX($key, $values);
-                foreach ($holds as $hold) {
-                    $holdings[] = $hold;
+                $chunks = array_chunk($values, $this->statuses_limit);
+                foreach ($chunks as $chunk) {
+                    $holds = $this->getStatusesX($key, $chunk);
+                    foreach ($holds as $hold) {
+                        $holdings[] = $hold;
+                    }
                 }
             }
         }
