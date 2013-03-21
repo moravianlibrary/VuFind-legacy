@@ -723,7 +723,11 @@ class Aleph implements DriverInterface
                 $type = "hold";
                 $docno = (string) $z37->{'z37-doc-number'};
                 $itemseq = (string) $z37->{'z37-item-sequence'};
-                $seq = (string) $z37->{'z37-sequence'};
+                $seq = 0;
+                $item_status = preg_replace("/\s[\s]+/", " ", (string) $item->{'status'});
+                if (preg_match("/Waiting in position ([0-9]+) in queue; current due date ([0-9]+\/[a-z|A-Z]+\/[0-9])+/", $item_status, $matches)) {
+                     $seq = $matches[1];
+                }
                 $location = (string) $z37->{'z37-pickup-location'};
                 $reqnum = (string) $z37->{'z37-doc-number'} .
                     (string) $z37->{'z37-item-sequence'} . (string) $z37->{'z37-sequence'};
