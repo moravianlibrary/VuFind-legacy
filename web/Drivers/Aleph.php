@@ -659,12 +659,21 @@ class Aleph implements DriverInterface
            }
            $transList[] = $transListItem;
         }
+        if ($history) {
+           usort($transList, "Aleph::compareByReturnedDate");
+        }
         if ($unreturned_books > 0) {
            foreach ($transList as &$transListItem) {
                $transListItem['renewable'] = false;
            }
         }
         return $transList;
+    }
+    
+    public static function compareByReturnedDate($a, $b) {
+        $a  = date("U", strtotime($a['returned']));
+        $b = date("U", strtotime($b['returned']));
+        return ($b - $a);
     }
 
     public function getRenewDetails($details)
