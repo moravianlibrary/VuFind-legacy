@@ -636,6 +636,7 @@ class Aleph implements DriverInterface
            $due_date = strtotime($this->parseDate($due));
            $return_in_days = ($due_date - $current_date) / (60*60*24);
            $renewable = ($renew[0] == 'Y');
+           $no_of_renewals = (string) $z36->{'z36-no-renewal'};
            $transListItem = array('type' => $type,
                                'id' => ($history)?null:$this->barcodeToID($barcode),
                                'item_id' => $group,
@@ -646,6 +647,7 @@ class Aleph implements DriverInterface
                                'reqnum' => $reqnum,
                                'barcode' => $barcode,
                                'duedate' => $this->parseDate($due),
+                               'no_of_renewals' => $no_of_renewals,
                                'returned' => $this->parseDate($returned),
                                'holddate' => $holddate,
                                'delete' => $delete,
