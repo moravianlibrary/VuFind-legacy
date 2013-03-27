@@ -26,7 +26,7 @@
 	<div class="col last"><p><strong>{translate text='Need Help?'}</strong></p>
 	  <ul>
 		<li><a href="{$url}/Help/Home?topic=search" onClick="window.open('{$url}/Help/Home?topic=search', 'Help', 'width=625, height=510'); return false;">{translate text='Search Tips'}</a></li>
-		<li><a href="http://www.ptejteseknihovny.cz/">{translate text='Ask a Librarian'}</a></li>
+		<li><a href="http://www.ptejteseknihovny.cz/zadani-dotazu?q=BOA001">{translate text='Ask a Librarian'}</a></li>
 		<li><a href="http://www.mzk.cz/faq">{translate text='FAQs'}</a></li>
 		<li><a href="https://docs.google.com/spreadsheet/viewform?formkey=dHN5S2pMa0pEYnJyQUtzbWU3Wm9YcWc6MQ&entry_3={$url|escape:url}&entry_4={$user->email|escape:url}&TB_iframe=true&height=600&width=600" class="thickbox">{translate text='Feedback'}</a></li>
 	  </ul>
