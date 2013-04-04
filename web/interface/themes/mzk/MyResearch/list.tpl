@@ -49,6 +49,7 @@
               {if is_array($exportOptions) && count($exportOptions) > 0}
               <li><input type="submit" class="button export" name="export" onClick="processIds('favForm', 'ui_checkboxes', 'makeArray', 'MyResearch', 'Export', '', '', '{translate text="export_selected_favorites"}', 'MyResearch', 'Favorites', ''); return false;" value="{translate text='export_selected'}"></li>
               {/if}
+              <li><input type="submit" class="button export" name="import" value="{translate text='import_favorites'}"></li>
            </ul>
            <br class="clearer" />
           </div>
@@ -82,7 +83,14 @@
           </ul>
           {if $pageLinks.all}<div class="pagination">{$pageLinks.all}</div>{/if}
           {else}
+          <div class="toolbar">
+            <ul>
+              <li><input type="submit" class="button export" name="import" value="{translate text='import_favorites'}"></li>
+            <ul>
+          </div>
+          <div class="yui-gd resulthead">
           {translate text='You do not have any saved resources'}
+          </div>
           {/if}
           </form>
         <!--</div>-->
