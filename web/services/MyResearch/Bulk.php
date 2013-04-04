@@ -97,6 +97,10 @@ class Bulk extends Action
             include_once 'services/Search/SortResults.php';
             $sort = new SortResults();
             $sort->launch();
+        } else if (isset($_REQUEST['import'])) {
+            include_once 'services/MyResearch/FavImport.php';
+            $favImport = new FavImport();
+            $favImport->launch();
         } else {
             // If we get this far, no export has been matched or we have errors
             $this->followupUrl .= "?errorMsg=bulk_fail";

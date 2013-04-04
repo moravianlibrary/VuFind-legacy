@@ -30,7 +30,6 @@
  * @link     http://vufind.org/wiki/building_an_ils_driver Wiki
  */
 require_once 'Interface.php';
-//require_once 'AlephTables.php';
 require_once 'sys/Proxy_Request.php';
 require_once 'sys/VuFindCache.php';
 
@@ -225,6 +224,10 @@ class Aleph implements DriverInterface
         $this->statuses_limit = 50;
         if (isset($configArray['Catalog']['statuses_limit'])) {
             $this->statuses_limit = $configArray['Catalog']['statuses_limit'];
+        }
+        $this->favourites_url = null;
+        if (isset($configArray['Catalog']['fav_cgi_url'])) {
+            $this->favourites_url = $configArray['Catalog']['fav_cgi_url'];
         }
     }
 
@@ -1262,6 +1265,31 @@ class Aleph implements DriverInterface
            return array('success' => false, 'sysMessage' => $ex->getMessage()); 
         }
         return array('success' => true);
+    }
+    
+    /**
+     * 
+     * Get Favorite Items from ILS
+     * 
+     * @param mixed  $patron  Patron data
+     * @return mixed          An array with favorite items (each item contains id, folder and note) 
+     * @access public
+     */
+    public function getMyFavorites($patron) {
+        if ($this->favourites_url == null) {
+            return array(); // graceful degradation
+        }
+        $url = $this->appendQueryString($this->favourites_url, array('id' => $patron['id']));
+        $xml = $this->doHTTPRequest($url);
+        $result = array();
+        foreach ($xml->{'favourite'} as $fav) {
+            $result[] = array( 
+                'id'     => (string) $fav->{'id'},
+                'folder' => (string) $fav->{'folder'},
+                'note'   => (string) $fav->{'note'} 
+            );
+        }
+        return $result;
     }
 
      /**
