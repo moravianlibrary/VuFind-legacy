@@ -8,7 +8,7 @@ function getStatuses(id)
     GetStatusList[GetStatusList.length] = id;
 }
 
-function doGetStatuses(strings)
+function doGetStatuses(strings, full)
 {
     // Do nothing if no statuses were requested:
     if (GetStatusList.length < 1) {
@@ -35,6 +35,8 @@ function doGetStatuses(strings)
                 if (statusDiv) {
                     if (items[i].reserves == 'true') {
                         statusDiv.innerHTML = '';
+                    } else if (items[i].full_status && full) {
+                        statusDiv.innerHTML = items[i].full_status;
                     } else if (items[i].availability_message) {
                         statusDiv.innerHTML = items[i].availability_message;
                     } else {

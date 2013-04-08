@@ -8,9 +8,7 @@
       <th>{translate text="Availability"}</th>
     </tr>
     {foreach from=$recordSet item=record name="recordLoop"}
-      <!--<div class="result {if ($smarty.foreach.recordLoop.iteration % 2) == 0}alt {/if}record{$smarty.foreach.recordLoop.iteration}">-->
        {$record}
-      <!--</div>-->
     {/foreach}
   </tbody>
 </table>
@@ -19,7 +17,7 @@
 <script type="text/javascript">
   doGetStatuses({literal}{{/literal}
     unknown: '<span class="unknown">{translate text='Unknown'}<\/span>'
-  {literal}}{/literal});
+  {literal}}{/literal}, false);
   {if $user}
   doGetSaveStatuses();
   {/if}

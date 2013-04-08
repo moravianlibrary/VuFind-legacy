@@ -5,16 +5,19 @@
     <tr>
     <td>
       {if $bookBag}
-        <!--<label for="checkbox_{$summId|regex_replace:'/[^a-z0-9]/':''|escape}" class="offscreen">{translate text="Select this record"}</label>-->
-        <input id="checkbox_{$summId|regex_replace:'/[^a-z0-9]/':''|escape}" type="checkbox" name="ids[]" value="{$summId|escape}" class="checkbox_ui"/>
-        <input type="hidden" name="idsAll[]" value="{$summId|escape}" />
+        <input id="checkbox_{$summId|regex_replace:'/[^a-zA-Z0-9\-]/':''|escape}" type="checkbox" name="ids[]" value="{$summId|escape}" class="checkbox_ui checkbox_record"
+          onchange="updateCart(this);" title="{translate text='Add to Book Bag'}" />
+        <input type="hidden" name="idsAll[]" value="{$summId|escape}" />&nbsp;
       {/if}
     </td>
-    <td id="obalka_{$summId}">{image id="obalka_`$summId`_format" src="formats/`$summFormats[0]`.png"
-    title="$summFormats[0]"|translate align="left"}</td>
+    <td id="obalka_{$summId}">
+      {image id="obalka_`$summId`_format" src="formats/`$summFormats[0]`.png" title="$summFormats[0]"|translate align="left"}
+    </td>
     </tr>
     <tr>
-    <td></td>
+    <td>
+      <span class="book_bag"></span>
+    </td>
     <td class="format">{translate text=$summFormats[0]}</td>
     </tr>
     </table>
@@ -26,6 +29,7 @@
         {rdelim});
       </script>
     {* End of modifications for Obalky knih *}
+
     {if $summFormats[0] == "WEB"}
     <div class="resultitem">
       <div class="resultItemLine1">
@@ -40,7 +44,6 @@
     <div class="resultitem">
       <div class="resultItemLine1">
       <a href="{$url}/Record/{$summId|escape:"url"}" class="title">{if !empty($summHighlightedTitle)}{$summHighlightedTitle|addEllipsis:$summTitle|highlight}{elseif !$summTitle}{translate text='Title not available'}{else}{$summTitle|truncate:180:"..."|escape}{/if}</a>
-      {*<a href="{$url}/Record/{$summId|escape:"url"}" class="title">{if !$summTitle}{translate text='Title not available'}{else}{$summTitle|truncate:180:"..."|escape}{/if}</a>*}
       </div>
 
       <div class="resultItemLine2">
@@ -55,12 +58,7 @@
       {if !empty($summSnippetCaption)}<b>{translate text=$summSnippetCaption}:</b>{/if}
       {if !empty($summSnippet)}<span class="quotestart">&#8220;</span>...{$summSnippet|highlight}...<span class="quoteend">&#8221;</span><br>{/if}
       {if $summAjaxStatus}
-      {*
-       <b>{translate text='Call Number'}:</b> <span id="callnumber{$summId|escape}">{translate text='Loading'}</span><br>
-      <b>{translate text='Located'}:</b> <span id="location{$summId|escape}">{translate text='Loading'}</span>
-      *}
       {elseif !empty($summCallNo)}
-      <!-- <b>{translate text='Call Number'}:</b> {$summCallNo|escape} -->
       {/if}
       </div>
       
@@ -73,23 +71,14 @@
         {foreach from=$summURLs key=recordurl item=urldesc}
           <br><a href="{if $proxy}{$proxy}/login?qurl={$recordurl|escape:"url"}{else}{$recordurl|escape}{/if}" class="fulltext" target="new">{if $recordurl == $urldesc}{translate text='Online'}{else}{$urldesc|escape}{/if}</a>
         {/foreach}
-      {elseif $summAjaxStatus}
-        <div class="status">
-          <b>{translate text='Loan type'}:</b> {translate text=$status}</span>
-        </div>
-        {if $status != "no items"}
-        <div class="status" id="status{$itemLink|escape}"> {*was {$summId|escape} *}
+      {/if}
+      {if $summAjaxStatus}
+        <div class="status" id="status{$itemLink|escape}">
           <span class="unknown" style="font-size: 8pt;">{translate text='Loading'}...</span>
         </div>
-        {/if}
       {/if}
         <div style="display: none;" id="locationDetails{$summId|escape}">&nbsp;</div>
       </div>
-      <!--
-      {foreach from=$summFormats item=format}
-        <span class="iconlabel {$format|lower|regex_replace:"/[^a-z0-9]/":""}">{translate text=$format}</span>
-      {/foreach}
-      -->
     </div>
     {/if}
   </div>
@@ -133,7 +122,7 @@
 
 {if $summAjaxStatus}
 <script type="text/javascript">
-  getStatuses('{$summId|escape:"javascript"}');
+  getStatuses('{$itemLink|escape:"javascript"}');
 </script>
 {/if}
 {if $showPreviews}

@@ -12,6 +12,7 @@ vufindString.bookbagFull = "{translate text="bookbag_full_msg"}";
 vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
 </script>
 
+{*
 <form method="post" name="bulkActionForm" action="{$url}/Cart/Home">
   <div class="bulkActionButtons yui-ge resulthead">
     <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="addFormCheckboxSelectAll"/> <label class="floatleft" for="addFormCheckboxSelectAll">{translate text="select_page"}</label>
@@ -23,6 +24,7 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
     </noscript>
     <div class="clear"></div>
   </div>
+*}
 {/if}
 
 
@@ -36,10 +38,11 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
 <script type="text/javascript">
   doGetStatuses({literal}{{/literal}
     unknown: '<span class="unknown">{translate text='Unknown'}<\/span>'
-  {literal}}{/literal});
+  {literal}}{/literal}, true);
   {if $user}
   // doGetSaveStatuses();
   {/if}
 </script>
+{if $bookBag}
 </form>
-
+{/if}

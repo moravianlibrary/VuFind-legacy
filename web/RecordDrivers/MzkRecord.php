@@ -68,7 +68,7 @@ class MzkRecord extends MarcRecord
         } else {
             $interface->assign('validity', null);
         }
-        $interface->assign('itemLink', $this->fields['itemlink']);
+        $interface->assign('itemLink', $this->fields['adm_id']);
         $statuses = $this->fields['statuses'];
         if ($statuses == null) {
            $statuses = array();
