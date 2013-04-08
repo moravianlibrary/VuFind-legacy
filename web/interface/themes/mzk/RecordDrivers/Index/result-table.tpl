@@ -15,13 +15,13 @@
   </td>
   <td>{if $summDate}{$summDate[0]}{/if}</td>
   <td>
-    <div class="status" id="status{$itemLink|escape}"> {*was {$summId|escape} *}
+    <div class="status" id="status{$itemLink|escape}">
       {if $summFormats[0] != "WEB"}<span class="unknown" style="font-size: 8pt;">{translate text='Loading'}...</span>{/if}
     </div>
   </td>
   {if $summAjaxStatus}
   <script type="text/javascript">
-    getStatuses('{$summId|escape:"javascript"}');
+    getStatuses('{$itemLink|escape:"javascript"}');
   </script>
   {/if}
 </tr>
