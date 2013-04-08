@@ -116,23 +116,6 @@
   </tr>
   {/if}
 
-  <!--
-  <tr valign="top">
-    <th>{translate text='Format'}: </th>
-    <td>
-     {if is_array($recordFormat)}
-      {foreach from=$recordFormat item=displayFormat name=loop}
-        {*<span class="iconlabel {$displayFormat|lower|regex_replace:"/[^a-z0-9]/":""}">{translate text=$displayFormat}</span>*}
-        <img src="{$path}/interface/themes/mzk/images/formats/small/{$displayFormat}.png" title="{translate text=$displayFormat}" align="left"/>&nbsp;{translate text=$displayFormat}
-      {/foreach}
-    {else}
-      <img src="{$path}/interface/themes/mzk/images/formats/small/{$displayFormat}.png" title="{translate text=$displayFormat}" align="left"/>&nbsp;{translate text=$displayFormat}
-      {*<span class="iconlabel {$recordFormat|lower|regex_replace:"/[^a-z0-9]/":""}">{translate text=$recordFormat}</span>*}
-    {/if}  
-    </td>
-  </tr>
-  -->
-
   <tr valign="top">
     <th>{translate text='Language'}: </th>
     <td>{foreach from=$recordLanguage item=lang}{$lang|translate|escape}<br>{/foreach}</td>
@@ -251,7 +234,7 @@
       <th>{translate text='Signature'}: </th>
         <td>
         {foreach from=$callNumber item=callNo}
-           {$callNo}
+           {$callNo}<br>
         {/foreach}
         </td>
     </tr>
