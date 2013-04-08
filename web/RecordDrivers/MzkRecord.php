@@ -65,8 +65,10 @@ class MzkRecord extends MarcRecord
         // Norms in MZK04
         if (strpos($this->getUniqueID(), "MZK04-") === 0) {
             $interface->assign('validity', $this->_getFirstFieldValue('520', array('a')));
+            $interface->assign('summAjaxStatus', false);
         } else {
             $interface->assign('validity', null);
+            $interface->assign('summAjaxStatus', true);
         }
         $interface->assign('itemLink', $this->fields['adm_id']);
         $statuses = $this->fields['statuses'];
@@ -105,7 +107,6 @@ class MzkRecord extends MarcRecord
         // By default, do not display AJAX status; we won't assume that all
         // records exist in the ILS.  Child classes can override this setting
         // to turn on AJAX as needed:
-        $interface->assign('summAjaxStatus', true);
         $this->addBibinfoForObalkyKnih();
         // Send back the template to display:
         return 'RecordDrivers/Index/result-' . $view . '.tpl';
