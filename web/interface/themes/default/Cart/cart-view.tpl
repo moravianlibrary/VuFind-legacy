@@ -16,7 +16,7 @@
     <ul>
       <li>
         <div class="control">
-          <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="cartCheckboxSelectAll"/> <label for="cartCheckboxSelectAll" class="floatleft">{translate text="select_page"}</label>
+          <input type="checkbox" checked="true" class="selectAllCheckboxes floatleft" name="selectAll" id="cartCheckboxSelectAll"/> <label for="cartCheckboxSelectAll" class="floatleft">{translate text="select_page"}</label>
         </div>
       </li>
       <li>| {translate text="with_selected"}:</li>
@@ -36,9 +36,6 @@
       </li>
       <li>
         <input type="submit" class="button delete" name="delete" value="{translate text='bookbag_delete_selected'}" title="{translate text='bookbag_delete'}"/>
-      </li>
-      <li>
-        <input type="submit" class="bookbagEmpty button" name="empty" value="{translate text='Empty Book Bag'}" title="{translate text='Empty Book Bag'}"/>
       </li>
       <div class="clearer"></div>
     </ul>
