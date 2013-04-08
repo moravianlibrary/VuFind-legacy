@@ -46,7 +46,7 @@ a.jt {
   <h3>{translate text="Internet"}</h3>
   {if !empty($holdingURLs)}
     {foreach from=$holdingURLs item=desc key=currentUrl name=loop}
-      <a href="{if $proxy}{$proxy}/login?qurl={$currentUrl|escape:"url"}{else}{$currentUrl|escape}{/if}">{$desc|escape}</a><br/>
+      <a href="{if $proxy}{$proxy}/login?qurl={$currentUrl|escape:"url"}{else}{$currentUrl|escape}{/if}" target="blank">{$desc|escape}</a><br/>
     {/foreach}
   {/if}
   {if $holdingsOpenURL}
@@ -72,6 +72,7 @@ a.jt {
     <th>{translate text='collection'}</th>
     <th>{hint title='location' text='location' translate=true}</th>
     <th>{translate text='description'}</th>
+    <th>{translate text='note'}</th>
   </tr>
   {foreach from=$holding item=row}
     {if $row.barcode != ""}
@@ -107,6 +108,9 @@ a.jt {
     </td>
     <td>
         {$row.description|escape}
+    </td>
+    <td>
+        {$row.note|escape}
     </td>
   </tr>
     {/if}
