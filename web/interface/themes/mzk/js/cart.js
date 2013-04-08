@@ -75,9 +75,11 @@ function redrawCartStatus() {
     var items = getItemsFromCartCookie();
     var checkBoxItems = [];
     $(items).each(function(i, value) {
-        checkBoxItems[i] = value.replace('[^a-z0-9]','');
+        val = value.replace('[^a-zA-Z0-9\-]', '');
+        checkBoxItems[i] = val;
+        $('#checkbox_' + val).attr('checked', true);
     })
-    removeCartCheckbox();
+    //removeCartCheckbox();
     updateRecordState(items);
     updateCartSummary(items);
 }
@@ -134,8 +136,20 @@ function removeRecordState() {
     $('#cartSize').empty().append("0");
 }
 
-function removeCartCheckbox() {
- $('.checkbox_ui, .selectAllCheckboxes').each(function(){
-     $(this).attr('checked', false);
- });
+function updateCart(item) {
+    id = $(item).attr('value');
+    if ($(item).prop("checked")) {
+        addItemToCartCookie(id);
+    } else {
+        removeItemFromCartCookie(id);
+    }
+    redrawCartStatus();
 }
+
+/*
+function removeCartCheckbox() {
+    $('.checkbox_ui, .selectAllCheckboxes').each(function(){
+        $(this).attr('checked', false);
+    });
+}
+*/

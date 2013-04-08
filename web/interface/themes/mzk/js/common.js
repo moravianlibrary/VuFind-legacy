@@ -33,7 +33,10 @@ $(document).ready(function(){
     // assign action to the "select all checkboxes" class
     $('input[type="checkbox"].selectAllCheckboxes').change(function(){
         newValue = $(this).attr('checked') || false;
-        $(this.form).find('input[type="checkbox"]').attr('checked', newValue);
+        $('input[type="checkbox"].checkbox_record').each(function(i, elm) { 
+            $(elm).attr('checked', newValue);
+            $(elm).change();
+        });
     });
     
     // attach mouseover event to grid view records

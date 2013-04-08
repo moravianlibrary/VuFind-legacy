@@ -7,6 +7,7 @@
     <div class="yui-b first">
     <b class="btop"><b></b></b>
 
+
       {* Recommendations *}
       {if $topRecommendations}
         {foreach from=$topRecommendations item="recommendations"}
@@ -81,6 +82,21 @@
          </td>
          </tr>
          </table>
+         <form method="post" name="bulkActionForm" action="{$url}/Cart/Home">
+           <div class="searchtools">
+             <input type="checkbox" class="selectAllCheckboxes floatleft" name="selectAll" id="addFormCheckboxSelectAll"/>
+             <label class="floatleft" for="addFormCheckboxSelectAll">{translate text="select_page"}</label>
+             {*<strong>{translate text='Search Tools'}:</strong>*}
+             {if $savedSearch}
+               <a href="{$url}/MyResearch/SaveSearch?delete={$searchId}" class="delete">{translate text='save_search_remove'}</a>
+             {else}
+               <a href="{$url}/MyResearch/SaveSearch?save={$searchId}" class="add">{translate text='save_search'}</a>
+             {/if}
+             <a id="searchHistory" href="{$path}/Search/History">{translate text='Search History'}</a>
+             <a href="{$rssLink|escape}" class="feed">{translate text='Get RSS Feed'}</a>
+             <a href="{$url}/Search/Email" class="mail" onClick="getLightbox('Search', 'Email', null, null, '{translate text="Email this"}'); return false;">{translate text='Email this Search'}</a>
+           </div>
+         </form>
         <!-- </div> -->
        
       </div>
@@ -93,12 +109,14 @@
       {/if}
 
       {if $pageLinks.all}<div class="pagination">{$pageLinks.all}</div>{/if}
+      {*
       <div class="searchtools">
         <strong>{translate text='Search Tools'}:</strong>
         <a href="{$rssLink|escape}" class="feed">{translate text='Get RSS Feed'}</a>
         <a href="{$url}/Search/Email" class="mail" onClick="getLightbox('Search', 'Email', null, null, '{translate text="Email this"}'); return false;">{translate text='Email this Search'}</a>
         {if $savedSearch}<a href="{$url}/MyResearch/SaveSearch?delete={$searchId}" class="delete">{translate text='save_search_remove'}</a>{else}<a href="{$url}/MyResearch/SaveSearch?save={$searchId}" class="add">{translate text='save_search'}</a>{/if}
       </div>
+      *}
       
       <b class="bbot"><b></b></b>
     </div>

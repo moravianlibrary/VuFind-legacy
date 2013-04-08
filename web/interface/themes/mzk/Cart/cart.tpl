@@ -12,7 +12,7 @@
 {foreach from=$records item=record}
 <tr>
   <td>
-    <input id="checkbox_{$record.id|regex_replace:'/[^a-z0-9]/':''|escape}" type="checkbox" name="ids[]" value="{$record.id|escape}" class="checkbox"/>
+    <input id="checkbox_{$record.id|regex_replace:'/[^a-zA-Z0-9\-]/':''|escape}" type="checkbox" name="ids[]" value="{$record.id|escape}" class="checkbox checkbox_record"/>
   </td>
   <td>
     {if !empty($record.author)}
