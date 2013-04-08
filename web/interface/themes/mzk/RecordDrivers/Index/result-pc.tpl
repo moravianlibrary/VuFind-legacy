@@ -5,9 +5,9 @@
     <tr>
     <td>
       {if $bookBag}
-        <!--<label for="checkbox_{$summId|regex_replace:'/[^a-z0-9]/':''|escape}" class="offscreen">{translate text="Select this record"}</label>-->
-        <input id="checkbox_{$summId|regex_replace:'/[^a-z0-9]/':''|escape}" type="checkbox" name="ids[]" value="{$summId|escape}" class="checkbox_ui"/>
-        <input type="hidden" name="idsAll[]" value="{$summId|escape}" />
+        <input id="checkbox_{$summId|regex_replace:'/[^a-zA-Z0-9\-]/':''|escape}" type="checkbox" name="ids[]" value="{$summId|escape}" class="checkbox_ui book_bag"
+          onchange="updateCart(this);" title="{translate text='Add to Book Bag'}" />
+        <input type="hidden" name="idsAll[]" value="{$summId|escape}" />&nbsp;
       {/if}
     </td>
     <td id="obalka_{$summId}">{image id="obalka_`$summId`_format" src="formats/`$summFormats[0]`.png"
