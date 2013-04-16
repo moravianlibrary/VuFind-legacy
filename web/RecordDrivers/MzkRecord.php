@@ -174,7 +174,11 @@ class MzkRecord extends MarcRecord
     
     protected function getRestrictions()
     {
-        return $this->_getFieldArray('540', array('a'));
+        $result = $this->_getFieldArray('540', array('a'));
+        if (in_array("NewspaperOrJournal", $this->getFormats())) {
+            $result[] = translate("NewspaperOrJournal notice");
+        }
+        return $result;
     }
 
     protected function getTitle()
