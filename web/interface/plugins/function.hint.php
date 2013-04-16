@@ -22,10 +22,11 @@ function smarty_function_hint($params, &$smarty)
         $append = 'href="' . htmlspecialchars($params['href']) . '"';
         $element = 'a';
     }
+    $key = urlencode($title);
     if (isset($params['text'])) {
-        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$title&lang=$lang' title='$title' $append>$text</$element>";
+        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$key&lang=$lang' title='$title' $append>$text</$element>";
     } else {
-        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$title&lang=$lang' title='$title' $append/>";
+        return "<$element class='jt' rel='$url/AJAX/MZKStatus?status=$key&lang=$lang' title='$title' $append/>";
     }
 }
 ?>
