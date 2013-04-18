@@ -128,6 +128,7 @@ class Export extends Bulk
                         urlencode(self::getExportUrl())
                     );
                 }
+                session_write_close();
                 exit();
             } else {
                 $this->errorMsg = 'bulk_fail';
