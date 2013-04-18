@@ -70,7 +70,7 @@ a.jt {
     <th>{translate text='due date'}</th>
     <th>{translate text='sublibrary'}</th>
     <th>{translate text='collection'}</th>
-    <th>{hint title='location' text='location' translate=true}</th>
+    <th>{hint title='location / second signature' text='location' translate=true}</th>
     <th>{translate text='description'}</th>
     <th>{translate text='note'}</th>
   </tr>

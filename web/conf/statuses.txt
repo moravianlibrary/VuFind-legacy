@@ -14,7 +14,7 @@ ZHR | cz | Zahraniční knihovny, 2. patro vpravo
 FOI | cz | Studovna firemní a obchodní literatury, 7. patro vpravo
 POP | cz | Popisovna - pro získání tohoto dokumentu kontaktujte knihovníka informátora v přízemí knihovny
 VV | cz | Volný výběr, 1. patro vpravo
-umístění | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinného třídění. V příslušné studovně vyhledejte regál s daným číslem a dále knihu podle příjmení autora.
+Umístění / druhá signatura | cz | Knihy jsou v regálech řazeny podle Mezinárodního desetinného třídění. V příslušné studovně vyhledejte regál s daným číslem a dále knihu podle příjmení autora.
 Hledat i v zahraničních zdrojích | cz | Prohledat: <ul>  <li>EBSCOhost Academic Search Complete</li> <li>EBSCOhost Business Source Complete</li> <li>EBSCOhost Regional Business News</li> <li>EBSCOhost Library, Information Science & Technology Abstracts with Fulltexts</li> <li>EBSCOhost Computers & Applied Sciences Complete</li> <li>EBSCOhost GreenFILE (OpenAccess)</li> <li>Elsevier Science Direct</li> <li>ISI Web of Science</li> </ul>
 
 Month | en | Can be borrowed home for a month. The requests are handled electronically
