@@ -42,11 +42,22 @@
                 <tr>
                 {foreach from=$facetList item="list" key="label"}
                   <td>
-                    <select name="filter[]" multiple="multiple" size="10">
+                    <select name="filter[]" id="{$label}Filter" multiple="multiple" size="10">
                       {foreach from=$list item="value" key="display"}
-                        <option value="{$value.filter|escape}"{if $value.selected} selected="selected"{/if}>{$display|escape}</option>
+                        {if $value.filter}
+                          <option value="{$value.filter|escape}"{if $value.selected} selected="selected"{/if}>{$display|escape}</option>
+                        {else}
+                          <option disabled="true">==================</option>
+                        {/if}
                       {/foreach}
                     </select>
+                  </td>
+                {/foreach}
+                </tr>
+                <tr>
+                {foreach from=$facetList item="list" key="label"}
+                  <td>
+                    <input type="button" class="form-submit" onclick="$('#{$label}Filter').val('');" value="{$label|cat:'_select_all'|translate}"></input>
                   </td>
                 {/foreach}
                 </tr>
@@ -89,7 +100,7 @@
                 <tr>
                   <th valign="top" align="right">{translate text="adv_search_year"}:&nbsp;</th>
                   <td>
-                    <input type="hidden" name="daterange[]" value="publishDateFacet"/>
+                    <input type="hidden" name="daterange[]" id="publishDateFacet" value="publishDateFacet"/>
                     <label for="publishDatefrom" class='yearboxlabel'>{translate text='date_from'}:</label>
                     <input class="text" type="text" size="4" maxlength="4" class="yearbox" name="publishDateFacetfrom" id="publishDatefrom" value="{$dateRangeLimit.0|escape}" />
                     <label for="publishDateto" class='yearboxlabel'>{translate text='date_to'}:</label>
@@ -98,6 +109,11 @@
                       <div id="publishDateslider_min_thumb" class="yui-slider-thumb"><img src="{$path}/images/yui/left-thumb.png"></div>
                       <div id="publishDateslider_max_thumb" class="yui-slider-thumb"><img src="{$path}/images/yui/right-thumb.png"></div>
                     </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input type="button" class="form-submit" onclick="(function() {ldelim} $('#publishDatefrom').val(''); $('#publishDateto').val(''); {rdelim}());" value="{translate text='adv_search_year_no_limits'}"></input>
                   </td>
                 </tr>
               </table>
