@@ -840,7 +840,8 @@ class Aleph implements DriverInterface
             $z13 = $item->z13;
             $z30 = $item->z30;
             $delete = $item->xpath('@delete');
-            $title = (string) $z13->{'z13-title'}; 
+            $title = (string) $z13->{'z13-title'};
+            $description = (string) $z31->{'z31-description'};
             $transactiondate = date('d-m-Y', strtotime((string) $z31->{'z31-date'}));
             $transactiontype = (string) $z31->{'z31-credit-debit'};
             $id = (string) $z13->{'z13-doc-number'};
@@ -856,8 +857,9 @@ class Aleph implements DriverInterface
             $cashdate = date('d-m-Y', strtotime((string) $z31->{'z31-date'}));
             $balance = 0;
 
-            $finesListSort["$cashref"]  = array(
+            $finesListSort[$cashref]  = array(
                     "title"   => $title,
+                    "description" => $description,
                     "barcode" => $barcode,
                     "amount" => $amount,
                     "transactiondate" => $transactiondate,
@@ -869,7 +871,8 @@ class Aleph implements DriverInterface
         }
         ksort($finesListSort);
         foreach ($finesListSort as $key => $value){
-            $title = $finesListSort[$key]["title"]; 
+            $title = $finesListSort[$key]["title"];
+            $description = $finesListSort[$key]["description"];
             $barcode = $finesListSort[$key]["barcode"]; 
             $amount = $finesListSort[$key]["amount"]; 
             $checkout = $finesListSort[$key]["checkout"]; 
@@ -879,6 +882,7 @@ class Aleph implements DriverInterface
             $id = $finesListSort[$key]["id"];
             $finesList[] = array(
                 "title"   => $title,
+                "description" => $description,
                 "barcode"  => $barcode,
                 "amount"   => $amount,
                 "transactiondate" => $transactiondate,
