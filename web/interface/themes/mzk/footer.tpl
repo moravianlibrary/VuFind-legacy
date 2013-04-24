@@ -4,9 +4,8 @@
 	  <ul>
 		<li><a href="{$path}/Search/History">{translate text='Search History'}</a></li>
 		<li><a href="{$path}/Search/Advanced">{translate text='Advanced Search'}</a></li>
-		{*
-		<li><a href="{$path}/Search/Results?{'filter[]'|escape:url}={$newItemsLink|escape:url}">{translate text='New acquisitions'}</a></li>
-		*}
+		<li><a href="{$path}/Search/Konspekt#bd">{translate text='Conspectus'}</a></li>
+		{*<li><a href="{$path}/Search/Results?{'filter[]'|escape:url}={$newItemsLink|escape:url}">{translate text='New acquisitions'}</a></li>*}
 		<li><a href="javascript:window.external.AddSearchProvider('{$url}/Search/OpenSearch?method=describe');">{translate text='Add as search engine'}</a></li>
 	  </ul>
 	</div>
