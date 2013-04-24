@@ -73,6 +73,9 @@ class MZKSolr extends Solr
                 if ($element == 'format:"Journal"' || $element == 'format:"Newspaper"') {
                     $element = 'format:"NewspaperOrJournal"';
                 }
+                if ($element == null || $element == '') {
+                    $addFilter = false;
+                }
                 if ($addFilter) {
                     $filters[] = $element;
                 }
@@ -84,7 +87,11 @@ class MZKSolr extends Solr
         if ($fields == "*") {
             $fields = array("score");
         }
-        return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror);
+        $params = array();
+        if ($facet && $facet['field'] && in_array("subcategory_txtF", $facet['field'])) {
+            $params["f.subcategory_txtF.facet.limit"] = 100; 
+        }
+        return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror, $params);
     }
 
     public function alphabeticBrowse($source, $from, $page, $page_size = 20,

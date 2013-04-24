@@ -900,7 +900,7 @@ class Solr implements IndexEngine
     public function search($query, $handler = null, $filter = null, $start = 0,
         $limit = 20, $facet = null, $spell = '', $dictionary = null,
         $sort = null, $fields = null,
-        $method = HTTP_REQUEST_METHOD_POST, $returnSolrError = false
+        $method = HTTP_REQUEST_METHOD_POST, $returnSolrError = false, $params = null
     ) {
         // Query String Parameters
         $options = array(
@@ -1014,7 +1014,7 @@ class Solr implements IndexEngine
                 = (isset($facet['prefix'])) ? $facet['prefix'] : null;
             unset($facet['prefix']);
             $options['facet.sort']
-                = (isset($facet['sort'])) ? $facet['sort'] : null;
+                = (isset($facet['sort'])) ? $facet['sort'] : 'count';
             unset($facet['sort']);
             if (isset($facet['offset'])) {
                 $options['facet.offset'] = $facet['offset'];
@@ -1064,6 +1064,12 @@ class Solr implements IndexEngine
             echo "</pre>\n";
         }
 
+        if ($params) {
+            foreach($params as $key => $value) {
+                $options[$key] = $value;
+            }
+        }
+        
         $result = $this->_select($method, $options, $returnSolrError);
         if (PEAR::isError($result)) {
             PEAR::raiseError($result);
