@@ -1,5 +1,27 @@
 <div class="sidegroup">
   {if $recordCount > 0}<h4>{translate text='Narrow Search'}</h4>{/if}
+  {*
+  {if isset($checkboxFilters) && count($checkboxFilters) > 0}
+  <p>
+    <table>
+      {foreach from=$checkboxFilters item=current name=boxes}
+          {if $current.desc neq 'Search also in central index'}
+          <tr{if $recordCount < 1 && !$current.selected && !$current.alwaysVisible} style="display: none;"{/if}>
+            <td style="vertical-align:top; padding: 3px;">
+              <input type="checkbox" id="checkFilter{$smarty.foreach.boxes.index}" name="filter[]" value="{$current.filter|escape}"
+                {if $current.selected}checked="checked"{/if}
+                onclick="document.location.href='{$current.toggleUrl|escape}';" />
+            </td>
+            <td>
+              <label for="checkFilter{$smarty.foreach.boxes.index}">{translate text=$current.desc}</label><br />
+            </td>
+          </tr>
+          {/if}
+      {/foreach}
+    </table>
+  </p>
+  {/if}
+  *}
   {if $filterList}
     <strong>{translate text='Remove Filters'}</strong>
     <ul class="filters">
@@ -60,6 +82,8 @@
             {else}
               {if $thisFacet.untranslated == "available_for_eod"}
               <dd>{hint title='EOD' text=$thisFacet.value href=$thisFacet.url} ({$thisFacet.count})</dd>
+              {elseif $thisFacet.untranslated == "LawsOrOthers"}
+              <dd>{hint title='LawsOrOthers' text=$thisFacet.value href=$thisFacet.url translate=true} ({$thisFacet.count})</dd>
               {else}
               <dd><a href="{$thisFacet.url|escape}">{$thisFacet.value|escape}</a> ({$thisFacet.count})</dd>
               {/if}
