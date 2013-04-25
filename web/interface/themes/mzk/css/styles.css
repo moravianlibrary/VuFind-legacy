@@ -328,7 +328,7 @@ ul.menu li{
     margin-right: 20px;
     padding: 5px 0 0 20px;
     width: 190px;
-	height: 90px;
+	height: 110px;
 }
 #ft .col.last {
     border-right: 1px dotted #cccccc;
@@ -340,7 +340,7 @@ ul.menu li{
 }
 .result { &width: 100%; border-bottom: 1px solid #eee; padding: 15px 20px 12px 20px; position: relative; }
 
-.record { padding: 20px 20px; }
+.record { padding: 10px 20px; }
 .record .resultscroller { margin: 0 0 20px 0; }
 .record .resultscroller .prev { margin-right: 10px; }
 .record .resultscroller .next { margin-left: 10px; }
@@ -1594,4 +1594,9 @@ a.jt {
 .button {
   color: #16969D;
   text-decoration: underline;
+}
+
+span.order {
+  float: left;
+  width: 25px;
 }

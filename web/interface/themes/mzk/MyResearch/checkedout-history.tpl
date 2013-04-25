@@ -20,6 +20,7 @@
                 {else}
                 <li class="result">
                 {/if}
+                <span class="order">{$smarty.foreach.recordLoop.iteration}.&nbsp;</span>
                 {if $renewForm}
                   {if $resource.ils_details.renewable && $resource.ils_details.renew_details}
                     <div class="hiddenLabel"><label for="checkbox_{$resource.id|regex_replace:'/[^a-z0-9]/':''|escape}">{translate text="Select this record"}</label></div>

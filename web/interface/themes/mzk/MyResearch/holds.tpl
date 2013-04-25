@@ -37,6 +37,7 @@
               {else}
               <li class="result">
               {/if}
+              <span class="order">{$smarty.foreach.recordLoop.iteration}.&nbsp;</span>
               {if $cancelForm && $resource.ils_details.cancel_details}
                 <input type="hidden" name="cancelAllIDS[]" value="{$resource.ils_details.cancel_details|escape}" />
                 <input type="checkbox" name="cancelSelectedIDS[]" value="{$resource.ils_details.cancel_details|escape}" class="ui_checkboxes" />
