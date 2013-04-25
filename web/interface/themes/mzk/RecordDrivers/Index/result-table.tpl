@@ -10,7 +10,7 @@
          <a href="{$recordurl}" class="title">{$summTitle|truncate:180:"..."|escape}</a>
          {/foreach}
      {else}
-     <a href="{$url}/Record/{$summId|escape:"url"}" class="title">{if !empty($summHighlightedTitle)}{$summHighlightedTitle|addEllipsis:$summTitle|highlight}{elseif !$summTitle}{translate text='Title not available'}{else}{$summTitle|truncate:180:"..."|escape}{/if}</a>
+     <a href="{$url}/Record/{$summId|escape:"url"}#bd" class="title">{if !empty($summHighlightedTitle)}{$summHighlightedTitle|addEllipsis:$summTitle|highlight}{elseif !$summTitle}{translate text='Title not available'}{else}{$summTitle|truncate:180:"..."|escape}{/if}</a>
      {/if}
   </td>
   <td>{if $summDate}{$summDate[0]}{/if}</td>
