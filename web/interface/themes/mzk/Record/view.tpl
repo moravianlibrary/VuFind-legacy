@@ -157,6 +157,22 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
       <div class="ltfl_reviews ltfl"></div>
     </div>
     {/if}
+    
+    <!--  AddThis -->
+    <div class="sidegroup">
+      <h4>{translate text="AddThis"}</h4>
+      <div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+        <a class="addthis_button_facebook"></a>
+        <a class="addthis_button_twitter"></a>
+        <a class="addthis_button_email"></a>
+        <a class="addthis_button_compact">
+        <a class="addthis_counter addthis_bubble_style"></a>
+      </div>
+      {literal}
+      <script type="text/javascript">var addthis_config = {"data_track_addressbar":false};</script>
+      {/literal}
+      <script type="text/javascript" src="https://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-51642e5a2b93cdc2&async=1"></script>
+    </div>
 
     {if is_array($editions)}
     <div class="sidegroup">
