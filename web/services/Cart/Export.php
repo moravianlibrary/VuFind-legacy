@@ -205,6 +205,10 @@ class Export extends Bulk
                 case 'refworks_data':
                     // No extra work necessary.
                     break;
+                case 'printshort':
+                case 'printfull':
+                    header('Content-type: text/plain; charset=utf-8');
+                    break;
                 default:
                     $export = false;
                 }

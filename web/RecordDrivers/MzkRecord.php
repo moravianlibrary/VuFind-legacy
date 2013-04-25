@@ -4,7 +4,7 @@ require_once 'RecordDrivers/MarcRecord.php';
 
 class MzkRecord extends MarcRecord
 {
-
+    
     public function __construct($record)
     {
         parent::__construct($record);
@@ -19,6 +19,7 @@ class MzkRecord extends MarcRecord
         $interface->assign('EOD', $this->getEOD());
         $interface->assign('callNumber', $this->getCallNumber());
         $interface->assign('physical', $this->getPhysicalDescriptions());
+        $interface->assign('id', $this->getUniqueID());
         $this->addBibinfoForObalkyKnih();
         return $result;
     }
@@ -111,6 +112,12 @@ class MzkRecord extends MarcRecord
         // Send back the template to display:
         return 'RecordDrivers/Index/result-' . $view . '.tpl';
     }
+    
+    public function getExtendedMetadata()
+    {
+        $result = parent::getExtendedMetadata();
+        return 'RecordDrivers/Mzk/extended.tpl';
+    }
 
     protected function getURLsFromSolr()
     {
@@ -196,6 +203,44 @@ class MzkRecord extends MarcRecord
     public function getEditions()
     {
         return null;
+    }
+    
+    public function getExportFormats()
+    {
+        $result = parent::getExportFormats();
+        $result[] = 'PrintShort';
+        $result[] = 'PrintFull';
+        return $result;
+    }
+    
+    public function getExport($format)
+    {
+        global $interface;
+        
+        switch(strtolower($format)) {
+            case 'printshort':
+                $this->getCoreMetadata();
+                $interface->assign("full", false);
+                $locations = array();
+                $holdings = $this->marcRecord->getFields('Z30');
+                if ($holdings) {
+                    foreach ($holdings as $holding) {
+                        $location = $holding->getSubfield('9');
+                        if ($location) {
+                            $locations[$location->getData()] = true;
+                        }
+                    }                    
+                }
+                $locations = array_keys($locations);
+                $interface->assign("coreLocations", $locations);
+                return 'RecordDrivers/Mzk/export-print.tpl';
+            case 'printfull':
+                $this->getCoreMetadata();
+                $interface->assign("full", true);
+                return 'RecordDrivers/Mzk/export-print.tpl';
+            default:
+                return parent::getExport($format);
+        }
     }
 
     protected function getCallNumber()
