@@ -75,10 +75,8 @@ class SolrCNAutocomplete extends SolrAutocomplete
         // LC priority:
         if (is_numeric(substr(trim($query), 0, 1))) {
             $this->setDisplayField(array('dewey-full', 'callnumber-a'));
-            $this->setSortField("dewey-sort,callnumber");
         } else {
             $this->setDisplayField(array('callnumber-a', 'dewey-full'));
-            $this->setSortField("callnumber,dewey-sort");
         }
 
         return $query;
