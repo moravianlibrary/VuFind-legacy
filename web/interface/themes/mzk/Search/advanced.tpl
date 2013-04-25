@@ -42,7 +42,7 @@
                 <tr>
                 {foreach from=$facetList item="list" key="label"}
                   <td>
-                    <select name="filter[]" id="{$label}Filter" multiple="multiple" size="10">
+                    <select name="filter[]" id="{$label|replace:' ':''}Filter" multiple="multiple" size="10">
                       {foreach from=$list item="value" key="display"}
                         {if $value.filter}
                           <option value="{$value.filter|escape}"{if $value.selected} selected="selected"{/if}>{$display|escape}</option>
@@ -57,7 +57,7 @@
                 <tr>
                 {foreach from=$facetList item="list" key="label"}
                   <td>
-                    <input type="button" class="form-submit" onclick="$('#{$label}Filter').val('');" value="{$label|cat:'_select_all'|translate}"></input>
+                    <input type="button" class="form-submit" onclick="$('#{$label|replace:' ':''}Filter').val('');" value="{$label|cat:'_select_all'|translate}"></input>
                   </td>
                 {/foreach}
                 </tr>
