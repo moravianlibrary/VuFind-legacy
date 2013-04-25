@@ -41,6 +41,7 @@ require_once 'Aleph.php';
  */
 class AlephMzk extends Aleph
 {
+    
     /**
      * Get Statuses
      *
@@ -54,11 +55,18 @@ class AlephMzk extends Aleph
      * @access public
      */
     public function getStatuses($idList)
-    {   
+    {
+        global $configArray;
         $foundIds = array();
         $in = implode(',', array_fill(0, count($idList), '?'));
-        $sql = "SELECT record_id, absent_total, present_total, absent_total - absent_on_loan AS absent_avail, present_total - present_on_loan AS present_avail FROM record_status WHERE record_id IN ( $in );";
-        $conn = new PDO('mysql:host=localhost;dbname=vufind_trunk', 'vufind_trunk', 'vufind_trunk');
+        $sql  = " SELECT record_id, absent_total, present_total, absent_total - absent_on_loan AS absent_avail,";
+        $sql .= "     present_total - present_on_loan AS present_avail";
+        $sql .= " FROM record_status";
+        $sql .= " WHERE record_id IN ( $in );";
+        $dsn = $configArray['Database']['pdo'];
+        $usr = $configArray['Database']['username'];
+        $pwd = $configArray['Database']['password'];
+        $conn = new PDO($dsn, $usr, $pwd);
         $stmt = $conn->prepare($sql);
         $stmt->execute($idList);
         while($row = $stmt->fetch()) {
@@ -87,5 +95,4 @@ class AlephMzk extends Aleph
         }
         return $holdings;
     }
-
 }
