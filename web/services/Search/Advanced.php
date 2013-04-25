@@ -84,7 +84,7 @@ class Advanced extends Action
                     }
                 }
                 ksort(&$facets[$facetName], SORT_LOCALE_STRING);
-                $top['---------------'] = array( filter => '*:*');
+                $top['---------------'] = array( filter => "");
                 $facets[$facetName] = array_merge($top, $facets[$facetName]);
             }
         }
