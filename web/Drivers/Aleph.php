@@ -647,6 +647,7 @@ class Aleph implements DriverInterface
            $return_in_days = ($due_date - $current_date) / (60*60*24);
            $renewable = ($renew[0] == 'Y');
            $no_of_renewals = (string) $z36->{'z36-no-renewal'};
+           $fine = (string) $item->{'fine'};
            $transListItem = array('type' => $type,
                                'id' => ($history)?null:$this->barcodeToID($barcode),
                                'item_id' => $group,
@@ -662,6 +663,7 @@ class Aleph implements DriverInterface
                                'holddate' => $holddate,
                                'delete' => $delete,
                                'renewable' => $renewable,
+                               'fine' => $fine,
                                'create' => $this->parseDate($create));
            if ($return_in_days < 0 && !$history) {
                $transListItem['message'] = "Unreturned book after due date, renewing is disabled. You can't renew items until you return this book.";

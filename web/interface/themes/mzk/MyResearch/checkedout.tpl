@@ -109,6 +109,9 @@
                                {if $resource.ils_details.no_of_renewals > 0}
                                | {translate text='No of renewals'}: {$resource.ils_details.no_of_renewals|escape}
                                {/if}
+                               {if $resource.ils_details.fine > 0}
+                               | {translate text='Fine'}: {$resource.ils_details.fine|escape}
+                               {/if}
                              </strong>
                           </p>
                           {if $showStatus == "show"}
