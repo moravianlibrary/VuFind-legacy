@@ -8,6 +8,7 @@
       {*<li{if $pageTemplate=="holds-history.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Holds?history=true">{translate text='Holds and Recalls History'}</a></li>*}
       <li{if $pageTemplate=="fines.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Fines">{translate text='Fines'}</a></li>
       <li{if $pageTemplate=="ills.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/InterlibraryLoans">{translate text='Interlibrary loans'}</a></li>
+      <li{if $pageTemplate=="acq.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/AcquisitionRequests">{translate text='Acquisition requests'}</a></li>
       <li{if $pageTemplate=="profile.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Profile">{translate text='Profile'}</a></li>
       <li{if $pageTemplate=="favorites.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Favorites">{translate text='Favorites'}</a></li>
       {* Only highlight saved searches as active if user is logged in: *}

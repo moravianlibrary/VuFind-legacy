@@ -1187,6 +1187,27 @@ class Aleph implements DriverInterface
            return array();
         }
     }
+    
+    public function getMyAcquisitionRequests($user) {
+        $userId = $user['id'];
+        $params = array("view" => "full");
+        $xml = $this->doRestDLFRequest(array('patron', $userId, 'circulationActions', 'requests', 'acq'), $params);
+        $requests = array();
+        foreach ($xml->xpath('//acq-request') as $item) { 
+            $request = array();
+            $z13 = $item->{'z13'};
+            $z68 = $item->{'z68'};
+            $request['author'] = (string) $z13->{'z13-author'};
+            $request['title'] = (string) $z13->{'z13-title'};
+            $request['publisher'] = (string) $z13->{'z13-imprint'};
+            $request['isbn'] = (string) $z13->{'z13-issn'};
+            $request['status'] = (string) $z68->{'z68-order-status'};
+            $request['updated'] = $this->parseDate((string) $z13->{'z13-update-date'});
+            $request['note'] = (string) $z68->{'z68-library-note'};
+            $requests[] = $request;
+        }
+        return $requests;
+    }
 
     public function getMyInterlibraryLoans($user) {
         $userId = $user['id'];
