@@ -59,7 +59,6 @@ class Konspekt extends Action
         $facets = $searchObject->getFacetList();
         $facets = $facets[$this->facet]['list'];
         usort($facets, "Konspekt::compare");
-        //print_r($facets);
         $interface->assign('categories', $facets);
         $interface->setTemplate('konspekt.tpl');
         $interface->display('layout.tpl');
