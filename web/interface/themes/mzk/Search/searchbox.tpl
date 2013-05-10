@@ -34,10 +34,6 @@
                {assign var="pciEnabled" value="1"}
           {/if}
       {/foreach}
-      <div class="keepFilters">
-          <input type="checkbox" id="PCI" name="filter[]" value="source:ALL" {if $pciEnabled}checked="checked"{/if}/>{* {$current.filter|escape} *}
-          <label for="retainAll">{hint title="Search also in foreign databases" text="Search also in foreign databases" translate=true}</label>
-      </div>
       {* Do we have any checkbox filters? *}
       {assign var="hasCheckboxFilters" value="0"}
       {if isset($checkboxFilters) && count($checkboxFilters) > 0}
