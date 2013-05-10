@@ -249,7 +249,7 @@
               <tr>
                  <td>
                     <a href="http://books2ebooks.eu/odm/orderformular.do?formular_id=131&sys_id={$sys_no}" target="blank">
-                       <img src='/interface/themes/mzk/images/eod_button_{$userLang}.gif'/>
+                       {image src="eod_button_`$userLang`.gif"}
                     </a>
                  </td>
                  <td>&nbsp;&nbsp;</td>
