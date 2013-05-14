@@ -54,38 +54,14 @@ class MZKSolr extends Solr
         $method = HTTP_REQUEST_METHOD_POST, $returnSolrError = false
     ) {
         global $configArray;
-        $fields = "*";
         $filters = array();
         $default = true;
         if ($filter != null) {
             foreach ($filter as $element) {
-                $addFilter = true;
-                if (isset($configArray['MultiSolr'])) {
-                    $element_norm = strtr($element, array('"' => '', "'" => ''));
-                    foreach ($configArray['MultiSolr'] as $key => $value) {
-                        if ($element_norm == $key) {
-                            $this->host = $value . '/' . $this->core;
-                            $default = false;
-                            $addFilter = false;
-                        }
-                    }
-                }
                 if ($element == 'format:"Journal"' || $element == 'format:"Newspaper"') {
                     $element = 'format:"NewspaperOrJournal"';
                 }
-                if ($element == null || $element == '') {
-                    $addFilter = false;
-                }
-                if ($addFilter) {
-                    $filters[] = $element;
-                }
             }
-        }
-        if ($default && isset($configArray['MultiSolr']['default'])) {
-            $this->host = $configArray['MultiSolr']['default'] . '/' . $this->core;
-        }
-        if ($fields == "*") {
-            $fields = array("score");
         }
         $params = array();
         if ($facet && $facet['field'] && in_array("subcategory_txtF", $facet['field'])) {
