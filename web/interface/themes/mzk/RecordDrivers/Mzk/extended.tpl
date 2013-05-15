@@ -45,18 +45,6 @@
   </tr>
   {/if}
 
-  {if !empty($extendedPhysical)}
-  {assign var=extendedContentDisplayed value=1}
-  <tr valign="top">
-    <th>{translate text='Physical Description'}: </th>
-    <td>
-      {foreach from=$extendedPhysical item=field name=loop}
-        {$field|escape}<br>
-      {/foreach}
-    </td>
-  </tr>
-  {/if}
-
   {if !empty($extendedFrequency)}
   {assign var=extendedContentDisplayed value=1}
   <tr valign="top">
