@@ -1599,6 +1599,7 @@ a.jt {
 span.order {
   float: left;
   width: 25px;
+  font-weight:bold;
 }
 
 span.recordNumber {

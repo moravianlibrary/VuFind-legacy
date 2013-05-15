@@ -30,6 +30,8 @@ vufindString.bookbagStatusFull = "{translate text="bookbag_full"}";
 
   {foreach from=$recordSet item=record name="recordLoop"}
     <div class="result {if ($smarty.foreach.recordLoop.iteration % 2) == 0}alt {/if}record{$smarty.foreach.recordLoop.iteration}">
+      {assign var="recordNumber" value=$recordStart+$smarty.foreach.recordLoop.iteration-1}
+      <span class="recordNumber">{$recordNumber|escape}.</span>
       {* This is raw HTML -- do not escape it: *}
       {$record}
     </div>
