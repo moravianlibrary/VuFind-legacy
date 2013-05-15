@@ -5,7 +5,11 @@
     <a href="{$path}/" class="small">{translate text="Start a new Basic Search"}</a>
     <br>{translate text="Your search terms"} : "<b>{$lookfor|escape:"html"}</b>"
   {else}
-    <form method="GET" action="{$path}/Search/Results" name="searchForm" id="searchForm" class="search">
+    {if $module == 'Discover'}
+      <form method="GET" action="{$path}/Discover/EBSCO" name="searchForm" id="searchForm" class="search">
+    {else}
+      <form method="GET" action="{$path}/Search/Results" name="searchForm" id="searchForm" class="search">
+    {/if}
       {* Only activate autocomplete if it is configured to be turned on: *}
       <div class="form-holder">
 		  <div class="hiddenLabel"><label for="lookfor">{translate text="Search For"}:</label></div>
