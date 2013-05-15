@@ -73,22 +73,22 @@ class Advanced extends Action
         $sortedFacets = $searchObject->getFacetSetting('Advanced_Settings', 'sorted_facets');
         if (isset($sortedFacets)) {
             foreach ($sortedFacets as $facetSetting) {
-                $top = array();
-                list($facetName, $facetTopValues) = explode(':', $facetSetting);
+                list($facetName, $facetKey, $facetTopValues) = explode(':', $facetSetting);
+                $bottom = $facets[$facetName];
                 $facetTopValues = explode(',', $facetTopValues);
-                foreach ($facets[$facetName] as $key => $element) {
-                    list($field, $value) = explode(':', ($element['filter']));
-                    $value = str_replace('"', '', $value);
-                    if (in_array($value, $facetTopValues)) {
-                        $top[$key] = $element;
+                $top = array();
+                foreach ($facetTopValues as $facetValue) {
+                    if (isset($bottom[translate($facetValue)])) { 
+                        $translated = translate($facetValue);
+                        $top[$translated] = $bottom[$translated];
                     }
                 }
                 ksort(&$facets[$facetName], SORT_LOCALE_STRING);
                 $top['---------------'] = array( filter => "");
-                $facets[$facetName] = array_merge($top, $facets[$facetName]);
+                $facets[$facetName] = array_merge($top, $bottom);
             }
         }
-        $interface->assign('facetList', $facets);
+        $interface->assign('facetLists', array_chunk($facets, 2, true));
 
         // Integer for % width of each column (be careful to avoid divide by zero!)
         $columnWidth = (count($facets) > 1) ? round(100 / count($facets), 0) : 0;

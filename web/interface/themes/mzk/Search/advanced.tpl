@@ -31,8 +31,9 @@
               <input class="form-submit" type="submit" name="submit" value="{translate text="Find"}"><br><br>
              
 			<div class="advanced-options">
-			 {if $facetList}
+			 {if $facetLists}
               <h3>{translate text='Limit To'}</h3><br>
+              {foreach from=$facetLists item="facetList" key="label"}
               <table class="citation" width="100%" summary="{translate text='Limit To'}">
                 <tr>
                 {foreach from=$facetList item="list" key="label"}
@@ -62,6 +63,7 @@
                 {/foreach}
                 </tr>
               </table>
+              {/foreach}
               {/if}
               {if $illustratedLimit}
               <table class="table-illustrated" summary="{translate text='Illustrated'}">
