@@ -89,8 +89,10 @@
                           {/if}
                         {else}
                           <p>
-                            <strong>{translate text='Due Date'}: {$resource.ils_details.duedate|escape} | 
-                            {translate text='Returned'}: {$resource.ils_details.returned|escape}</strong>
+                            <strong>
+                              {translate text='Returned'}: {$resource.ils_details.returned|escape} |
+                              {translate text='Due Date'}: {$resource.ils_details.duedate|escape}
+                            </strong>
                           </p>
                           {if $showStatus == "show"}
                             {if $resource.ils_details.dueStatus == "overdue"}
