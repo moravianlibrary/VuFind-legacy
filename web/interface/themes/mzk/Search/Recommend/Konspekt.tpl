@@ -2,7 +2,7 @@
   {foreach from=$konspektFacetSet item=cluster key=title}
   <div class="authorbox">
   <table class="facetsTop navmenu narrow_begin">
-    <tr><th colspan="{$topFacetSettings.cols}">{translate text=$cluster.label}</th></tr>
+    <tr><th colspan="{$topFacetSettings.cols}" width="{math equation="floor(100/x)" x=$topFacetSettings.cols}%">{translate text=$cluster.label}</th></tr>
         {foreach from=$cluster.list item=thisFacet name="narrowLoop"}
     {if $smarty.foreach.narrowLoop.iteration % $topFacetSettings.cols == 1}
     <tr>

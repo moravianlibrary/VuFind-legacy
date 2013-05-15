@@ -1600,3 +1600,12 @@ span.order {
   float: left;
   width: 25px;
 }
+
+span.recordNumber {
+  position: absolute;
+  font-weight: bold;
+}
+
+.facetsTop td {
+  vertical-align: top;
+}

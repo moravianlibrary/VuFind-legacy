@@ -111,8 +111,10 @@ class Konspekt implements RecommendationInterface
         $filters = $this->_searchObject->getFilters();
         if ($this->checkCondition($filters)) {
             $interface->assign('showKonspekt', true);
+            $facets = $this->_searchObject->getFacetList($this->_facets, false);
+            usort($facets[$this->_subcategoryFacet]['list'], "Konspekt::sort");
             $interface->assign(
-                'konspektFacetSet', $this->_searchObject->getFacetList($this->_facets, false)
+                'konspektFacetSet', $facets
             );
             $interface->assign('topFacetSettings', $this->_baseSettings);
         } else {
@@ -137,6 +139,10 @@ class Konspekt implements RecommendationInterface
     public function getTemplate()
     {
         return 'Search/Recommend/Konspekt.tpl';
+    }
+    
+    public static function sort($a, $b) {
+        return strcoll($a['value'], $b['value']);
     }
 
 }
