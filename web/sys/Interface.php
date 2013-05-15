@@ -117,7 +117,9 @@ class UInterface extends Smarty
             isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : false
         );
         $this->assign('supportEmail', $configArray['Site']['email']);
+        /* begin of costumization for MZK */
         $searchObject = SearchObjectFactory::initSearchObject();
+        /* end of costumization for MZK */
         $this->assign(
             'basicSearchTypes',
             is_object($searchObject) ? $searchObject->getBasicTypes() : array()
@@ -347,14 +349,13 @@ class UInterface extends Smarty
         if (isset($configArray['GoogleAnalytics'])) {
             $this->assign('googleAnalytics', $configArray['GoogleAnalytics']);
             /* begin of costumization for MZK */
-            $firstload = true;
-            if (!isset($_SESSION['firstload'])) {
+            // google analytics
+            $firstload = !isset($_SESSION['firstload']);
+            if ($firstload) {
                 if ($_GET['logout']) {
                     $firstload = false;
                 }
                 $_SESSION['firstload'] = false;
-            } else {
-                $firstload = false;
             }
             $gaVars = array();
             if ($firstload) {
@@ -375,6 +376,9 @@ class UInterface extends Smarty
                 $gaVars['visitorStatus'] = array('index' => 2, 'value' => 'logged-in', 'type' => 1);
             }
             $this->assign('googleAnalyticsVariables', $gaVars);
+            // new items link
+            $curr_date = date('Ym', strtotime('now'));
+            $this->assign('newItemsLink', "acq_int:[$curr_date TO $curr_date]");
             /* end of costumizaton for MZK */
         }
     }
