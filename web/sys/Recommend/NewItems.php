@@ -1,10 +1,10 @@
 <?php
 /**
- * MapScale
+ * NewItems
  *
  * PHP version 5
  *
- * Copyright (C) Václav Rosecký 2013.
+ * Copyright (C) Václav Rosecký 2012.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -29,7 +29,7 @@
 require_once 'sys/Recommend/Interface.php';
 
 /**
- * Konspekt Recommendations Module
+ * NewItems Recommendations Module
  *
  * @category VuFind
  * @package  Recommendations
@@ -37,13 +37,13 @@ require_once 'sys/Recommend/Interface.php';
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/building_a_recommendations_module Wiki
  */
-class Konspekt implements RecommendationInterface
+class NewItems implements RecommendationInterface
 {
     private $_searchObject;
+    private $_fieldDate = 'acq_int';
+    private $_fieldDateLabel = 'Acquisition_range_facet';
     private $_categoryFacet = "category_txtF";
-    private $_categoryFacetName = "Conspectus category";
-    private $_subcategoryFacet = "subcategory_txtF";
-    private $_subcategoryFacetName = "Conspectus subcategory";
+    private $_categoryFacetLabel = "category";
 
     /**
      * Constructor
@@ -57,23 +57,7 @@ class Konspekt implements RecommendationInterface
      */
     public function __construct($searchObject, $params)
     {
-        //Save the basic parameters:
         $this->_searchObject = $searchObject;
-
-        // Parse the additional parameters:
-        $params = explode(':', $params);
-        $section = empty($params[0]) ? 'ResultsTop' : $params[0];
-        $iniFile = isset($params[1]) ? $params[1] : 'facets';
-
-        // Load the desired facet information:
-        $config = getExtraConfigArray($iniFile);
-        $this->_facets = array($this->_subcategoryFacet => $this->_subcategoryFacetName);
-
-        // Load other relevant settings:
-        $this->_baseSettings = array(
-            'rows' => $config['Results_Settings']['top_rows'],
-            'cols' => $config['Results_Settings']['top_cols']
-        );
     }
 
     /**
@@ -88,11 +72,6 @@ class Konspekt implements RecommendationInterface
      */
     public function init()
     {
-        $filters = $this->_searchObject->getFilters();
-        if ($this->checkCondition($filters)) {
-            $this->_searchObject->addFacet($this->_categoryFacet, $this->_categoryFacetName);
-            $this->_searchObject->addFacet($this->_subcategoryFacet, $this->_subcategoryFacetName);
-        }
     }
 
     /**
@@ -109,21 +88,58 @@ class Konspekt implements RecommendationInterface
     {
         global $interface;
         $filters = $this->_searchObject->getFilters();
-        if ($this->checkCondition($filters)) {
-            $interface->assign('showKonspekt', true);
-            $facets = $this->_searchObject->getFacetList($this->_facets, false);
-            usort($facets[$this->_subcategoryFacet]['list'], "Konspekt::sort");
-            $interface->assign(
-                'konspektFacetSet', $facets
-            );
-            $interface->assign('topFacetSettings', $this->_baseSettings);
-        } else {
-            $interface->assign('showKonspekt', false);
+        if (!$this->checkCondition($filters)) {
+            $interface->assign('showNewItems', false);
+            return;
         }
+        $curr_date = date('Ym', strtotime('now'));
+        $interface->assign('newItemsLink', $this->createFilter($this->createRange($curr_date, $curr_date)));
+        $field = $this->_fieldDate;
+        $curr_range = $filters[$field][0];
+        $interface->assign('showNewItems', true);
+        $s1 = date('Ym', strtotime('last year'));
+        $e1 = date('Ym', strtotime('last year december'));
+        $s2 = date('Ym', strtotime('this year january'));
+        $e2 = $curr_date;
+        $ranges = array_merge(range($e2, $s2), range($e1, $s1));
+        foreach ($ranges as $date) {
+            $range = $this->createRange($date, $e2);
+            $label = $this->createLabel($date);
+            $newItemsDates[$label] = array(
+                'filter' => $this->createFilter($range),
+                'selected' => ($curr_range == $range)
+            );
+        }
+        $interface->assign('newItemsDates', $newItemsDates);
+        $searchObject = SearchObjectFactory::initSearchObject();
+        $searchObject->addFacet($this->_categoryFacet, $this->_categoryFacetLabel);
+        $searchObject->init();
+        $searchObject->processSearch();
+        $facets = $searchObject->getFacetList();
+        $facets = $facets[$this->_categoryFacet]['list'];
+        $interface->assign('newItemsConspectusCategories', $facets);
+        $interface->assign('newItemsConspectusField', $this->_categoryFacet);
+        $interface->assign('newItemsConspectusLabel', $this->_categoryFacetLabel);
+        $interface->assign('newItemsExcludeFields', array($this->_fieldDate));
+        $interface->assign('newItemsConspectusExcludeFields', array($this->_categoryFacet));
+        $this->_searchObject->addFacet($this->_fieldDate, $this->_fieldDateLabel);
     }
     
+    private function createFilter($range) {
+        return "{$this->_fieldDate}:$range";
+    }
+    
+    private function createRange($begin, $end) {
+        return "[$begin TO $end]";
+    }
+    
+    private function createLabel($date) {
+        $date = substr($date, 0, 4) . '-' . substr($date, 4, 6);
+        return strftime('%B %Y', strtotime($date));
+    }
+
     private function checkCondition($filters) {
-        return isset($filters[$this->_categoryFacet]) || isset($filters[$this->_subcategoryFacet]);
+       return (isset($filters[$this->_fieldDate]) && $this->_searchObject->getResultTotal() > 0);
     }
 
     /**
@@ -138,11 +154,7 @@ class Konspekt implements RecommendationInterface
      */
     public function getTemplate()
     {
-        return 'Search/Recommend/Konspekt.tpl';
-    }
-    
-    public static function sort($a, $b) {
-        return strcoll($a['value'], $b['value']);
+        return 'Search/Recommend/NewItems.tpl';
     }
 
 }
