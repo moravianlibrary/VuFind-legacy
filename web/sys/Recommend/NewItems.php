@@ -117,6 +117,7 @@ class NewItems implements RecommendationInterface
         $searchObject->processSearch();
         $facets = $searchObject->getFacetList();
         $facets = $facets[$this->_categoryFacet]['list'];
+        usort($facets, "NewItems::compare");
         $interface->assign('newItemsConspectusCategories', $facets);
         $interface->assign('newItemsConspectusField', $this->_categoryFacet);
         $interface->assign('newItemsConspectusLabel', $this->_categoryFacetLabel);
@@ -140,6 +141,10 @@ class NewItems implements RecommendationInterface
 
     private function checkCondition($filters) {
        return (isset($filters[$this->_fieldDate]) && $this->_searchObject->getResultTotal() > 0);
+    }
+    
+    public static function compare($a, $b) {
+        return strcoll($a['value'], $b['value']);
     }
 
     /**
