@@ -41,13 +41,13 @@
                 {/foreach}
                 </tr>
                 <tr>
-                {foreach from=$facetList item="list" key="label"}
+                {foreach from=$facetList item="list" key="label" name="facetList"}
                   <td>
                     <select name="filter[]" id="{$label|replace:' ':''}Filter" multiple="multiple" size="10">
                       {foreach from=$list item="value" key="display"}
                         {if $value.filter}
                           <option value="{$value.filter|escape}"{if $value.selected} selected="selected"{/if}>{$display|escape}</option>
-                        {else}
+                        {elseif !$smarty.foreach.facetList.last}
                           <option disabled="true">==================</option>
                         {/if}
                       {/foreach}
