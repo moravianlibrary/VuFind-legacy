@@ -109,14 +109,17 @@ class Konspekt implements RecommendationInterface
     {
         global $interface;
         $filters = $this->_searchObject->getFilters();
-        if ($this->checkCondition($filters)) {
+        if ($this->checkCondition($filters) && $this->_searchObject->getResultTotal() > 0) {
             $interface->assign('showKonspekt', true);
             $facets = $this->_searchObject->getFacetList($this->_facets, false);
-            usort($facets[$this->_subcategoryFacet]['list'], "Konspekt::sort");
+            $facetsToSort = $facets[$this->_subcategoryFacet]['list'];
+            usort($facetsToSort, "Konspekt::sort");
+            $interface->assign('showKonspekt', false);
             $interface->assign(
                 'konspektFacetSet', $facets
             );
             $interface->assign('topFacetSettings', $this->_baseSettings);
+            $interface->assign('showKonspekt', !isset($filters[$this->_subcategoryFacet]));
         } else {
             $interface->assign('showKonspekt', false);
         }
