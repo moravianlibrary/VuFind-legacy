@@ -61,6 +61,7 @@ class MZKSolr extends Solr
                 if ($element == 'format:"Journal"' || $element == 'format:"Newspaper"') {
                     $element = 'format:"NewspaperOrJournal"';
                 }
+                $filters[] = $element;
             }
         }
         $params = array();
