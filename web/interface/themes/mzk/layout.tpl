@@ -50,15 +50,12 @@
     {js filename="jquery.cluetip.min.js"}
     {js filename="common.js"}
     {js filename="lightbox.js"}
-    {if module == 'EBSCO'}
-    {*
-    {js filename="discover.js"}
+    {if $module == 'EBSCO'}
+    {js filename="ebsco.js"}
     {js filename="element-min.js "}
     {js filename="event-delegate-min.js"}
-    {js filename="discover.js"}
     {js filename="selector-min.js"}
     {js filename="slider-min.js"}
-    *}
     {/if}
     {if $bookBag}
        {js filename="cart.js"}
