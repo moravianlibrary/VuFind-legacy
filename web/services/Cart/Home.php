@@ -85,6 +85,7 @@ class Home extends Bulk
             $_SESSION['exportFormat'] = 'printShort';
             $this->followupUrl = $configArray['Site']['url'] . "/Cart/Export?exportInit";
             header("Location: " . $this->followupUrl);
+            session_write_close();
             exit();
         } else if ($this->origin == "Favorites") {
             // Favorites Functions
