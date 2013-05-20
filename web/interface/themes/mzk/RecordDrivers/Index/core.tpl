@@ -185,6 +185,17 @@
     </td>
   </tr>
   {/if}
+  
+  {if !empty($provenience)}
+  <tr valign="top">
+    <th>{translate text='Provenience'}: </th>
+    <td>
+      {foreach from=$provenience item=field name=loop}
+        {$field|escape}<br>
+      {/foreach}
+    </td>
+  </tr>
+  {/if}
 
   {if !empty($coreURLs) || $coreOpenURL}
   <tr valign="top">

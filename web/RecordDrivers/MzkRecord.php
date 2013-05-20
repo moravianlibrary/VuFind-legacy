@@ -20,6 +20,7 @@ class MzkRecord extends MarcRecord
         $interface->assign('callNumber', $this->getCallNumber());
         $interface->assign('physical', $this->getPhysicalDescriptions());
         $interface->assign('id', $this->getUniqueID());
+        $interface->assign('provenience', $this->getProvenience());
         $this->addBibinfoForObalkyKnih();
         return $result;
     }
@@ -172,6 +173,11 @@ class MzkRecord extends MarcRecord
     {
         $eod = $this->_getFirstFieldValue('EOD', array('a'));
         return ($eod == 'Y')?true:false;
+    }
+    
+    protected function getProvenience() {
+        $result = $this->_getFieldArray('561', array('a'));
+        return $result;
     }
     
     protected function getCNB()
