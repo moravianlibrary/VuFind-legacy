@@ -190,6 +190,7 @@
   {/if}
   
   {if !empty($callNumber)}
+  {assign var=extendedContentDisplayed value=1}
   <tr valign="top">
     <th>{translate text='Signature'}: </th>
     <td>
@@ -201,6 +202,7 @@
   {/if}
   
   {if !empty($fullViewURL) and !empty($holdingsURL)}
+  {assign var=extendedContentDisplayed value=1}
   <tr valign="top">
     <th>{translate text='Link to aleph'}: </th>
     <td>
