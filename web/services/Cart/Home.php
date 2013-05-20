@@ -81,7 +81,11 @@ class Home extends Bulk
             $action = array('module' => 'Cart', 'action' => 'Email');
         } else if (isset($_REQUEST['print'])) {
             // Print
-            $action = array('module' => 'Cart', 'action' => 'PrintCart');
+            $_SESSION['exportIDS'] = $_REQUEST['ids'];
+            $_SESSION['exportFormat'] = 'printShort';
+            $this->followupUrl = $configArray['Site']['url'] . "/Cart/Export?exportInit";
+            header("Location: " . $this->followupUrl);
+            exit();
         } else if ($this->origin == "Favorites") {
             // Favorites Functions
             if (isset($_REQUEST['delete'])) {
