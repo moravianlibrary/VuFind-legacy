@@ -47,6 +47,8 @@ require_once 'XML/Serializer.php';
  */
 class MZKSolr extends Solr
 {
+    
+    private static $EMPTY_QUERY = "*:*";
 
     public function search($query, $handler = null, $filter = null, $start = 0,
         $limit = 20, $facet = null, $spell = '', $dictionary = null,
@@ -67,6 +69,10 @@ class MZKSolr extends Solr
         $params = array();
         if ($facet && $facet['field'] && in_array("subcategory_txtF", $facet['field'])) {
             $params["f.subcategory_txtF.facet.limit"] = 100; 
+        }
+        if ($query == self::$EMPTY_QUERY) {
+            $curr_date = date('Ym', strtotime('now'));
+            $query = "acq_int:$curr_date^50 OR *:*";
         }
         return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror, $params);
     }
