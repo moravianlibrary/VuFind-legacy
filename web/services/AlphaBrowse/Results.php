@@ -75,10 +75,10 @@ class Results extends Home
             }
 
             // Only display next/previous page links when applicable:
-            if ($result['Browse']['totalCount'] > $limit) {
+            if ($result['Browse']['totalCount'] > $limit || $result['Browse']['hasNext']) {
                 $interface->assign('nextpage', $page + 1);
             }
-            if ($result['Browse']['offset'] + $result['Browse']['startRow'] > 1) {
+            if ($result['Browse']['offset'] + $result['Browse']['startRow'] > 1 || $result['Browse']['hasPrevious']) {
                 $interface->assign('prevpage', $page - 1);
             }
 
