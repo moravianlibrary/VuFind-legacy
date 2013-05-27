@@ -229,6 +229,10 @@ class Aleph implements DriverInterface
         if (isset($configArray['Catalog']['fav_cgi_url'])) {
             $this->favourites_url = $configArray['Catalog']['fav_cgi_url'];
         }
+        $this->history_limit = 50;
+        if (isset($configArray['History']['limit'])) {
+            $this->history_limit = $configArray['History']['limit'];
+        }
     }
 
     protected function doXRequest($op, $params, $auth=false)
@@ -641,6 +645,7 @@ class Aleph implements DriverInterface
         $params = array("view" => "full");
         if ($history) {
            $params["type"] = "history";
+           $params["no_loans"] = $this->history_limit;
         }
         $count = 0;
         $unreturned_books = 0;
