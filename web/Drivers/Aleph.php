@@ -238,12 +238,41 @@ class Aleph implements DriverInterface
         if ($auth) {
            $url = $this->appendQueryString($url, array('user_name' => $this->wwwuser, 'user_password' => $this->wwwpasswd));
         }
-        $result = $this->doHTTPRequest($url);
+        if ($post) {
+            $result = $this->doHTTPRequest($url, 'POST', $post);
+        } else {
+           $result = $this->doHTTPRequest($url);
+        }
         if ($result->error) {
            if ($this->debug_enabled) {
                $this->debug("XServer error, URL is $url, error message: $result->error.");
            }
            throw new Exception("XServer error: $result->error.");
+        }
+        return $result;
+    }
+    
+    protected function doXRequestUsingPost($op, $params, $auth=true)
+    {
+        $url = "http://$this->host/X?";
+        $body = '';
+        $sep = '';
+        $params['op'] = $op;
+        if ($auth) {
+            $params['user_name'] = $this->wwwuser;
+            $params['user_password'] = $this->wwwpasswd;
+        }
+        foreach ($params as $key => $value) {
+            $body .= $sep . $key . '=' . urlencode($value);
+            $sep = '&';
+        }
+        //print "$body<BR>";
+        $result = $this->doHTTPRequest($url, 'POST', $body);
+        if ($result->error) {
+            if ($this->debug_enabled) {
+                $this->debug("XServer error, URL is $url, error message: $result->error.");
+            }
+            throw new Exception("XServer error: $result->error.");
         }
         return $result;
     }
@@ -1238,6 +1267,7 @@ class Aleph implements DriverInterface
     public function getInterlibraryLoanFields($user, $type) {
         $userId = $user['id'];
         $xml = $this->doRestDLFRequest(array('patron', $userId, 'record', 'MN', 'ill'), null);
+        //$xml = @simplexml_load_string(file_get_contents("conf/aleph/book.xml"));
         $result = array();
         $fields = $this->ill_fields[$type];
         foreach($fields as $field) {
@@ -1277,20 +1307,50 @@ class Aleph implements DriverInterface
     }
 
     public function createInterlibraryLoan($user, $attrs) {
+        $payment = $attrs['payment'];
+        $type = $attrs['new'];
+        unset($attrs['payment']);
+        unset($attrs['type']);
+        unset($attrs['new']);
+        unset($attrs['additional_authors']);
+        if ($type == 'serial') {
+            $type = 'SE';
+        } else if ($type == 'monography') {
+            $type = 'MN';
+        }
+        //print "type:$type<BR>";
         $patronId = $user['id'];
-        $xml = "";
-        //$xml = "post_xml=";
-        $xml .= "<ill-parameters>";
+        $xml = "post_xml=<ill-parameters>";
         foreach ($attrs as $key => $value) {
             $xml .= "<$key>" . htmlentities($value) . "</$key>";
         }
         $xml.="</ill-parameters>";
         try {
-            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', 'MN', 'ill'), null, HTTP_REQUEST_METHOD_PUT, $xml);
+            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $type, 'ill'), null, HTTP_REQUEST_METHOD_PUT, $xml);
         } catch (Exception $ex) {
-           print "error:" . $ex->getMessage() . "\n";
            return array('success' => false, 'sysMessage' => $ex->getMessage()); 
         }
+        /*
+        $result = '<?xml version = "1.0" encoding = "UTF-8"?><put-rec-ill><reply-text>ok</reply-text><reply-code>0000</reply-code><create-ill><request-number>MZK40000038883</request-number><note type="info">Request No. MZK40000038883 created successfully.</note></create-ill></put-rec-ill>';
+        $result = simplexml_load_string($result);
+        */
+        $baseAndDocNumber = $result->{'create-ill'}->{'request-number'};
+        $base = substr($baseAndDocNumber, 0, 5);
+        $docNum = substr($baseAndDocNumber, 5);
+        $params = array('base'=> $base, 'doc_num' => $docNum);
+        $document = $this->doXRequest('find-doc', $params, true);
+        // create varfield for ILL request type
+        $varfield = $document->{'record'}->{'metadata'}->{'oai_marc'}->addChild('varfield');
+        $varfield->addAttribute('id', 'PNZ');
+        $varfield->addAttribute('i1', ' ');
+        $varfield->addAttribute('i2', ' ');
+        $subfield = $varfield->addChild('subfield', $payment);
+        $subfield->addAttribute('label', 'a'); 
+        $params['xml_full_req'] = $document->asXml();
+        //print $params['xml_full_req']; 
+        $params['doc_action'] = 'UPDATE';
+        $update = $this->doXRequestUsingPost('update-doc', $params, true);
+        //print $update->asXml();
         return array('success' => true);
     }
     
