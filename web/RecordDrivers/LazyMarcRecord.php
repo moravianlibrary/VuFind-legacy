@@ -19,6 +19,9 @@ class LazyMarcRecord {
 
     public function load()
     {
+        if ($this->marcRecord != false) {
+            return;
+        }
         // Also process the MARC record:
         $marc = trim($this->record['fullrecord']);
 
