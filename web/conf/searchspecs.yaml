@@ -133,7 +133,7 @@ Author:
     - author2
     - author_additional
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - author:
       - [onephrase, 350]
@@ -158,7 +158,7 @@ ISN:
     - isbn
     - issn
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - issn:
       - [and, 100]
@@ -175,7 +175,7 @@ Subject:
     - genre^50
     - era
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - topic_unstemmed:
       - [onephrase, 350]
@@ -210,7 +210,7 @@ JournalTitle:
     - series^100
     - series2
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - title_short:
       - [onephrase, 500]
@@ -248,7 +248,7 @@ Title:
     - series^100
     - series2
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - title_short:
       - [onephrase, 500]
@@ -279,7 +279,7 @@ Series:
     - series^100
     - series2
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - series:
       - [onephrase, 500]
@@ -314,7 +314,7 @@ AllFields:
   # modification for MZK
     - publishDateFacet
   DismaxParams:
-    - [bq, "relevancy:default"^2]
+    - [bq, "relevancy:default^2"]
   QueryFields:
     - 
       - [OR, 50]
