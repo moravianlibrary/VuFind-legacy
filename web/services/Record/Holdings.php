@@ -58,17 +58,26 @@ class Holdings extends Record
         // holds / recalls
         $patron = UserAccount::isLoggedIn() ? UserAccount::catalogLogin() : false;
         // begin of modifications for MZK
-        /*
-        $interface->setPageTitle(
-            translate('Holdings') . ': ' . $this->recordDriver->getBreadcrumb()
-        );
-        */
         $interface->setPageTitle($this->recordDriver->getBreadcrumb());
+        
+        $holdingsMetadata = null;
+        if ($this->recordDriver instanceof MZKRecord) {
+            $filters = array();
+            if (isset($_GET['hide_loans']) && $_GET['hide_loans'] == 'true') {
+                $filters['hide_loans'] = true;
+            }
+            if (isset($_GET['year'])) {
+                $filters['year'] = $_GET['year']; 
+            } else if (isset($_GET['volume'])) {
+                $filters['volume'] = $_GET['volume'];
+            }
+            $holdingsMetadata = $this->recordDriver->getHoldings($patron, $filters);
+        } else {
+            $holdingsMetadata = $this->recordDriver->getHoldings($patron);
+        } 
+        $interface->assign('holdingsMetadata', $holdingsMetadata);
         // end of modifications for MZK
         
-        $interface->assign(
-            'holdingsMetadata', $this->recordDriver->getHoldings($patron)
-        );
         $interface->assign('subTemplate', 'view-holdings.tpl');
         $interface->setTemplate('view.tpl');
 

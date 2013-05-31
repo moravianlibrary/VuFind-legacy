@@ -24,12 +24,54 @@ class MzkRecord extends MarcRecord
         $this->addBibinfoForObalkyKnih();
         return $result;
     }
-
-    public function getHoldings($patron = false)
+    
+    public function getHoldings($patron = false, $filters=array())
     {
         global $interface;
-        $result = parent::getHoldings($patron);
+        global $configArray;
+        $z30s = $this->marcRecord->getFields("Z30");
+        $years = array();
+        $volumes = array(); 
+        foreach ($z30s as $item) {
+            $s = $item->getSubfield('s');
+            if ($s && $s->getData() != 'Archiv') {
+                $a = $item->getSubfield('a');
+                if ($a) {
+                    $years[] = $a->getData();
+                }
+                // FIXME: import from aleph needs to be fixed
+                $second = false;
+                foreach ($item->getSubfields() as $code => $value) {
+                    if ($code == 'b') {
+                        if ($second) {
+                            $volumes[] = $value->getData();
+                        } else {
+                            $second = true;
+                        }
+                    }
+                }
+            }
+        }
+        $years = array_unique($years);
+        sort($years, SORT_NUMERIC );
+        $years = array_reverse($years);
+        $volumes = array_unique($volumes);
+        sort($volumes, SORT_NUMERIC );
+        $volumes = array_reverse($volumes);
         $interface->assign('id', $this->getUniqueID());
+        $interface->assign('items_years', $years);
+        $interface->assign('items_volumes', $volumes);
+        if (isset($filters['hide_loans']) && $filters['hide_loans']) {
+            $interface->assign('hide_loans', true);
+        }
+        if (isset($filters['year'])) { 
+            $interface->assign('items_selected_year', $filters['year']);
+        } else if (isset($filters['volume'])) {
+            $interface->assign('items_selected_volume', $filters['volume']);
+        } else if (count($z30s) > 30 && count($years) > 0) {
+            $filters['year'] = $years[0];
+            $interface->assign('items_selected_year', $years[0]);
+        }
         $itemLink = $this->fields['itemlink'];
         if ($this->getUniqueID() != $itemLink) {
             $interface->assign('itemLink', $itemLink);
@@ -39,8 +81,29 @@ class MzkRecord extends MarcRecord
                 $interface->assign('itemLinkType', "LKR");
             }
         }
+        // Holdings Restrictions
         $interface->assign('holdingsRestrictions', $this->getRestrictions());
-        return $result;
+        // Only display OpenURL link if the option is turned on and we have
+        // an ISSN.  We may eventually want to make this rule more flexible,
+        // but for now the ISSN restriction is designed to be consistent with
+        // the way we display items on the search results list.
+        $hasOpenURL = ($this->openURLActive('holdings') && $this->getCleanISSN());
+        if ($hasOpenURL) {
+            $interface->assign('holdingsOpenURL', $this->getOpenURL());
+        }
+        // Display regular URLs unless OpenURL is present and configured to
+        // replace them:
+        if (!isset($configArray['OpenURL']['replace_other_urls'])
+            || !$configArray['OpenURL']['replace_other_urls'] || !$hasOpenURL
+        ) {
+            $interface->assign('holdingURLs', $this->getURLs());
+        }
+        $interface->assign('holdingLCCN', $this->getLCCN());
+        $interface->assign('holdingArrOCLC', $this->getOCLC());
+        // Load real-time data if available:
+        $interface->assign('holdings', $this->getRealTimeHoldings($patron, $filters));
+        $interface->assign('history', $this->getRealTimeHistory());
+        return 'RecordDrivers/Index/holdings.tpl';
     }
 
     public function getSearchResult($view = 'list')
@@ -279,6 +342,22 @@ class MzkRecord extends MarcRecord
         $permalink = $configArray['Site']['url'] . '/Record/' . urlencode($this->getUniqueID());
         $interface->assign('obalkyknih_permalink', $permalink);
         $interface->assign('obalkyknih_bibinfo', json_encode($bibinfo));
+    }
+    
+    protected function getRealTimeHoldings($patron = false, $filters = array())
+    {
+        // Get ID and connect to catalog
+        $id = $this->getUniqueID();
+        $catalog = ConnectionManager::connectToCatalog();
+        include_once 'sys/HoldLogic.php';
+        $holdLogic = new HoldLogic($catalog);
+        if (!empty($filters)) {
+            $filter = $filters;
+            $filter['id'] = $id; 
+            return $holdLogic->getHoldings($filter, $patron);
+        } else {
+            return $holdLogic->getHoldings($id, $patron);
+        }
     }
 
 }

@@ -23,6 +23,7 @@ a.jt {
   {/foreach}
   </div>
 {/if}
+
 {if $itemLink}
    {if $itemLinkType == "LKR"}
       <a href="{$url}/Record/{$itemLink|escape:'url'}">{translate text='To place a hold, visit this record.'}<a/>
@@ -61,6 +62,65 @@ a.jt {
     <a id="HT{$id|escape}" style="display:none"  target="_blank"><img src="{$path}/images/preview_ht.gif" border="0" style="width: 70px; margin: 0" title="{translate text='View online: Full view Book Preview from the Hathi Trust'}"/></a>
   </span>
 {/if}
+
+
+<table>
+  <tbody>
+    <tr>
+      {* filter by year *}
+      {if !empty($items_years)}
+      <td>
+        <form id="year_filter" name="year_filter" method="get">
+          <label for="year">{translate text="Items filter by year"}:</label>
+          <select id="year" name="year" onchange="document.forms['year_filter'].submit()">
+            <option value="">{translate text="all"}</option>
+            {foreach from=$items_years item=year}
+              {if $year == $items_selected_year}
+                <option selected="true" value="{$year|escape}">{$year|escape}</option>
+              {else}
+                <option value="{$year|escape}">{$year|escape}</option>
+              {/if}
+            {/foreach}
+          </select>
+          {if $hide_loans}
+            <input type="hidden" name="hide_loans" value="true" />
+          {/if}
+          <noscript><input type="submit" value="{translate text='Set'}" /></noscript>
+        </form>
+      </td>
+      {* filter by volume *}
+      <td>
+        <form id="volume_filter" name="volume_filter" method="get">
+          <label for="volume">{translate text="Items filter by volume"}:</label>
+          <select id="volume" name="volume" onchange="document.forms['volume_filter'].submit()">
+            <option value="">{translate text="all"}</option>
+            {foreach from=$items_volumes item=volume}
+                <option {if $volume == $items_selected_volume}selected="true"{/if} value="{$volume|escape}">{$volume|escape}</option>
+            {/foreach}
+          </select>
+          {if $hide_loans}
+            <input type="hidden" name="hide_loans" value="true" />
+          {/if}
+          <noscript><input type="submit" value="{translate text='Set'}" /></noscript>
+        </form>
+      </td>
+      {/if}
+      <td>
+        <form id="hide_loans_filter" name="hide_loans_filter" method="get">
+          {if $items_selected_year}
+          <input type="hidden" name="year" value="{$items_selected_year|escape}" />
+          {/if}
+          {if $items_selected_volume}
+          <input type="hidden" name="volume" value="{$items_selected_volume|escape}" />
+          {/if}
+          <input type="checkbox" name="hide_loans" value="true" {if $hide_loans}checked="true"{/if} onchange="document.forms['hide_loans_filter'].submit()" />
+          <label for="hide_loans">{translate text="Hide loaned items"}</label>
+          <noscript><input type="submit" value="{translate text='Set'}" /></noscript>
+        </form>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 {foreach from=$holdings item=holding key=location}
 <h3>{translate text=$location}</h3>
