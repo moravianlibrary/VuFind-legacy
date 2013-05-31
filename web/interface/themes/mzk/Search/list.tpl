@@ -74,7 +74,7 @@
             {foreach from=$viewList item=viewData key=viewLabel}
               &nbsp;
               {if !$viewData.selected}<a href="{$viewData.viewUrl|escape}" title="{translate text='Switch view to'} {translate text=$viewData.desc}"  style="text-decoration:none">{/if}
-              <img src="{$path}/images/view_{$viewData.viewType}.png"/>
+              {image src="view_`$viewData.viewType`.png"}
               {if !$viewData.selected}</a>{/if}&nbsp;
             {/foreach}
             <br />
