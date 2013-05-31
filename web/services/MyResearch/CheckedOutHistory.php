@@ -56,7 +56,13 @@ class CheckedOutHistory extends MyResearch
                 PEAR::raiseError($patron);
             }
 
-            $result = $this->catalog->getMyHistory($patron);
+            $limit = 50;
+            $view = 'list';
+            if (isset($_GET['limit'])) {
+                $limit = (int) $_GET['limit'];
+            }
+
+            $result = $this->catalog->getMyHistory($patron, $limit);
             if (PEAR::isError($result)) {
                 PEAR::raiseError($result);
             }
@@ -80,6 +86,9 @@ class CheckedOutHistory extends MyResearch
             }
 
         }
+        $interface->assign('limitList', array(50, 100, 200));
+        $interface->assign('currentLimit', $limit);
+        $interface->assign('currentView', $this->view);
         $interface->assign('transList', $transList);
         $interface->setTemplate('checkedout-history.tpl');
         $interface->setPageTitle('Checked Out Items History');

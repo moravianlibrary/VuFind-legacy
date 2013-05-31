@@ -88,8 +88,10 @@ class CheckedOut extends MyResearch
                 $transList = $this->_addRenewDetails($transList);
             }
         }
+        
         $interface->assign('patron', $patron);
         $interface->assign('transList', $transList);
+        $interface->assign('currentView', $this->view);
         $interface->setTemplate('checkedout.tpl');
         $interface->setPageTitle('Checked Out Items');
         $interface->display('layout.tpl');

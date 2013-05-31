@@ -117,6 +117,7 @@ class Holds extends MyResearch
         } else {
             $interface->setTemplate('holds-history.tpl');
         }
+        $interface->assign('currentView', $this->view);
         $interface->setPageTitle('My Holds');
         $interface->display('layout.tpl');
     }

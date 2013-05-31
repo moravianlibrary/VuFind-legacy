@@ -52,6 +52,7 @@ class MyResearch extends Action
     protected $checkHolds;
     protected $checkRenew;
     protected $cancelHolds;
+    protected $view; // costumization for MZK
 
     /**
      * Constructor
@@ -117,6 +118,16 @@ class MyResearch extends Action
         $this->errorMsg = isset($_GET['errorMsg']) ? $_GET['errorMsg'] : false;
         $this->showExport = isset($_GET['showExport']) ? $_GET['showExport'] : false;
         $this->followUpUrl = false;
+        
+        // begin of costumization for MZK
+        $this->view = 'list';
+        if (isset($_GET['view'])) {
+            $this->view = $_GET['view'];
+            $_SESSION['lastView'] = $this->view;
+        } else if (isset($_SESSION['lastView'])) {
+            $this->view = $_SESSION['lastView'];
+        }
+        // end of costumization for MZK
     }
 }
 
