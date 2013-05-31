@@ -510,10 +510,23 @@ class Aleph implements DriverInterface
      */
     public function getHolding($id, $patron = false)
     {
-        $holding = array();
-        list($bib, $sys_no) = $this->parseId($id);
-        $resource = $bib . $sys_no;
+        $bibId = $id;
         $params = array('view' => 'full');
+        if (is_array($id)) {
+            $bibId = $id['id'];
+            if (isset($id['year'])) {
+                $params['year'] = $id['year']; 
+            }
+            if (isset($id['volume'])) {
+                $params['volume'] = $id['volume'];
+            }
+            if (isset($id['hide_loans']) && $id['hide_loans']) {
+                $params['loaned'] = 'NO';
+            }
+        }
+        $holding = array();
+        list($bib, $sys_no) = $this->parseId($bibId);
+        $resource = $bib . $sys_no;
         if ($patron) {
             $params['patron'] = $patron['id'];
         } else {
@@ -588,7 +601,7 @@ class Aleph implements DriverInterface
            } else {
                $duedate = null;
            }
-           $holding[] = array('id' => $id,
+           $holding[] = array('id' => $bibId,
                               'item_id' => $item_id,
                               'availability' => $availability, // was true
                               'status' => (string) $item_status['desc'],
