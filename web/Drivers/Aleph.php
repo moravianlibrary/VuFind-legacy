@@ -634,9 +634,9 @@ class Aleph implements DriverInterface
         
     }
 
-    public function getMyHistory($user)
+    public function getMyHistory($user, $limit = 0)
     {
-        return $this->getMyTransactions($user, true);
+        return $this->getMyTransactions($user, true, $limit);
     }
 
     /**
@@ -651,14 +651,16 @@ class Aleph implements DriverInterface
      * PEAR_Error otherwise.
      * @access public
      */
-    public function getMyTransactions($user, $history=false)
+    public function getMyTransactions($user, $history=false, $limit = 0)
     {
         $userId = $user['id'];
         $transList = array();
         $params = array("view" => "full");
         if ($history) {
            $params["type"] = "history";
-           $params["no_loans"] = $this->history_limit;
+           if ($limit > 0) {
+              $params["no_loans"] = $limit;
+           }
         }
         $count = 0;
         $unreturned_books = 0;
