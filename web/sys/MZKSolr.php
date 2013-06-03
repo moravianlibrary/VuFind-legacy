@@ -71,8 +71,7 @@ class MZKSolr extends Solr
             $params["f.subcategory_txtF.facet.limit"] = 100; 
         }
         if ($query == self::$EMPTY_QUERY) {
-            $curr_date = date('Ym', strtotime('now'));
-            $query = "acq_int:$curr_date^50 OR *:*";
+            $sort = "acq_int desc";
         }
         return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror, $params);
     }
