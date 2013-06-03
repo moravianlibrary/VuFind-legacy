@@ -70,7 +70,7 @@ class MZKSolr extends Solr
         if ($facet && $facet['field'] && in_array("subcategory_txtF", $facet['field'])) {
             $params["f.subcategory_txtF.facet.limit"] = 100; 
         }
-        if ($query == self::$EMPTY_QUERY) {
+        if ($query == self::$EMPTY_QUERY && $sort == null) {
             $sort = "acq_int desc";
         }
         return parent::search($query, $handler, $filters, $start, $limit, $facet, $spell, $dictionary, $sort, $fields, $method, $returnSolrErrror, $params);
