@@ -39,16 +39,9 @@ class MzkRecord extends MarcRecord
                 if ($a) {
                     $years[] = $a->getData();
                 }
-                // FIXME: import from aleph needs to be fixed
-                $second = false;
-                foreach ($item->getSubfields() as $code => $value) {
-                    if ($code == 'b') {
-                        if ($second) {
-                            $volumes[] = $value->getData();
-                        } else {
-                            $second = true;
-                        }
-                    }
+                $b = $item->getSubfield('b');
+                if ($b) {
+                    $volumes[] = $b->getData();
                 }
             }
         }
