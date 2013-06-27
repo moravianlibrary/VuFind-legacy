@@ -1,0 +1,398 @@
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+import java.io.*;
+import java.util.*;
+
+org.solrmarc.index.SolrIndexer indexer = null;
+
+static int count = 0;
+static String base = "";
+static Map records = new HashMap();
+
+static String fulltextDir = "/home/vufind/toc/";
+
+static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+static String currentYearTwoDigits = Calendar.getInstance().get(Calendar.YEAR).toString().substring(2);
+
+public class MyRecord {
+   public String[] statuses;
+   public String uplink;
+}
+
+public static init() {
+    BufferedReader br  = new BufferedReader(new FileReader("indexace.txt"));
+    while ((strLine = br.readLine()) != null) {
+       try {
+          String[] attrs = strLine.split(" ");
+          String sysno = attrs[0];
+          String[] statuses = attrs[1].split(",");
+          String[] uplinks = attrs[2].split(",");
+          MyRecord rec = new MyRecord();
+          rec.statuses = statuses;
+          rec.uplink = uplinks[0];
+          if (rec.uplink.equals("none")) {
+             rec.uplink = sysno;
+          }
+          records.put(sysno, rec);
+       } catch (java.lang.ArrayIndexOutOfBoundsException ex) {}
+    }
+    br.close();
+    BufferedReader br3  = new BufferedReader(new FileReader("base.txt"));
+    base = br3.readLine().trim();
+    br3.close();
+}
+
+init();
+
+public String getField(Record record, String field) {
+   return (String) indexer.getFieldList(record, field).iterator().next();
+}
+
+public String getID(Record record) {
+   return (base +  "-" + record.getControlNumber());
+}
+
+/*
+ * Statuses
+ */
+public Set getStatuses(Record record) {
+   MyRecord rec = records.get(getItemLink(record));
+   if (rec != null) {
+         Set result = new HashSet(Arrays.asList(rec.statuses));
+         if (result.contains("noitems")) {
+            return new HashSet();
+         } else {
+            return result;
+         }
+   } else {
+      System.err.println("statuses is null for:"+getItemLink(record));
+      Set result = new HashSet();
+      return result;
+   }
+}
+
+public String getItemLink(Record record) {
+   MyRecord rec = records.get(getID(record));
+   if (rec == null || rec.uplink==null) {
+      return getID(record);
+   } else {
+      return rec.uplink;
+   }
+}
+
+public Set getPublishDate(Record record) {
+   Set yearsFromItems = indexer.getFieldList(record, "Z30a");
+   if (yearsFromItems.size() > 0) {
+      Set result = new HashSet();
+      for (String year : yearsFromItems) {
+         if (isInteger(year)) {
+            result.add(year);
+         } else if (year.contains("-")) {
+            String[] range = year.split("-");
+            if (range.length == 2) {
+               result.add(range[0]);
+               result.add(range[1]);
+            }
+         }
+      }
+      return result;
+   }
+   Set result = new HashSet();
+   if (record == null) {
+      return result;
+   }
+   String val = indexer.getFirstFieldVal(record, "008");
+   if (val == null) {
+      return result;
+   }
+   String type = val.substring(6, 7);
+   int from = 0;
+   int to = 0;
+   try {
+      from = Integer.parseInt(val.substring(7, 11)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   try {
+      to = Integer.parseInt(val.substring(11, 15)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   if (from == 0 && to == 0) {
+      return result;
+   }
+   if (from == 0) {
+      from = to;
+   }
+   if (to == 0) {
+      to = from;
+   }
+   if (to > currentYear) {
+      to = 2013;
+   }
+   if (type.equals("e")) {
+      to = from;
+   }
+   for (int year = from; year <= to; year+=1) {
+       // result.add(Integer.toString(year));
+       result.add(String.format("%04d", new Object[]{ year }));
+   }
+   System.err.println(getID(record) + " has span " + result.size() + " years");
+   return result;
+}
+
+public static boolean isInteger(String s) {
+    try { 
+        Integer.parseInt(s); 
+    } catch(NumberFormatException e) { 
+        return false; 
+    }
+    // only got here if we didn't return false
+    return true;
+}
+
+/*
+ * Era
+ */
+public Set getEra(Record record) {
+   Set result = new HashSet();
+   if (record == null) {
+      return result;
+   }
+   String val = indexer.getFirstFieldVal(record, "008");
+   if (val == null) {
+      return result;
+   }
+   // System.err.println(val);
+   // int year = Integer.parseInt(val.substring(val.indexOf('s')+1, val.indexOf(' ')));
+   String type = val.substring(6, 7);
+   int from = 0;
+   int to = 0;
+   try {
+      from = Integer.parseInt(val.substring(7, 11)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   try {
+      to = Integer.parseInt(val.substring(11, 15)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   if (from == 0 && to == 0) {
+      return result;
+   }
+   if (from == 0) {
+      from = to;
+   }
+   if (to == 0) {
+      to = from;
+   }
+   if (to > 2010) {
+      to = 2010;
+   }
+   if (type.equals("e")) {
+      to = from;
+   }
+   for (int year = from; year <= to; year+=5) {
+       String era = toEra(year);
+       result.add(era);
+   }
+   // System.err.print("years:");
+   // for (String str : result) {
+   //     System.err.print(str+" ");
+   // }
+   // System.err.println("");
+   return result;
+}
+
+public String toEra(int year) {
+   int round = 50;
+   if (year > 1900) {
+      round = 10;
+   } else if (year > 1800) {
+      round = 20;
+   }
+   int rem = year % round;
+   // System.out.println("year: "+year + " rem: "+rem);
+   return String.valueOf(year-rem) + "-" + String.valueOf(year-rem+round);
+}
+
+public String getFullRecord(Record record) {
+   return "";
+}
+
+public String getCreated(Record record) {
+   return indexer.getFirstFieldVal(record, "005").substring(0, 8);
+}
+
+public String getShortTitle(Record record) {
+   String title = indexer.getFirstFieldVal(record, "245a");
+   if (title != null) {
+      title = title.replaceAll("[/: \\]]*$", "").replaceAll("^[\\[]", "");
+      System.out.println(title);
+   }
+   return title;
+}
+
+public String getVisible(Record record) {
+   String visible = "visible";
+   String value = indexer.getFirstFieldVal(record, "MZKs");
+   if (value != null && value.startsWith("SKRYTO")) {
+      visible = "hidden";
+   }
+   String fmt = indexer.getFirstFieldVal(record, "998a");
+   if (fmt != null && fmt.startsWith("AZ")) {
+      visible = "hidden";
+   }
+   String sta = indexer.getFirstFieldVal(record, "STAa");
+   if (sta != null && (sta.startsWith("SUPPRESSED") || sta.startsWith("DELETED"))) {
+      visible = "hidden";
+   }
+   return visible;
+}
+
+public static String readFile(File file) {
+    StringBuffer data = new StringBuffer(1000);
+    BufferedReader br  = new BufferedReader(new FileReader(file));
+    while ((strLine = br.readLine()) != null)   {
+       data.append(strLine);
+    }
+    br.close();
+    return data.toString();
+}
+
+public String getFullText(Record record) {
+   String nbn = indexer.getFirstFieldVal(record, "015a");
+   String content = null;
+   if (nbn != null) {
+      String path = fulltextDir + nbn + ".txt";
+      File file = new File(path);
+      if (file.exists()) {
+         content = readFile(file);
+         System.out.println("path: " + path);
+      }
+   }
+   return content;
+}
+
+public Set getKeywords(Record record) {
+   return getAllSubfieldsWithIndicator(record, "600#7abdqklmprs:610#7abcklmprs:" +
+   "611#7aceqklmprs:630#7adklmprs:" +
+   "650#7avxyz:651#7avxyz:653##a:655#7avxyz:964##a:967##abc");
+}
+
+public String getRelevancy(Record record) {
+   String relevancy = "default";
+   // platnost normy
+   String title = indexer.getFirstFieldVal(record, "520a");
+   if (title != null && title.equals("Norma je neplatná")) {
+      relevancy = "invalid_norm";
+   }
+   // vychazejici casopisy ci noviny
+   String pse = indexer.getFirstFieldVal(record, "PSEq");
+   if (pse != null && pse.equals(currentYearTwoDigits)) {
+      relevancy = "live_periodical";
+   }
+   return relevancy;
+}
+
+public String getAcquisitionDate(Record record) {
+   String nov = indexer.getFirstFieldVal(record, "MZKc");
+   if (nov != null && nov.startsWith("NOV")) {
+      String result = indexer.getFirstFieldVal(record, "MZKb");
+      if (result.length() > 6) {
+         result = result.substring(6);
+      }
+      return result;
+   }
+   return null;
+}
+
+/*
+public String isRetro(Record record) {
+   String result = "true";
+   String nov = indexer.getFirstFieldVal(record, "MZKc");
+   if (nov != null && nov.startsWith("NOV")) {
+      result = "false";
+   }
+   return result;
+}
+*/
+
+public Set getAllSubfieldsWithIndicator(Record record, String spec) {
+   Map dataFields = new HashMap();
+   for (DataField dataField : record.getDataFields()) {
+      String tag = dataField.getTag();
+      if (tag != null) {
+         if (!dataFields.containsKey(tag)) {
+            dataFields.put(tag, new ArrayList());
+         }
+         dataFields.get(tag).add(dataField);
+      }
+   }
+   Set result = new HashSet();
+   String[] fields = spec.split(":");
+   for (String fieldSpec : fields) {
+      String field = fieldSpec.substring(0, 3);
+      char ind1 = fieldSpec.substring(3, 4).charAt(0);
+      char ind2 = fieldSpec.substring(4, 5).charAt(0);
+      String subfieldSpec = fieldSpec.substring(5);
+      if (dataFields.containsKey(field)) {
+         for (DataField dataField : dataFields.get(field)) {
+            if ((ind1 == '#' || dataField.getIndicator1() == ind1) && (ind2 == '#' || dataField.getIndicator2() == ind2)) {
+               for (char subfield : subfieldSpec.toCharArray()) {
+                  if (dataField.getSubfield((char) subfield) != null) {
+                     String value = new String(dataField.getSubfield(subfield).getData());
+                     result.add(value);
+                  }
+               }
+            }
+         }
+      }
+   }
+   return result;
+}
+
+static HashSet allowedBasesMZKk = new HashSet(Arrays.asList(new Object[] { "mzk", "rajhrad", "znojmo", "trebova"}));
+static HashSet allowedBasesMZKx = new HashSet(Arrays.asList(new Object[] { "33", "44", "99" }));
+
+public Set getBases(Record record) {
+   Set result = new HashSet();
+   String prefix = "facet_base_";
+   String basePrefix = prefix + base;
+   result.add(basePrefix);
+   String k = indexer.getFirstFieldVal(record, "MZKk");
+   if (base.equals("MZK03") && k != null && allowedBasesMZKk.contains(k)) {
+      result.add(basePrefix + "_" + k);
+   }
+   String x = indexer.getFirstFieldVal(record, "MZKx");
+   if (base.equals("MZK01") && x != null && allowedBasesMZKx.contains(x)) {
+      result.add(basePrefix + "_" + x);
+   }
+   return result;
+}
+
+public Set getScale(Record record) {
+   Set result = new HashSet();
+   try {
+      String val = indexer.getFirstFieldVal(record, "034b");
+      if (val != null) {
+         val.replace(" ", "").trim();
+         Integer scale = Integer.valueOf(val);
+         result.add(Integer.toString(scale));
+      }
+   } catch (NumberFormatException nfe) {
+      // empty
+   }
+   return result;
+}
+
+public Set getBarcode(Record record) {
+   return indexer.getFieldList(record, "Z306");
+}
+
+public String getAuthorAndTitle(Record record) {
+   String author = indexer.getFirstFieldVal(record, "100ad");
+   String title = indexer.getFirstFieldVal(record, "245a");
+   if (author != null && title != null) {
+      return author + ": " + title;
+   }
+   return null;
+}
