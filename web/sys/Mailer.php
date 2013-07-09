@@ -26,6 +26,7 @@
  * @link     http://vufind.org/wiki/system_classes Wiki
  */
 require_once 'Mail.php';
+require_once "Mail/mime.php";
 require_once 'Mail/RFC822.php';
 
 /**
@@ -99,7 +100,7 @@ class VuFindMailer
         PEAR::setErrorHandling(PEAR_ERROR_RETURN);
 
         // Get mail object
-        $mail =& Mail::factory('smtp', $this->settings);
+        $mailer =& Mail::factory('smtp', $this->settings);
         if (PEAR::isError($mail)) {
             return $mail;
         }
@@ -112,8 +113,14 @@ class VuFindMailer
             $headers['From'] = $this->settings['from'];
             $headers['Reply-to'] = $from;
         }
-        $result = $mail->send($to, $headers, $body);
-
+        $mail = new Mail_mime(array(
+            'text_charset' => 'utf-8',
+            'html_charset' => 'utf-8'));
+        $mail->setTXTBody($body);
+        foreach ($headers as $name => $value){
+            $headers[$name] = $mail->encodeHeader($name, $value, 'utf-8', 'quoted-printable');
+        }
+        $result = $mailer->send($to, $mail->headers($headers), $mail->get());
         return $result;
     }
 
