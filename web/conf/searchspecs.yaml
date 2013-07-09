@@ -245,8 +245,8 @@ Title:
     - title_alt^200
     - title_new^100
     - title_old
-    - series^100
-    - series2
+#    - series^100
+#    - series2
   DismaxParams:
     - [bq, "relevancy:default^2"]
   QueryFields:
@@ -266,12 +266,12 @@ Title:
       - [and, 100]
     - title_old:
       - [and, ~]  
-    - series:
-      - [onephrase, 100]
-      - [and, 50]
-    - series2:
-      - [onephrase, 50]
-      - [and , ~]
+#    - series:
+#      - [onephrase, 100]
+#      - [and, 50]
+#    - series2:
+#      - [onephrase, 50]
+#      - [and , ~]
   FilterQuery: "mzk_visible_str_ns:visible"
 
 Series:
@@ -307,12 +307,12 @@ AllFields:
     - topic^500
     - geographic^300
     - genre^300
+  #modification for MZK
+    - publishDateFacet^50
     - allfields_unstemmed^10
     - fulltext_unstemmed^10
     - allfields
     - fulltext
-  # modification for MZK
-    - publishDateFacet
   DismaxParams:
     - [bq, "relevancy:default^2"]
   QueryFields:
