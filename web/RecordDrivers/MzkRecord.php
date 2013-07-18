@@ -34,7 +34,12 @@ class MzkRecord extends MarcRecord
         $volumes = array(); 
         foreach ($z30s as $item) {
             $s = $item->getSubfield('s');
-            if ($s && $s->getData() != 'Archiv') {
+            $p = $item->getSubfield('p');
+            $visible = true;
+            if (($s && $s->getData() == 'Archiv') || ($p && $p->getData() == 'NA')) {
+                $visible = false;
+            }
+            if ($visible) {
                 $a = $item->getSubfield('a');
                 if ($a) {
                     $years[] = $a->getData();
