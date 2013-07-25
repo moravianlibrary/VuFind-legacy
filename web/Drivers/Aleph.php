@@ -808,6 +808,7 @@ class Aleph implements DriverInterface
                 $author = (string) $z13->{'z13-author'};
                 $isbn = (string) $z13->{'z13-isbn-issn'};
                 $barcode = (string) $z30->{'z30-barcode'};
+                $description = (string) $z30->{'z30-description'};
                 $status = (string) $z37->{'z37-status'};
                 if ($holddate == "00000000") {
                     $holddate = null;
@@ -829,6 +830,7 @@ class Aleph implements DriverInterface
                                     'delete' => $delete,
                                     'create' => $this->parseDate($create),
                                     'status' => $status,
+                                    'description' => $description,
                                     'position' => ltrim($seq, '0'));
            }
         }

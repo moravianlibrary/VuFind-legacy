@@ -51,6 +51,10 @@
             <span class="iconlabel {$resource.format|lower|regex_replace:"/[^a-z0-9]/":""}">{translate text=$resource.format}</span><br />
           {/if}
 
+          {if $resource.ils_details.description}
+            <strong>{translate text='Description'}:</strong> {$resource.ils_details.description|escape}<br />
+          {/if}
+          
           {if $resource.ils_details.volume}
             <strong>{translate text='Volume'}:</strong> {$resource.ils_details.volume|escape}<br />
           {/if}
