@@ -83,7 +83,7 @@ class Home extends Bulk
             // Print
             $_SESSION['exportIDS'] = $_REQUEST['ids'];
             $_SESSION['exportFormat'] = 'printShort';
-            $this->followupUrl = $configArray['Site']['url'] . "/Cart/Export?exportInit";
+            $this->followupUrl = $configArray['Site']['url'] . "/Cart/Export?exportInit&inline=true";
             header("Location: " . $this->followupUrl);
             session_write_close();
             exit();

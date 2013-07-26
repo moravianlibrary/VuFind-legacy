@@ -50,6 +50,7 @@ class Export extends Bulk
     {
         global $configArray;
         global $interface;
+        
 
         $doExport = false;
 
@@ -119,6 +120,7 @@ class Export extends Bulk
             if ($_SESSION['exportIDS'] && $_SESSION['exportFormat']) {
                 // Special case -- for RefWorks, go directly there;
                 // for everything else, provide a save dialog.
+                /*
                 if (strtolower($_POST['format']) == 'refworks') {
                     header('Location: ' . self::getExportUrl());
                 } else {
@@ -128,8 +130,8 @@ class Export extends Bulk
                         urlencode(self::getExportUrl())
                     );
                 }
-                session_write_close();
-                exit();
+                */
+                header('Location: ' . self::getExportUrl());
             } else {
                 $this->errorMsg = 'bulk_fail';
             }
@@ -208,6 +210,9 @@ class Export extends Bulk
                 case 'printshort':
                 case 'printfull':
                     header('Content-type: text/plain; charset=utf-8');
+                    if (!isset($_GET['inline'])) {
+                        header('Content-disposition: attachment; filename="export.txt"');
+                    }
                     break;
                 default:
                     $export = false;
