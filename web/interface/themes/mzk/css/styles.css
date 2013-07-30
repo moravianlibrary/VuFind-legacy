@@ -432,7 +432,7 @@ ul.menu li{
 }
 div.warning {
     font-weight: bold;
-    font-family: courier new, courier, fixed;
+    margin: 10px;
     color: #990000;
 }
 #listForm {
