@@ -80,15 +80,14 @@ class XCNCIP2 implements DriverInterface
         if (PEAR::isError($result)) {
             PEAR::raiseError($result);
         }
-
         // Process the NCIP response:
         $response = $client->getResponseBody();
         $result = @simplexml_load_string($response);
         if (is_a($result, 'SimpleXMLElement')) {
             $result->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
-            return $result;
+	        return $result;    
         } else {
-            PEAR::raiseError(new PEAR_Error("Problem parsing XML"));
+            PEAR::raiseError(new PEAR_Error("Problem parsing XML".$response));
         }
     }
 
@@ -103,67 +102,94 @@ class XCNCIP2 implements DriverInterface
      */
     private function _getHoldingsForChunk($current)
     {
-        // Maintain an internal static count of line numbers:
-        static $number = 1;
-
-        // Extract details from the XML:
-        $status = $current->xpath(
-            'ns1:HoldingsSet/ns1:ItemInformation/' .
-            'ns1:ItemOptionalFields/ns1:CirculationStatus'
-        );
-        $status = empty($status) ? '' : (string)$status[0];
-
-        $id = $current->xpath(
-            'ns1:BibliographicId/ns1:BibliographicItemId/' .
-            'ns1:BibliographicItemIdentifier'
-        );
-
-        // Pick out the permanent location (TODO: better smarts for dealing with
-        // temporary locations and multi-level location names):
-        $locationNodes = $current->xpath('ns1:HoldingsSet/ns1:Location');
-        $location = '';
-        foreach ($locationNodes as $curLoc) {
-            $type = $curLoc->xpath('ns1:LocationType');
-            if ((string)$type[0] == 'Permanent') {
-                $tmp = $curLoc->xpath(
-                    'ns1:LocationName/ns1:LocationNameInstance/ns1:LocationNameValue'
-                );
-                $location = (string)$tmp[0];
-            }
+        static $number = 0;
+        $result = array();
+        if (empty($current)) {
+           //sample chunk for untracked items
+           return $this->_getSampleChunk();
         }
-
-        // Get both holdings and item level call numbers; we'll pick the most
-        // specific available value below.
-        $holdCallNo = $current->xpath('ns1:HoldingsSet/ns1:CallNumber');
-        $holdCallNo = (string)$holdCallNo[0];
-        $itemCallNo = $current->xpath(
-            'ns1:HoldingsSet/ns1:ItemInformation/' .
-            'ns1:ItemOptionalFields/ns1:ItemDescription/ns1:CallNumber'
-        );
-        $itemCallNo = (string)$itemCallNo[0];
-
-        // Build return array:
-        return array(
-            'id' => empty($id) ? '' : (string)$id[0],
-            'availability' => ($status == 'Not Charged'),
-            'status' => $status,
-            'location' => $location,
-            'reserve' => 'N',       // not supported
-            'callnumber' => empty($itemCallNo) ? $holdCallNo : $itemCallNo,
-            'duedate' => '',        // not supported
-            'number' => $number++,
-            // XC NCIP does not support barcode, but we need a placeholder here
-            // to display anything on the record screen:
-            'barcode' => 'placeholder' . $number
-        );
+        
+        $current->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');  
+        //iterate over all items
+       
+        $items = $current->xpath('ns1:ItemInformation');
+        foreach ($items as $item) {
+            $item->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+            $status = $item->xpath(
+                'ns1:ItemOptionalFields/ns1:CirculationStatus'
+            );
+            $status = empty($status) ? '' : (string)$status[0];
+          
+            // Pick out the permanent location (TODO: better smarts for dealing with
+            // temporary locations and multi-level location names):
+            //   $locationNodes = $current->xpath('ns1:HoldingsSet/ns1:Location');
+            $location = '';
+           
+    /*
+     foreach ($locationNodes as $curLoc) {
+                $type = $curLoc->xpath('ns1:LocationType');
+                if ((string)$type[0] == 'Permanent') {
+                    $tmp = $curLoc->xpath(
+                        'ns1:LocationName/ns1:LocationNameInstance/ns1:LocationNameValue'
+                    );
+                    $location = (string)$tmp[0];
+                }
+            }
+    */
+            
+            $id = $item->xpath('ns1:ItemId/ns1:ItemIdentifierValue');
+            // Get both holdings and item level call numbers; we'll pick the most
+            // specific available value below.
+            $holdCallNo = $current->xpath('ns1:HoldingsSet/ns1:CallNumber');
+            $holdCallNo = (string)$holdCallNo[0];
+            $itemCallNo = $current->xpath(
+                'ns1:ItemOptionalFields/ns1:ItemDescription/ns1:CallNumber'
+            );
+            $itemCallNo = (string)$itemCallNo[0];
+            
+            // Build return array:
+            $result[] = array(
+                'item' => empty($id) ? '' : (string)$id[0],
+                'availability' => ($status === 'Available On Shelf'),
+                'status' => $status,
+                'location' => $location,
+                'reserve' => 'N',       // not supported
+                'callnumber' => empty($itemCallNo) ? $holdCallNo : $itemCallNo,
+                'duedate' => '',        // not supported
+                'number' => $number++,
+                // XC NCIP does not support barcode, but we need a placeholder here
+                // to display anything on the record screen:
+                'barcode' => 'placeholder' . $number
+            );
+            }
+        return $result;
     }
+    
+    private function _getSampleChunk() {
+        static $number = 0;
+        $result = array();
+        $result[] =  array(
+            'item' => 'id',
+            'availability' => false,
+            'status' => 'X',
+            'location' => 'X',
+            'reserve' => 'N',       // not supported
+            'callnumber' => 'A'.$number,
+            'duedate' => '12.12.12',        // not supported
+            'number' => ++$number,
+            'barcode' => 'placeholder' . $number
+             );
+       return $result;
+    }
+    
+    
 
     /**
      * Get Status
      *
      * This is responsible for retrieving the status information of a certain
      * record.
-     *
+     *$xml
      * @param string $id The record id to retrieve the holdings for
      *
      * @return mixed     On success, an associative array with the following keys:
@@ -189,51 +215,33 @@ class XCNCIP2 implements DriverInterface
      */
     private function _getStatusRequest($idList, $resumption = null)
     {
-        // Build a list of the types of information we want to retrieve:
-        $desiredParts = array(
-            'Bibliographic Description',
-            'Circulation Status',
-            'Electronic Resource',
-            'Hold Queue Length',
-            'Item Description',
-            'Item Use Restriction Type',
-            'Location'
-        );
+  
+    	$xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'.
+    		'<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" '.
+    		'ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_02.xsd">';
+    
+    	$xml .= '<ns1:LookupItemSet>';
+    
+    	foreach ($idList as $id) {
+    		$xml .= '<ns1:BibliographicId><ns1:BibliographicRecordId>'.
+                            '<ns1:BibliographicRecordIdentifier>'.
+    			$id.
+    			'</ns1:BibliographicRecordIdentifier><ns1:AgencyId>UIU</ns1:AgencyId>'.
+                   		'</ns1:BibliographicRecordId>'.
+           			 '</ns1:BibliographicId>';
+    	}
 
-        // Start the XML:
-        $xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' .
-            '<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ' .
-            'ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/' .
-            'ncip_v2_0.xsd"><ns1:Ext><ns1:LookupItemSet>';
+	    $xml .= '<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Bibliographic Description</ns1:ItemElementType>'.
+		'<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Circulation Status</ns1:ItemElementType>'.
+		'<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Electronic Resource</ns1:ItemElementType>'.
+		'<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Hold Queue Length</ns1:ItemElementType>'.
+		'<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Description</ns1:ItemElementType>'.
+		'<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Use Restriction Type</ns1:ItemElementType>'.
+		'<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Location</ns1:ItemElementType>'.
+		'</ns1:LookupItemSet>'.
+		'</ns1:NCIPMessage>';
 
-        // Add the ID list:
-        foreach ($idList as $id) {
-            $xml .= '<ns1:BibliographicId>' .
-                    '<ns1:BibliographicItemId>' .
-                        '<ns1:BibliographicItemIdentifier>' .
-                            htmlspecialchars($id) .
-                        '</ns1:BibliographicItemIdentifier>' .
-                        '<ns1:AgencyId>LOCAL</ns1:AgencyId>' .
-                    '</ns1:BibliographicItemId>' .
-                '</ns1:BibliographicId>';
-        }
 
-        // Add the desired data list:
-        foreach ($desiredParts as $current) {
-            $xml .= '<ns1:ItemElementType ' .
-                'ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/' .
-                'itemelementtype/itemelementtype.scm">' .
-                htmlspecialchars($current) . '</ns1:ItemElementType>';
-        }
-
-        // Add resumption token if necessary:
-        if (!empty($resumption)) {
-            $xml .= '<ns1:NextItemToken>' . htmlspecialchars($resumption) .
-                '</ns1:NextItemToken>';
-        }
-
-        // Close the XML and send it to the caller:
-        $xml .= '</ns1:LookupItemSet></ns1:Ext></ns1:NCIPMessage>';
         return $xml;
     }
 
@@ -253,37 +261,52 @@ class XCNCIP2 implements DriverInterface
     {
         $status = array();
         $resumption = null;
-        do {
+       // do {
             $request = $this->_getStatusRequest($idList, $resumption);
             $response = $this->_sendRequest($request);
+            $response->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');  
             $avail = $response->xpath(
-                'ns1:Ext/ns1:LookupItemSetResponse/ns1:BibInformation'
+                'ns1:LookupItemSetResponse/ns1:BibInformation'
             );
-
             // Build the array of statuses:
             foreach ($avail as $current) {
                 // Get data on the current chunk of data:
-                $chunk = $this->_getHoldingsForChunk($current);
+                $current->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+                $holdingsSet = $current->xpath("ns1:HoldingsSet");
+                $chunk = $this->_getHoldingsForChunk($holdingsSet[0]);
+		
+
 
                 // Each bibliographic ID has its own key in the $status array; make
                 // sure we initialize new arrays when necessary and then add the
                 // current chunk to the right place:
-                $id = $chunk['id'];
-                if (!isset($status[$id])) {
-                    $status[$id] = array();
+                $id = $current->xpath('ns1:BibliographicId/ns1:BibliographicRecordId/ns1:BibliographicRecordIdentifier');
+     
+                $id = (string)$id[0];
+                if (empty($id)) {
+                    $query = $current->xpath('ns1:Problem/ns1:ProblemValue');
+                    $id = (string)$query[0];
                 }
-                $status[$id][] = $chunk;
-            }
+                
+                //add id to each item
+                for( $i = 0; $i != count($chunk); $i++) {
+                    $chunk[$i]['id'] = $id;
+                }
+                $status[] = $chunk;
 
+            }
+            
             // Check for resumption token:
             $resumption = $response->xpath(
-                'ns1:Ext/ns1:LookupItemSetResponse/ns1:NextItemToken'
+                'ns1:LookupItemSetResponse/ns1:NextItemToken'
             );
             $resumption = count($resumption) > 0 ? (string)$resumption[0] : null;
-        } while (!empty($resumption));
+
+       // } while (!empty($resumption));
         return $status;
     }
 
+    
     /**
      * Get Holding
      *
@@ -301,15 +324,13 @@ class XCNCIP2 implements DriverInterface
     public function getHolding($id, $patron = false)
     {
         $request = $this->_getStatusRequest(array($id));
-        $response = $this->_sendRequest($request);
-        $avail = $response->xpath(
-            'ns1:Ext/ns1:LookupItemSetResponse/ns1:BibInformation'
+        $response = $this->_sendRequest($request);   
+		$avail = $response->xpath(
+            'ns1:LookupItemSetResponse/ns1:BibInformation/ns1:HoldingsSet'
         );
-
-        // Build the array of holdings:
-        $holdings = array();
-        foreach ($avail as $current) {
-            $holdings[] = $this->_getHoldingsForChunk($current);
+        $holdings = $this->_getHoldingsForChunk($avail[0]);
+        for ($i = 0; $i < count($holdings); $i++) {
+            $holdings[$i]['id']=$id;
         }
         return $holdings;
     }
@@ -437,15 +458,19 @@ class XCNCIP2 implements DriverInterface
             $patron['cat_username'], $patron['cat_password'], $extras
         );
         $response = $this->_sendRequest($request);
-
         $retVal = array();
         $list = $response->xpath('ns1:LookupUserResponse/ns1:LoanedItem');
-        foreach ($list as $current) {
-            $due = $current->xpath('ns1:DateDue');
-            $title = $current->xpath('ns1:Title');
-            $retVal[] = array(
-                'id' => false,
+	foreach ($list as $current) {
+            $current->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');    
+	    $due = $current->xpath('ns1:DateDue');
+            $title = $current->xpath('ns1:Ext/ns1:BibliographicDescription/ns1:Title');
+            // $id = $current->xpath('ns1:ItemIdentifierValue');
+	    $pubyear = $current->xpath('ns1:Ext/ns1:BibliographicDescription/ns1:PublicationDate');
+
+	    $retVal[] = array(
+           //     'id' => (string)$id[0],
                 'duedate' => (string)$due[0],
+		'publication_year' => (string)$pubyear[0],
                 'title' => (string)$title[0]
             );
         }
@@ -466,7 +491,7 @@ class XCNCIP2 implements DriverInterface
      */
     public function getMyFines($patron)
     {
-        $extras = array('<ns1:UserFiscalAccountDesired/>');
+	$extras = array('<ns1:UserFiscalAccountDesired/>');
         $request = $this->_getLookupUserRequest(
             $patron['cat_username'], $patron['cat_password'], $extras
         );
@@ -478,6 +503,7 @@ class XCNCIP2 implements DriverInterface
 
         $fines = array();
         foreach ($list as $current) {
+	    $current->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
             $tmp = $current->xpath(
                 'ns1:FiscalTransactionInformation/ns1:Amount/ns1:MonetaryValue'
             );
@@ -488,7 +514,14 @@ class XCNCIP2 implements DriverInterface
                 'ns1:FiscalTransactionInformation/ns1:FiscalTransactionType'
             );
             $desc = (string)$tmp[0];
-            /* This is an item ID, not a bib ID, so it's not actually useful:
+	    
+            $tmp = $current->xpath('ns1:FiscalTransactionInformation/ns1:ItemDetails/ns1:DateDue');
+	    $due = (string)$tmp[0];
+	    
+            $tmp = $current->xpath('ns1:FiscalTransactionInformation/ns1:ItemDetails/ns1:DateCheckedOut');
+            $checkout = (string)$tmp[0];
+
+	   /* This is an item ID, not a bib ID, so it's not actually useful:
             $tmp = $current->xpath(
                 'ns1:FiscalTransactionInformation/ns1:ItemDetails/' .
                 'ns1:ItemId/ns1:ItemIdentifierValue'
@@ -499,11 +532,12 @@ class XCNCIP2 implements DriverInterface
             $fines[] = array(
                 'amount' => $amount,
                 'balance' => $amount,
-                'checkout' => '',
+                'checkout' => $checkout,
                 'fine' => $desc,
                 'duedate' => '',
                 'createdate' => $date,
-                'id' => $id
+                'id' => $id,
+		'duedate' => $due
             );
         }
         return $fines;
@@ -527,17 +561,19 @@ class XCNCIP2 implements DriverInterface
             $patron['cat_username'], $patron['cat_password'], $extras
         );
         $response = $this->_sendRequest($request);
-
+	
         $retVal = array();
         $list = $response->xpath('ns1:LookupUserResponse/ns1:RequestedItem');
         foreach ($list as $current) {
-            $created = $current->xpath('ns1:DatePlaced');
-            $title = $current->xpath('ns1:Title');
-            $pos = $current->xpath('ns1:HoldQueuePosition');
+            $current->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+	    $created = $current->xpath('ns1:DatePlaced');
+            $expire = $current->xpath('ns1:PickupExpiryDate');
+	    $title = $current->xpath('ns1:Ext/ns1:BibliographicDescription/ns1:Title');
+	    $pos = $current->xpath('ns1:HoldQueuePosition');
             $retVal[] = array(
                 'id' => false,
                 'create' => (string)$created[0],
-                'expire' => '',
+                'expire' => (string)$expire[0],
                 'title' => (string)$title[0],
                 'position' => (string)$pos[0]
             );
@@ -585,24 +621,53 @@ class XCNCIP2 implements DriverInterface
             'ns1:Surname'
         );
 
+        
         // TODO: distinguish between permanent and other types of addresses; look
         // at the UnstructuredAddressType field and handle multiple options.
-        $address = $response->xpath(
-            'ns1:LookupUserResponse/ns1:UserOptionalFields/' .
-            'ns1:UserAddressInformation/ns1:PhysicalAddress/' .
-            'ns1:UnstructuredAddress/ns1:UnstructuredAddressData'
-        );
-        $address = explode("\n", trim((string)$address[0]));
+//         $address = $response->xpath(
+//             'ns1:LookupUserResponse/ns1:UserOptionalFields/' .
+//             'ns1:UserAddressInformation/ns1:PhysicalAddress/' .
+//             'ns1:UnstructuredAddress/ns1:UnstructuredAddressData'
+//         );
+//         $address = explode("\n", trim((string)$address[0]));
+
+           $addresses = $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/'.
+                   'ns1:UserAddressInformation');
+//            $zip = $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/'.
+//                    'ns1:UserAddressInformation/ns1:PhysicalAddress/ns1:StructuredAddress/ns1:PostalCode');
         return array(
             'firstname' => (string)$first[0],
             'lastname' => (string)$last[0],
-            'address1' => isset($address[0]) ? $address[0] : '',
-            'address2' => (isset($address[1]) ? $address[1] : '') .
-                (isset($address[2]) ? ', ' . $address[2] : ''),
-            'zip' => isset($address[3]) ? $address[3] : '',
+            'address1' => isset($addresses[0]) ? $this->_addressToString($addresses[0]) : '',
+            'address2' => isset($addresses[1]) ? $this->_addressToString($addresses[1]) : '',
+//             'zip' =>  isset($zip[0]) ? string($zip) : '',
             'phone' => '',  // TODO: phone number support
             'group' => ''
         );
+	
+    }
+    
+    /**
+     * converts SimpleXML addres object to string
+     * @param unknown $address
+     * @return string
+     */
+    private function _addressToString($address) {
+
+        $address->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+        $addr = $address->xpath('ns1:PhysicalAddress/ns1:UnstructuredAddress/ns1:UnstructuredAddressData');
+        if ($addr) {
+            return (string)$addr[0] != null ? (string)$addr[0] : '';
+        }        
+        
+        $street = $address->xpath('ns1:PhysicalAddress/ns1:StructuredAddress/ns1:Street');
+        $locality = $address->xpath('ns1:PhysicalAddress/ns1:StructuredAddress/ns1:Locality');
+        $postal = $address->xpath('ns1:PhysicalAddress/ns1:StructuredAddress/ns1:PostalCode');
+        
+        $street = isset($street[0]) ? (string)$street[0] : '';
+        $locality = isset($locality[0]) ? (string)$locality[0] : '';
+        $postal = isset($postal[0]) ? (string)$postal[0] : '';
+        return $street.' '.$locality.' '.$postal;
     }
 
     /**
@@ -715,6 +780,83 @@ class XCNCIP2 implements DriverInterface
         // TODO
         return array();
     }
+
+    public function getConfig($param) {
+        
+        $result = array();
+        switch ($param) {
+            case "cancelHolds":break;
+            case "Holds":
+                $result['HMACKeys'] = 'id:title:item';
+                break;
+            case "Renewals":break;
+            default: break;            
+        }
+        return $result;
+    }
+    
+    public function placeHold($params) {
+        if (!$params['id'] || !$params['item'] || !$params['patron']) {
+            return;
+        }
+        
+        $patron = $params['patron'];
+        $username = $patron['cat_username'];
+        $password = $patron['cat_password'];
+       
+        $xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'.
+                '<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+                         ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">'.    
+            '<ns1:RequestItem>'.  
+            '<ns1:InitiationHeader>'.  
+                '<ns1:FromAgencyId>'.  
+                    '<ns1:AgencyId>UICdb</ns1:AgencyId>'.  
+                '</ns1:FromAgencyId>'.  
+                '<ns1:ToAgencyId>'.  
+                    '<ns1:AgencyId>UICdb</ns1:AgencyId>'.  
+                '</ns1:ToAgencyId>'.  
+            '</ns1:InitiationHeader>'.
+    
+            '<ns1:AuthenticationInput>'.  
+                '<ns1:AuthenticationInputData>'.$username.'</ns1:AuthenticationInputData>'.  
+                '<ns1:AuthenticationDataFormatType>text</ns1:AuthenticationDataFormatType>'.  
+                '<ns1:AuthenticationInputType>Username</ns1:AuthenticationInputType>'.  
+            '</ns1:AuthenticationInput>'.  
+            '<ns1:AuthenticationInput>'.  
+                '<ns1:AuthenticationInputData>'.$password.'</ns1:AuthenticationInputData>'.  
+                '<ns1:AuthenticationDataFormatType>text</ns1:AuthenticationDataFormatType>'.  
+                '<ns1:AuthenticationInputType>Password</ns1:AuthenticationInputType>'.  
+            '</ns1:AuthenticationInput>'.  
+    
+            '<ns1:BibliographicId>'.  
+                    '<ns1:BibliographicRecordId>'.  
+                            '<ns1:BibliographicRecordIdentifier>'.$params['id'].'</ns1:BibliographicRecordIdentifier>'.  
+                            '<ns1:AgencyId>UICdb</ns1:AgencyId>'.  
+                    '</ns1:BibliographicRecordId>'.  
+            '</ns1:BibliographicId>'.  
+                    
+            '<ns1:ItemId>'.  
+                 '<ns1:ItemIdentifierValue>'.$params['item'].'</ns1:ItemIdentifierValue>'.  
+            '</ns1:ItemId>'.  
+    
+            '<ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/'.
+            'requesttype.scm">Hold</ns1:RequestType>'.  
+            '<ns1:RequestScopeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/'.
+            'requestscopetype.scm">Bibliographic Item</ns1:RequestScopeType>'.  
+    
+        '</ns1:RequestItem>'.  
+        '</ns1:NCIPMessage>';
+        
+        $response = $this->_sendRequest($xml);
+        $results = array();
+        $results['succsess'] = false;
+        if ( $response->xpath('ns1:RequestItemResponse/ns1:Problem') == null ){
+            $results['success'] = true;
+        }
+    	return $results;
+    }
+
+
 }
 
 ?>
