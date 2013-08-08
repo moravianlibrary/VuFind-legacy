@@ -663,7 +663,7 @@ class Solr implements IndexEngine
 
         // Apply filter query if applicable:
         if (isset($ss['FilterQuery'])) {
-            return "({$baseQuery}) AND ({$ss['FilterQuery']})";
+            return "(({$baseQuery}) AND ({$ss['FilterQuery']}))";
         }
 
         return "($baseQuery)";
