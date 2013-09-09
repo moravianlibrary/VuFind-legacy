@@ -1610,3 +1610,23 @@ span.recordNumber {
 .facetsTop td {
   vertical-align: top;
 }
+
+#ill legend {
+  font-size: 17px;
+  font-weight:bold;
+  margin-bottom:.5em;
+  color:#21BDC6;
+}
+
+#ill .label {
+  display: inline-block;
+  width: 120px;
+}
+ 
+#ill .element {
+  display: inline-block;
+}
+
+.quickform .reqnote {
+  visibility: hidden;
+}
