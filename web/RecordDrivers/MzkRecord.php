@@ -288,6 +288,7 @@ class MzkRecord extends MarcRecord
             case 'printshort':
                 $this->getCoreMetadata();
                 $interface->assign("full", false);
+                $interface->assign("rn", "\r");
                 $locations = array();
                 $holdings = $this->marcRecord->getFields('Z30');
                 if ($holdings) {
@@ -304,6 +305,7 @@ class MzkRecord extends MarcRecord
             case 'printfull':
                 $this->getCoreMetadata();
                 $interface->assign("full", true);
+                $interface->assign("rn", "\r");
                 return 'RecordDrivers/Mzk/export-print.tpl';
             default:
                 return parent::getExport($format);

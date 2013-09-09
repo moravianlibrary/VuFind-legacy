@@ -111,11 +111,7 @@ class Export extends MyResearch
             $_SESSION['exportFormat'] = $_POST['format'];
 
             if ($_SESSION['exportIDS'] && $_SESSION['exportFormat']) {
-                header(
-                    "Location: " . $this->followupUrl .
-                    "?infoMsg=export_success&showExport=true"
-                );
-                exit();
+                header('Location: ' . self::getExportUrl());
             } else {
                 $this->errorMsg = 'bulk_fail';
             }
@@ -241,7 +237,6 @@ class Export extends MyResearch
         global $interface;
 
         if (!empty($_POST['ids'])) {
-            // Assign Item Info
             $interface->assign('exportIDS', $_POST['ids']);
             $interface->assign('exportList', $this->_getExportList($_POST['ids']));
             $interface->assign('title', $_GET['message']);
@@ -336,6 +331,36 @@ class Export extends MyResearch
             'errorDetails' => $errorMsgDetails
         );
         return $results;
+    }
+    
+    /**
+     * Get the URL for exporting the current set of resources.
+     *
+     * @return string
+     * @access public
+     */
+    public static function getExportUrl()
+    {
+        global $configArray;
+    
+        if (strtolower($_SESSION['exportFormat']) == 'refworks') {
+            // can't pass the ids through the session, so need to stringify
+            $parts = array();
+            foreach ($_SESSION['exportIDS'] as $id) {
+                $parts[] = urlencode('ids[]') . '=' . urlencode($id);
+            }
+            $id_str = implode('&', $parts);
+            // Build the URL to pass data to RefWorks:
+            $exportUrl = $configArray['Site']['url'] . '/Cart/Home' .
+                '?export=true&exportInit=true&exportToRefworks=true&' . $id_str;
+            // Build up the RefWorks URL:
+            return $configArray['RefWorks']['url'] . '/express/expressimport.asp' .
+                '?vendor=' . urlencode($configArray['RefWorks']['vendor']) .
+                '&filter=RefWorks%20Tagged%20Format&url=' . urlencode($exportUrl);
+        }
+    
+        // Default case:
+        return $configArray['Site']['url'] . '/Cart/Home?exportInit';
     }
 }
 ?>
