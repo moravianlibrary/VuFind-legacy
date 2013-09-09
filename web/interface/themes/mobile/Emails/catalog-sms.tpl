@@ -1,7 +1,5 @@
 {* This is a text-only email template; do not include HTML! *}
-{if !empty($callnumber)}{translate text="callnumber_abbrev"}: {$callnumber}
-{/if}
-{if !empty($location)}{translate text="Location"}: {$location}
-{/if}
+{translate text="callnumber_abbrev"}: {$callnumber}
+{translate text="Location"}: {$location}
 {$title}
 {$url}/Record/{$recordID|escape:"url"}

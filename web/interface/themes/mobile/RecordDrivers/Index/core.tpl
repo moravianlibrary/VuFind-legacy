@@ -165,15 +165,12 @@
   {/if}
 
   {if !empty($coreRecordLinks)}
-    <tr valign="top">
-      <th>{translate text="Related Items"}:</th>
-      <td>
-        {foreach from=$coreRecordLinks item=coreRecordLink}
-          {translate text=$coreRecordLink.title}:
-          <a href="{$coreRecordLink.link|escape}">{$coreRecordLink.value|escape}</a><br/>
-        {/foreach}
-      </td>
-    </tr>
+  {foreach from=$coreRecordLinks item=coreRecordLink}
+  <tr valign="top">
+    <th>{translate text=$coreRecordLink.title}: </th>
+    <td><a href="{$coreRecordLink.link|escape}">{$coreRecordLink.value|escape}</a></td>
+  </tr>
+  {/foreach}
   {/if}
 
   {* TODO: Remove this "if $taglist" once add tag functionality is added; for now, we want to
