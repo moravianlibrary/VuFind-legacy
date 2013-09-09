@@ -59,6 +59,9 @@ class Holdings extends Record
         $patron = UserAccount::isLoggedIn() ? UserAccount::catalogLogin() : false;
         // begin of modifications for MZK
         $interface->setPageTitle($this->recordDriver->getBreadcrumb());
+        // set last page parameters
+        $interface->assign('lastModule', $_SESSION['lastModule']);
+        $interface->assign('lastAction', $_SESSION['lastAction']);
         
         $holdingsMetadata = null;
         if ($this->recordDriver instanceof MZKRecord) {
@@ -77,7 +80,6 @@ class Holdings extends Record
         } 
         $interface->assign('holdingsMetadata', $holdingsMetadata);
         // end of modifications for MZK
-        
         $interface->assign('subTemplate', 'view-holdings.tpl');
         $interface->setTemplate('view.tpl');
 

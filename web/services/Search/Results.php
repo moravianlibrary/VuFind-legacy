@@ -204,6 +204,10 @@ class Results extends Action
 
         // Save the URL of this search to the session so we can return to it easily:
         $_SESSION['lastSearchURL'] = $searchObject->renderSearchUrl();
+        
+        // Set last page parameters
+        $_SESSION['lastModule'] = $_GET['module'];
+        $_SESSION['lastAction'] = $_GET['action'];
 
         // initialize the search result scroller for this search
         $scroller = new ResultScroller();

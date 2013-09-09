@@ -49,6 +49,10 @@ class CheckedOut extends MyResearch
     public function launch()
     {
         global $interface;
+        
+        // Set last page parameters
+        $_SESSION['lastModule'] = $_GET['module'];
+        $_SESSION['lastAction'] = $_GET['action'];
 
         // Get My Transactions
         if ($patron = UserAccount::catalogLogin()) {

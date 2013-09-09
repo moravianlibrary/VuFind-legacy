@@ -53,6 +53,10 @@ class Favorites extends MyResearch
         global $interface;
         global $user;
 
+        // Set last page parameters
+        $_SESSION['lastModule'] = $_GET['module'];
+        $_SESSION['lastAction'] = $_GET['action'];
+        
         // Delete Resource
         if (isset($_GET['delete'])) {
             $resource = Resource::staticGet('record_id', $_GET['delete']);
