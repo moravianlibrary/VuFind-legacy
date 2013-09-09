@@ -17,12 +17,13 @@
   </div>
 
   <!-- Begin of costumization for MZK -->
-  {if $pageTemplate=="profile.tpl"}
+  {if $pageTemplate=="profile.tpl" || $pageTemplate=="profile-change.tpl"}
      <div class="sidegroup">
         <h4>{translate text=User}</h4>
         <ul class="bulleted">
-          <li><a href="https://aleph.mzk.cz/F/?func=file&file_name=bor-update-password" target="_new">{translate text="Change password"}</a></li>
-          <li><a href="https://aleph.mzk.cz/F/?func=bor-update" target="_new">{translate text="Change email address"}</a></li>
+          <li><a href="{$url}/MyResearch/ProfileChange?op=password">{translate text="Change password"}</a></li>
+          <li><a href="{$url}/MyResearch/ProfileChange?op=nickname">{translate text="Change nickname"}</a></li>
+          <li><a href="{$url}/MyResearch/ProfileChange?op=email">{translate text="Change email"}</a></li>
         </ul>
      </div>
   {/if}

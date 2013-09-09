@@ -229,6 +229,10 @@ class Aleph implements DriverInterface
         if (isset($configArray['Catalog']['fav_cgi_url'])) {
             $this->favourites_url = $configArray['Catalog']['fav_cgi_url'];
         }
+        $this->user_cgi_url = null;
+        if (isset($configArray['Catalog']['user_cgi_url'])) {
+            $this->user_cgi_url = $configArray['Catalog']['user_cgi_url'];
+        }
         $this->history_limit = 50;
         if (isset($configArray['History']['limit'])) {
             $this->history_limit = $configArray['History']['limit'];
@@ -1369,6 +1373,62 @@ class Aleph implements DriverInterface
             );
         }
         return $result;
+    }
+    
+    public function getUserNickname($patron) {
+        $params = array(
+            'op'           => 'get_nickname',
+        );
+        $xml = $this->changeUserRequest($patron, $params, true);
+        if ($xml->error) {
+            return new PEAR_Error($xml->error);
+        } else {
+            return $xml->nick;
+        }
+    }
+    
+    public function changeUserNickname($patron, $newAlias) {
+        $params = array(
+            'op'           => 'change_nickname',
+            'new_nickname' => $newAlias,
+        );
+        return $this->changeUserRequest($patron, $params);
+    }
+    
+    public function changeUserPassword($patron, $oldPassword, $newPassword) {
+        $params = array(
+            'op'      => 'change_password',
+            'old_pwd' => $oldPassword,
+            'new_pwd' => $newPassword,
+        );
+        return $this->changeUserRequest($patron, $params);
+    }
+    
+    public function changeUserEmailAddress($patron, $newEmailAddress) {
+        $params = array(
+            'op'      => 'change_email',
+            'email' => $newEmailAddress,
+        );
+        return $this->changeUserRequest($patron, $params);
+    }
+    
+    protected function changeUserRequest($patron, $params, $returnResult = false) {
+        if ($this->user_cgi_url == null) {
+            return new PEAR_Error('not supported');
+        }
+        $params['id']            = $patron['id'];
+        $params['user_name']     = $this->wwwuser;
+        $params['user_password'] = $this->wwwpasswd;
+        $url = $this->appendQueryString($this->user_cgi_url, $params);
+        $xml = $this->doHTTPRequest($url);
+        if ($returnResult) {
+            return $xml;
+        }
+        if ($xml->error) {
+            return new PEAR_Error($xml->error);
+        } else {
+            return true;
+        }
     }
 
      /**
