@@ -5,9 +5,15 @@
         {if $user->cat_username}          
           <div class="page">
             <h3>{translate text='Interlibrary loans'}</h3>
+            
+            {if $illMessage}
+              <p class="info">{translate text=$illMessage} {translate text='Req No.'}: {$illNewReqId|escape}</p>
+            {/if}
+            
             {translate text='Create new ILL request for'}:
-            <a href="https://aleph.mzk.cz/F/?func=new-ill-request-l&request_type=BOOK">{translate text='Book'}</a>&nbsp;|&nbsp;
-            <a href="https://aleph.mzk.cz/F/?func=new-ill-request-l&request_type=JOURNAL">{translate text='Journal/Article'}</a>
+            <a href="{$path}/MyResearch/InterlibraryLoans?new=monography">{translate text='Book'}</a>&nbsp;|&nbsp;
+            <a href="{$path}/MyResearch/InterlibraryLoans?new=serial">{translate text='Journal/Article'}</a>
+            
             {if $ills}
 
               <ul class="filters">
@@ -29,7 +35,7 @@
                         <p class="resultItemLine2">{translate text='Periodical article title'}: {$resource.article_title|escape}</p>
                         <p class="resultItemLine2">{translate text='Periodical article author'}: {$resource.article_author|escape}</p>
                         <p class="resultItemLine2">{translate text='Pickup location'}: {$resource.pickup_location|escape}</p>
-                        <p class="resultItemLine2">{translate text='Requested media'}: {$resource.media|escape}</p>
+                        <p class="resultItemLine2">{translate text='Requested media'}: {$resource.media|translate|escape}</p>
                         <p class="resultItemLine2">{translate text='Required by'}: {$resource.required_by|escape}</p>
                         </table>
                       </div>

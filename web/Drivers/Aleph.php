@@ -270,9 +270,11 @@ class Aleph implements DriverInterface
             $body .= $sep . $key . '=' . urlencode($value);
             $sep = '&';
         }
-        //print "$body<BR>";
         $result = $this->doHTTPRequest($url, 'POST', $body);
         if ($result->error) {
+            if ($op == 'update-doc' && preg_match('/Document: [0-9]+ was updated successfully\\./', trim($result->error)) === 1) {
+                return $result;
+            }
             if ($this->debug_enabled) {
                 $this->debug("XServer error, URL is $url, error message: $result->error.");
             }
@@ -331,7 +333,7 @@ class Aleph implements DriverInterface
         $sep = (strpos($url, "?") === false)?'?':'&';
         if ($params != null) {
            foreach ($params as $key => $value) {
-              $url.= $sep . $key . "=" . $value;
+              $url.= $sep . $key . "=" . urlencode($value);
               $sep = "&";
            }
         }
@@ -1286,94 +1288,62 @@ class Aleph implements DriverInterface
         return $loans; 
     }
 
-    public function getInterlibraryLoanFields($user, $type) {
-        $userId = $user['id'];
-        $xml = $this->doRestDLFRequest(array('patron', $userId, 'record', 'MN', 'ill'), null);
-        //$xml = @simplexml_load_string(file_get_contents("conf/aleph/book.xml"));
-        $result = array();
-        $fields = $this->ill_fields[$type];
-        foreach($fields as $field) {
-            $attrs = explode(':', $field);
-            $title = $attrs[0];
-            $name = $attrs[1];
-            $type = $attrs[2];
-            if ($type == 'section') {
-                $result[] = array('type' => 'section', title => $title);
-            } else if ($type == 'string') {
-                $required = $xml->xpath("/get-rec-ill/ill-information/$name/@usage");
-                $required = $required[0] == 'Mandatory';
-                $result[] = array('type' => 'text', 'required' => $required, title => $title, id => $name);
-            } else if ($type == 'option') {
-                $element = $attrs[3];
-                $inner_element = $attrs[4];
-                $options = array();
-                foreach($xml->xpath("/get-rec-ill/ill-information/$name/$element") as $part) {
-                    $code = (string) $part->{$inner_element . '-code'};
-                    $desc = (string) $part->{$inner_element . '-text'};
-                    $options[$code] = $desc;
-                }
-                $result[] = array('type' => 'select', 'required' => true, id => $name, title => $title, 'options' => $options);
-            } else if ($type == 'boolean') {
-                $required = $xml->xpath("/get-rec-ill/ill-information/$name/@usage");
-                $required = $required[0] == 'Mandatory';
-                $result[] = array('type' => 'checkbox', 'required' => $required, id => $name, title => $title);
-            } else if ($type == 'date') {
-                $required = $xml->xpath("/get-rec-ill/ill-information/$name/@usage");
-                $required = $required[0] == 'Mandatory';
-                $result[] = array('type' => 'date', 'required' => $required, id => $name, title => $title);
-            } else if ($type =='hidden') {
-                $result[] = array('type' => 'hidden', id => $name, value => $title);
-            }
-        }
-        return $result;
-    }
-
     public function createInterlibraryLoan($user, $attrs) {
         $payment = $attrs['payment'];
-        $type = $attrs['new'];
         unset($attrs['payment']);
-        unset($attrs['type']);
+        $new = $attrs['new'];
         unset($attrs['new']);
+        $additional_authors = $attrs['additional_authors']; 
         unset($attrs['additional_authors']);
-        if ($type == 'serial') {
-            $type = 'SE';
-        } else if ($type == 'monography') {
-            $type = 'MN';
+        if ($new == 'serial') {
+            $new = 'SE';
+        } else if ($new == 'monography') {
+            $new = 'MN';
         }
-        //print "type:$type<BR>";
         $patronId = $user['id'];
-        $xml = "post_xml=<ill-parameters>";
+        $illDom = new DOMDocument('1.0', 'UTF-8');
+        $illRoot = $illDom->createElement('ill-parameters');
+        $illRootNode = $illDom->appendChild($illRoot);
         foreach ($attrs as $key => $value) {
-            $xml .= "<$key>" . htmlentities($value) . "</$key>";
+            $element = $illDom->createElement($key);
+            $element->appendChild($illDom->createTextNode($value));
+            $illRootNode->appendChild($element);
         }
-        $xml.="</ill-parameters>";
+        $xml = $illDom->saveXML();
         try {
-            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $type, 'ill'), null, HTTP_REQUEST_METHOD_PUT, $xml);
+            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $new, 'ill'), null, HTTP_REQUEST_METHOD_PUT, 'post_xml=' . $xml);
         } catch (Exception $ex) {
            return array('success' => false, 'sysMessage' => $ex->getMessage()); 
         }
-        /*
-        $result = '<?xml version = "1.0" encoding = "UTF-8"?><put-rec-ill><reply-text>ok</reply-text><reply-code>0000</reply-code><create-ill><request-number>MZK40000038883</request-number><note type="info">Request No. MZK40000038883 created successfully.</note></create-ill></put-rec-ill>';
-        $result = simplexml_load_string($result);
-        */
         $baseAndDocNumber = $result->{'create-ill'}->{'request-number'};
         $base = substr($baseAndDocNumber, 0, 5);
         $docNum = substr($baseAndDocNumber, 5);
-        $params = array('base'=> $base, 'doc_num' => $docNum);
-        $document = $this->doXRequest('find-doc', $params, true);
+        $findDocParams = array('base' => $base, 'doc_num' => $docNum);
+        $document = $this->doXRequest('find-doc', $findDocParams, true);
         // create varfield for ILL request type
         $varfield = $document->{'record'}->{'metadata'}->{'oai_marc'}->addChild('varfield');
         $varfield->addAttribute('id', 'PNZ');
         $varfield->addAttribute('i1', ' ');
         $varfield->addAttribute('i2', ' ');
         $subfield = $varfield->addChild('subfield', $payment);
-        $subfield->addAttribute('label', 'a'); 
-        $params['xml_full_req'] = $document->asXml();
-        //print $params['xml_full_req']; 
-        $params['doc_action'] = 'UPDATE';
-        $update = $this->doXRequestUsingPost('update-doc', $params, true);
-        //print $update->asXml();
-        return array('success' => true);
+        $subfield->addAttribute('label', 'a');
+        if (!empty($additional_authors)) {
+            $varfield = $document->{'record'}->{'metadata'}->{'oai_marc'}->addChild('varfield');
+            $varfield->addAttribute('id', '700');
+            $varfield->addAttribute('i1', '1');
+            $varfield->addAttribute('i2', ' ');
+            $subfield = $varfield->addChild('subfield', $additional_authors);
+            $subfield->addAttribute('label', 'a');
+        }
+        $updateDocParams = array('library' => $base, 'doc_num' => $docNum);
+        $updateDocParams['xml_full_req'] = $document->asXml(); 
+        $updateDocParams['doc_action'] = 'UPDATE';
+        try {
+            $update = $this->doXRequestUsingPost('update-doc', $updateDocParams, true);
+        } catch (Exception $ex) {
+           return array('success' => false, 'sysMessage' => $ex->getMessage()); 
+        }
+        return array('success' => true, 'id' => $docNum);
     }
     
     /**
