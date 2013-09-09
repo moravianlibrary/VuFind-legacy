@@ -47,7 +47,7 @@
               <li><input type="submit" class="button mail" name="email" onClick="processIds('favForm', 'ui_checkboxes', 'makeArray', 'MyResearch', 'Email', '', '', '{translate text="email_selected_favorites"}', 'MyResearch', 'Favorites', ''); return false;" value="{translate text='email_selected'}" /></li>
               {if $listEditAllowed}<li><input type="submit" class="button delete" name="delete" onClick="processIds('favForm', 'ui_checkboxes', 'makeArray', 'MyResearch', 'Delete', '{if $list}{$list->id|escape}{/if}', '', '{translate text="delete_selected_favorites"}', 'MyResearch', 'Favorites', ''); return false;" value="{translate text='delete_selected'}"></li>{/if}
               {if is_array($exportOptions) && count($exportOptions) > 0}
-              <li><input type="submit" class="button export" name="export" onClick="processIds('favForm', 'ui_checkboxes', 'makeArray', 'MyResearch', 'Export', '', '', '{translate text="export_selected_favorites"}', 'MyResearch', 'Favorites', ''); return false;" value="{translate text='export_selected'}"></li>
+              <li><input type="submit" class="button export" name="export" _onClick="processIds('favForm', 'ui_checkboxes', 'makeArray', 'MyResearch', 'Export', '', '', '{translate text="export_selected_favorites"}', 'MyResearch', 'Favorites', ''); return false;" value="{translate text='export_selected'}"></li>
               {/if}
               <li><input type="submit" class="button export" name="import" value="{translate text='import_favorites'}"></li>
            </ul>
