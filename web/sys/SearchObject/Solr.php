@@ -942,6 +942,10 @@ class SearchObject_Solr extends SearchObject_Base
     {
         $this->hiddenFilters[] = $fq;
     }
+    
+    public function disableSpellcheck() {
+        $this->spellcheck = false;
+    }
 
     /**
      * Actually process and submit the search
