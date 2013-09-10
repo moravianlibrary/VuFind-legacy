@@ -92,6 +92,10 @@ class SolrEdgeFacetedAutocomplete implements AutocompleteInterface
         $query = str_replace($forbidden, " ", $query);
         return $query;
     }
+    
+    protected function escapeQuery($query) {
+        return str_replace(array('-'), array('\-'), $query);
+    }
 
     /**
      * getSuggestions
@@ -143,7 +147,7 @@ class SolrEdgeFacetedAutocomplete implements AutocompleteInterface
         $result = array();
         foreach($this->fields as $facetField => $autoField) {
             foreach($json->{'facet_counts'}->{'facet_fields'}->{$facetField} as $item) {
-                $value = $item[0];
+                $value = $this->escapeQuery($item[0]);
                 $count = $item[1];
                 $result[$value] = $count;
             }
