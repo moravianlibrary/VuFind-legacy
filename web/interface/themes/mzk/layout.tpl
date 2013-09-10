@@ -123,7 +123,7 @@
         <!--{if $showTopSearchBox}-->
           <div class="top-search-box">
 			  <div class="logo">
-				<a href="{$url}">{image src="logo-mzk.png" alt="MZK" class="alignleft"}</a>
+				<a href="http://www.mzk.cz/">{image src="logo-mzk.png" alt="MZK" class="alignleft"}</a>
 			  </div>
 			  {if $pageTemplate != 'advanced.tpl'}
 				{if $module=="Summon" || $module=="WorldCat" || $module=="Authority" || $module=="EBSCOHost" || $module=="PCI" || $module=="EBSCO"}
