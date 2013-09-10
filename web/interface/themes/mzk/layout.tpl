@@ -2,7 +2,7 @@
 <html lang="{$userLang}">
 
 {* We should hide the top search bar and breadcrumbs in some contexts: *}
-{if ($module=="Search" || $module=="Summon" || $module=="WorldCat" || $module=="Authority") && $pageTemplate=="home.tpl"}
+{if ($module=="Search" || $module=="Summon" || $module=="WorldCat" || $module=="Authority") && $pageTemplate == "home.tpl"}
     {assign var="showTopSearchBox" value=0}
     {assign var="showBreadcrumbs" value=0}
 {else}
@@ -18,9 +18,10 @@
     {css media="print" filename="print.css"}
     {css media="screen" filename="mzk.css"}
     {css media="screen" filename="thickbox.css"}
-    {if $module == 'EBSCO'}
+    {if $module == 'EBSCO' || $module == 'Discover'}
     {css media="screen" filename="discover.css"}
     {css media="screen" filename="ebsco.css"}
+    {css media="screen" filename="pubtype-icons.css"}
     {/if}
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script language="JavaScript" type="text/javascript">
@@ -116,7 +117,6 @@
     <div id="lightbox" onClick="hideLightbox(); return false;"></div>
     <div id="popupbox" class="popupBox"><b class="btop"><b></b></b></div>
     {* End LightBox *}
-    
     {if $showTopSearchBox}
 	<div class="searchheader">
       <div class="searchcontent">
@@ -176,12 +176,15 @@
     {if $showBreadcrumbs}
     <div class="breadcrumbs">
       <div class="breadcrumbinner">
-        <a href="{$url}">{translate text="Home"}</a> <span>&gt;</span>
+      	{if $module == "EBSCO"}
+      		<a href="{$url}/EBSCO/Search">{translate text="Ebsco Home Breadcrumps"}</a> <span>&gt;</span>
+      	{else}
+        	<a href="{$url}">{translate text="Home"}</a> <span>&gt;</span>
+        {/if}
         {include file="$module/breadcrumbs.tpl"}
       </div>
     </div>
     {/if}
-    
     <div id="doc2" class="yui-t4"> {* Change id for page width, class for menu layout. *}
 
       {if $useSolr || $useWorldcat || $useSummon}
