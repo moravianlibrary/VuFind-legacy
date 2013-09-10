@@ -80,36 +80,27 @@ class InterlibraryLoans extends MyResearch
             $attrs = $form->getValue();
             $hmac = $attrs['hmac'];
             if ($form->validate()) {
-                if ($attrs['confirmation'] != 'true') {
-                    $form->getElementById('confirmation')->setValue('true');
-                    $confirmationText = $form->getElementById('confirmation_text');
-                    $confirmationText->setContent('<b>' . $confirmationText->getContent() .  '</b>');
-                    $form->toggleFrozen(true);
+                unset($attrs['submit']);
+                unset($attrs['ill_confirmation']);
+                $attrs['ill-unit'] = 'MVS';
+                $attrs['pickup-location'] = 'MVS';
+                $attrs['allowed-media'] = $attrs['media'];
+                $attrs['send-directly'] = 'N';
+                $attrs['delivery-method'] = 'S';
+                list($day, $month, $year) = split("\.", $attrs['last-interest-date']);
+                $attrs['last-interest-date'] = $year . str_pad($month, 2, "0", STR_PAD_LEFT) . str_pad($day, 2, "0", STR_PAD_LEFT);
+                $result = null;
+                if ($hmac == $this->getHMAC()) {
+                    $result = $this->catalog->createInterlibraryLoan($patron, $attrs);
+                } else {
+                    $result = array('success' => false, 'sysMessage' => 'Form has been tampered with');
+                }
+                if (!$result['success']) {
                     $interface->assign('form', $form);
+                    $interface->assign('ill_error', $result['sysMessage']);
                     $interface->setTemplate('ill-new.tpl');
                 } else {
-                    unset($attrs['submit']);
-                    unset($attrs['ill_confirmation']);
-                    $attrs['ill-unit'] = 'MVS';
-                    $attrs['pickup-location'] = 'MVS';
-                    $attrs['allowed-media'] = $attrs['media'];
-                    $attrs['send-directly'] = 'N';
-                    $attrs['delivery-method'] = 'S';
-                    list($day, $month, $year) = split("\.", $attrs['last-interest-date']);
-                    $attrs['last-interest-date'] = $year . str_pad($month, 2, "0", STR_PAD_LEFT) . str_pad($day, 2, "0", STR_PAD_LEFT);
-                    $result = null;
-                    if ($hmac == $this->getHMAC()) {
-                        $result = $this->catalog->createInterlibraryLoan($patron, $attrs);
-                    } else {
-                        $result = array('success' => false, 'sysMessage' => 'Form has been tampered with');
-                    }
-                    if (!$result['success']) {
-                        $interface->assign('form', $form);
-                        $interface->assign('ill_error', $result['sysMessage']);
-                        $interface->setTemplate('ill-new.tpl');
-                    } else {
-                        header("Location: " . $configArray['Site']['url'] . '/MyResearch/InterlibraryLoans?info=new&id=' . urlencode($result['id']));
-                    }
+                    header("Location: " . $configArray['Site']['url'] . '/MyResearch/InterlibraryLoans?info=new&id=' . urlencode($result['id']));
                 }
             } else {
                 $interface->assign('form', $form);
@@ -202,17 +193,14 @@ class InterlibraryLoans extends MyResearch
         $articleTitle  = $sub->addElement('text', 'sub-title', $textParams)->setLabel(translate('ill_article_title'));
         $pages         = $sub->addElement('text', 'pages', $textParams)->setLabel(translate('ill_article_pages'));
         $note          = $sub->addElement('text', 'note', $textParams)->setLabel(translate('ill_article_note'));
-        $media         = $sub->addSelect('media')->setLabel(translate('mvs_media'))->loadOptions(array(
-            'C-COPY' => translate('ill_serial_photocopy'),
-            'L-COPY' => translate('ill_serial_loan_physical'),
-        ));
+        $form->addElement('hidden', 'media')->setValue('C-COPY');
         $this->addAuthorsRightsResctriction($form);
         // Administration information
         $adm              = $form->addElement('fieldset')->setLabel(translate('ILL Administration information'));
         $lastInterestDate = $adm->addElement('text', 'last-interest-date', array('size' => 8, 'maxlength' => 8))->setLabel(translate('last-interest-date'))->setId('calendar');
         $lastInterestDate->addRule('required', translate('last interest date is required'));
         $payment     = $form->addElement('fieldset')->setLabel(translate('ILL payment options'));
-        $paymentType = $adm->addSelect('payment')->setLabel(translate('Payment'))->loadOptions(array(
+        $paymentType = $adm->addSelect('payment')->setLabel(translate('payment'))->loadOptions(array(
             '100-200'   => translate('ILL serial request from abroad'),
             'kopie ČR'  => translate('ILL serial request from Czech Republic'),
         ));

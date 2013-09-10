@@ -1276,13 +1276,14 @@ class Aleph implements DriverInterface
             $loan = array();
             $z13 = $item->z13;
             $status = (string) $item->z410->{'z410-status'};
-            if ($status != 'Closed') {
+            if ($status != 'Closed' && $status != 'Deleted') {
                 $loan['docno'] = (string) $z13->{'z13-doc-number'};
                 $loan['author'] = (string) $z13->{'z13-author'};
                 $loan['title'] = (string) $z13->{'z13-title'};
                 $loan['imprint'] = (string) $z13->{'z13-imprint'};
                 $loan['article_title'] = (string) $item->{'title-of-article'};
                 $loan['article_author'] = (string) $item->{'author-of-article'};
+                $loan['price'] = (string) $item->{'z13u-additional-bib-info-1'};
                 $loan['pickup_location'] = (string) $item->z410->{'z410-pickup-location'};
                 $loan['media'] = (string) $item->z410->{'z410-media'};
                 $loan['required_by'] = $this->parseDate((string) $item->z410->{'z410-last-interest-date'});

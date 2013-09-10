@@ -32,11 +32,16 @@
                         <p class="resultItemLine2">{translate text='Author'}: {$resource.author|escape}</p>
                         <p class="resultItemLine2">{translate text='Title'}: {$resource.title|escape}</p>
                         <p class="resultItemLine2">{translate text='Imprint'}: {$resource.imprint|escape}</p>
-                        <p class="resultItemLine2">{translate text='Periodical article title'}: {$resource.article_title|escape}</p>
-                        <p class="resultItemLine2">{translate text='Periodical article author'}: {$resource.article_author|escape}</p>
+                        {if $resource.media eq "PHOTOCOPY (serial)"}
+                          <p class="resultItemLine2">{translate text='Periodical article title'}: {$resource.article_title|escape}</p>
+                          <p class="resultItemLine2">{translate text='Periodical article author'}: {$resource.article_author|escape}</p>
+                        {/if}
                         <p class="resultItemLine2">{translate text='Pickup location'}: {$resource.pickup_location|escape}</p>
                         <p class="resultItemLine2">{translate text='Requested media'}: {$resource.media|translate|escape}</p>
                         <p class="resultItemLine2">{translate text='Required by'}: {$resource.required_by|escape}</p>
+                        {if $resource.price}
+                          <p class="resultItemLine2">{translate text='Price'}: {$resource.price|escape}</p>
+                        {/if}
                         </table>
                       </div>
                     </div>
