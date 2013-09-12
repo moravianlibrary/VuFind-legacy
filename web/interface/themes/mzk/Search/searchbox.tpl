@@ -33,6 +33,7 @@
 		  <input type="submit" name="submit" class="form-submit" value="{translate text="Find"}">
 	  </div>
       <a href="{$path}/Search/Advanced" class="advanced small">{translate text="Advanced Search"}</a>
+      <a href="{$path}/EBSCO/Search" class="advanced small">{translate text="EBSCO search"}</a>
       {* Do we have any checkbox filters? *}
       {assign var="hasCheckboxFilters" value="0"}
       {if isset($checkboxFilters) && count($checkboxFilters) > 0}

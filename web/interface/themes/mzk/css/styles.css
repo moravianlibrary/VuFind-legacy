@@ -77,7 +77,7 @@ div.yui-b.first { background-color:#fff; }
 
 
 #searchForm { margin: 0; text-align: left; position: relative; }
-#searchForm .advanced { float: left; margin: 2px 0 0 0; }
+#searchForm .advanced { float: left; margin: 2px 10px 0 0; }
 
 .searchHomeBrowse { background-color:#94c632; }
 .searchHomeBrowseInner { padding:0 25px;font-size:90%; }

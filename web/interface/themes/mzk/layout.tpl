@@ -177,7 +177,7 @@
     <div class="breadcrumbs">
       <div class="breadcrumbinner">
       	{if $module == "EBSCO"}
-      		<a href="{$url}/EBSCO/Search">{translate text="Ebsco Home Breadcrumps"}</a> <span>&gt;</span>
+      		<a href="{$url}/EBSCO/Search">{translate text="Ebsco Home Breadcrumb"}</a> <span>&gt;</span>
       	{else}
         	<a href="{$url}">{translate text="Home"}</a> <span>&gt;</span>
         {/if}
