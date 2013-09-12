@@ -33,11 +33,6 @@
 		  <input type="submit" name="submit" class="form-submit" value="{translate text="Find"}">
 	  </div>
       <a href="{$path}/Search/Advanced" class="advanced small">{translate text="Advanced Search"}</a>
-      {foreach from=$checkboxFilters item=current}
-          {if $current.filter and $current.filter == "source:ALL" && $current.selected}
-               {assign var="pciEnabled" value="1"}
-          {/if}
-      {/foreach}
       {* Do we have any checkbox filters? *}
       {assign var="hasCheckboxFilters" value="0"}
       {if isset($checkboxFilters) && count($checkboxFilters) > 0}
