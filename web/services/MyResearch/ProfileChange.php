@@ -89,12 +89,12 @@ class ProfileChange extends MyResearch
         $newPasswordCheck = $_POST['new_password_repeat'];
         if ($newPassword != $newPasswordCheck) {
             $interface->assign('operation', 'password');
-            $interface->assign('userErrorMsg', 'Password fields do not match or empty!');
+            $interface->assign('userErrorMsg', 'Password fields do not match or empty');
             return;
         }
         if (trim($newPassword) == '') {
             $interface->assign('operation', 'password');
-            $interface->assign('userErrorMsg', 'New password is empty!');
+            $interface->assign('userErrorMsg', 'New password is empty');
             return;
         }
         $result = $this->catalog->changeUserPassword($patron, $oldPassword, $newPassword);
@@ -112,7 +112,19 @@ class ProfileChange extends MyResearch
             $interface->assign('userErrorMsg', 'Your session has timed out, please reload page to login again');
             return;
         }
-        $nickname = $_POST['nickname'];
+        $nickname = trim($_POST['nickname']);
+        if (empty($nickname)) {
+            $interface->assign('userErrorMsg', 'Nickname is empty');
+            return;
+        }
+        if (strlen($nickname) > 20) {
+            $interface->assign('userErrorMsg', 'Max nickname length is 20 characters');
+            return;
+        }
+        if (!preg_match('/^[\w_]*$/', $nickname)) {
+            $interface->assign('userErrorMsg', 'Nickname must contain only alphanumeric characters and underscores');
+            return;
+        }
         $result = $this->catalog->changeUserNickname($patron, $nickname);
         if (PEAR::isError($result)) {
             $interface->assign('userErrorMsg', 'Nickname change failed, nickname is already used');
