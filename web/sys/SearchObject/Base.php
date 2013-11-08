@@ -1491,6 +1491,9 @@ abstract class SearchObject_Base
      */
     public function deminify($minified)
     {
+    	if (!is_a($minified, minSO)) {
+    		return;
+    	}
         // Clean the object
         $this->purge();
 
@@ -2124,7 +2127,7 @@ abstract class SearchObject_Base
             $this->recommend = false;
             return;
         }
-
+        
         // Process recommendations for each location:
         $this->recommend = array(
             'top' => array(), 'side' => array(), 'noresults' => array()

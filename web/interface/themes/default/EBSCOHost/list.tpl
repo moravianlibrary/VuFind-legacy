@@ -1,5 +1,4 @@
 {js filename="ajax_common.js"}
-
 {* Main Listing *}
 <div id="bd">
   <div id="yui-main" class="content">

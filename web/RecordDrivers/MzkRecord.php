@@ -249,6 +249,12 @@ class MzkRecord extends MarcRecord
     protected function getRestrictions()
     {
         $result = $this->_getFieldArray('540', array('a'));
+        if (strpos($this->getUniqueID(), "MZK04-") === 0) {
+            $result = array();
+            $result[] = 'Normy lze objednat u pultu ve Studovně novin a časopisů (2. p.) a studovat se mohou pouze ve studovně. ' . 
+            'Podle zákona č. 22/1997 Sb. smějí být české technické normy rozmnožovány a rozšiřovány jen se souhlasem Úřadu pro technickou ' . 
+            'normalizaci, metrologii a státní zkušebnictví.';
+        }
         if (in_array("NewspaperOrJournal", $this->getFormats())) {
             $result[] = translate("NewspaperOrJournal notice");
         }

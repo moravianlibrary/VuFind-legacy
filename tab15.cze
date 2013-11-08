@@ -136,6 +136,9 @@ MZK15 ## ZT L Vyøízená ztráta                N N C N Y N N N N 00
 MZK15 ## N1 L Nenalezeno 1                   N N C Y Y N N N N 00
 MZK15 ## N2 L Nenalezeno 2                   N N C N Y N N N N 00
 MZK15 ## N3 L Nenalezeno 3                   N N C N Y N N N N 00
+!MZK15 ## OB L Zruseno objednavani            Y Y N N Y N N N N 00
+
+!MZK15 31 VV L Vol.výb.-mìs.                  Y N C Y Y N N N N 00
 
 MZK15 31 ## L Mìsíc                          Y Y C Y Y N N N N 00
 MZK15 07 ## L Týden                          Y Y C N Y N N N N 00
@@ -144,10 +147,12 @@ MZK15 44 ## L Pøíruèka                       N N N N Y N N N N 00
 MZK15 55 ## L Dlouhodobá výp                 N N N N Y N N N N 00
 MZK15 67 ## L Studovna                       Y N N Y Y N N N N 00
 MZK15 88 ## L Retro                          Y Y C Y Y N N N N 00
-MZK15 94 ## L Aktuální roè. èsp.             Y N N Y Y N N N N 00
-MZK15 95 ## L Jen do studovny novin a èsp.   Y Y C Y Y N N N N 00
+MZK15 94 ## L Aktuální roèník                Y N N Y Y N N N N 00
+MZK15 95 ## L Jen do studovny SNC            Y Y C Y Y N N N N 00
 MZK15 96 ## L Jen do studovny                Y Y C Y Y N N N N 00
-MZK15 97 ## L Jen do studovny hum. vìd       Y Y C Y Y N N N N 00
+MZK15 97 ## L Jen do studovny HSS            Y Y C Y Y N N N N 00
+!MZK15 32 ## L Test Mynarova nepouzivat M     Y Y C Y Y N N N N 00
+!MZK15 97 ## L Test Mynarova nepouzivat P     Y Y C Y Y N N N N 00 
 
 !pridana kvuli novemu prez. rezimu na studovne - nelze prodluzovat (sloupec 7)
 ! nepouzivam od srpna 2012
@@ -161,10 +166,10 @@ HSS15 44 ## L Pøíruèka                       N N N N Y N N N N 00
 HSS15 55 ## L Dlouhodobá výp                 N N N N Y N N N N 00
 HSS15 67 ## L Studovna                       Y N N Y Y N N N N 00
 HSS15 88 ## L Retro                          Y N C Y Y N N N N 00
-HSS15 94 ## L Aktuální roè. èsp.             Y N N Y Y N N N N 00
-HSS15 95 ## L Jen do studovny novin a èsp.   Y N C Y Y N N N N 00
+HSS15 94 ## L Bì~^ný roè. èsp.                Y N N Y Y N N N N 00
+HSS15 95 ## L Jen do studovny SNC            Y N C Y Y N N N N 00
 HSS15 96 ## L Jen do studovny                Y N C Y Y N N N N 00
-HSS15 97 ## L Jen do studovny hum. vìd       Y N C Y Y N N N N 00
+HSS15 97 ## L Jen do studovny HSS            Y N C Y Y N N N N 00
 HSS15 ## ZP L Ve zpracování                  N N C Y Y N N N N 00
 HSS15 ## VZ L Vazba zaèala                   Y N C Y Y N N N N 00
 HSS15 ## OV L Odesl.do vazby                 Y N C Y Y N N N N 00
@@ -203,10 +208,10 @@ STT15 44 ## L Pøíruèka                       N N N N Y N N N N 00
 STT15 55 ## L Dlouhodobá výp                 N N N N Y N N N N 00
 STT15 67 ## L Studovna                       Y N N Y Y N N N N 00
 STT15 88 ## L Retro                          Y Y C Y Y N N N N 00
-STT15 94 ## L Aktální roè. èsp.              Y N N Y Y N N N N 00
-STT15 95 ## L Jen do studovny novin a èsp.   Y Y C Y Y N N N N 00
-STT15 96 ## L Jen do studovny starých tiskù  Y Y C Y Y N N N N 00
-STT15 97 ## L Jen do studovny hum. vìd       Y Y C Y Y N N N N 00
+STT15 94 ## L Bì~^ný roè. èsp.                Y N N Y Y N N N N 00
+STT15 95 ## L Jen do studovny SNC            Y Y C Y Y N N N N 00
+STT15 96 ## L Jen do studovny ST             Y Y C Y Y N N N N 00
+STT15 97 ## L Jen do studovny HSS            Y Y C Y Y N N N N 00
 !
 
 HSS15 ## N3 L Nenalezeno 3                   N N C N Y N N N N 00
@@ -275,5 +280,34 @@ ZHR15 96 ## L Pøíruèka                       Y Y N Y Y Y N Y Y 00
 AVM15 67 ## L Studovna                       Y N N N Y N N N N 00
 AVM15 01 ## L Hodina                         Y N Y Y Y N Y N N 00
 AVM15 07 ## L Týden                          Y Y C Y Y N N N N 00
+
+SKSNP ## NA L Oèekává se                     N N C N N Y N N N 00
+SKSNP ## ZP L Ve zpracování                  N N C Y Y N N N N 00
+SKSNP ## VZ L Vazba zaèala                   Y Y C Y Y N N N N 00
+SKSNP ## OV L Odesl.do vazby                 Y Y C Y Y N N N N 00
+SKSNP ## DZ L Digit. zaèala                  Y Y C Y Y N N N N 00
+SKSNP ## DO L Digit.-odesláno                Y Y C Y Y N N N N 00
+SKSNP ## RE L Reklamováno                    N N N N Y N N N N 00
+SKSNP ## NE L Nevydáno                       N N N N Y N N N N 00
+SKSNP ## OD L Odpisy                         N N N N N N N N N 00
+SKSNP ## R0 L Hledá revize                   N N C N Y N N N N 00
+SKSNP ## SR L 0 po revizi                    N N N N Y N N N N 00
+SKSNP ## ZT L Vyøízená ztráta                N N C N Y N N N N 00
+SKSNP ## N1 L Nenalezeno 1                   N N C Y Y N N N N 00
+SKSNP ## N2 L Nenalezeno 2                   N N C N Y N N N N 00
+SKSNP ## N3 L Nenalezeno 3                   N N C N Y N N N N 00
+
+SKSNP 31 ## L Mìsíc                          Y Y C Y Y N N N N 00
+SKSNP 07 ## L Týden                          Y Y C N Y N N N N 00
+SKSNP 33 ## L Archiv                         N N N N N N N N N 00
+SKSNP 44 ## L Pøíruèka                       N N N N Y N N N N 00
+SKSNP 55 ## L Dlouhodobá výp                 N N N N Y N N N N 00
+SKSNP 67 ## L Studovna                       Y N N Y Y N N N N 00
+SKSNP 88 ## L Retro                          Y Y C Y Y N N N N 00
+SKSNP 94 ## L Prezenènì                      Y N N Y Y N N N N 00
+SKSNP 95 ## L Jen do studovny                Y Y C Y Y N N N N 00
+SKSNP 96 ## L Jen do studovny                Y Y C Y Y N N N N 00
+SKSNP 97 ## L Jen do studovny HSS            Y Y C Y Y N N N N 00
+
 
 KLIC  07 ## L Týden - klíè od skøíòky        Y Y N N N N N N N 00

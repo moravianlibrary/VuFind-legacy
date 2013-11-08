@@ -237,17 +237,17 @@ SK8   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
 MVS   1 MZK50 L MVS                            MVS15 MVS16 MVS17 MZK50 ALEPH
 PP1   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
 PP2   1 MZK50 L MZK                            MZK15 MZK16 MZK17 MZK50
-SKSNP 1 MZK50 L SNP-sklad                      MZK15 SNP16 MZK17 MZK50
-STT   4 MZK50 L stud. ST                       MZK15 STU16 MZK17 MZK50
-STUD  4 MZK50 L Stud. humanitních vìd/4.patr   HSS15 HSS16 STU17 MZK50
+SKSNP 1 MZK50 L SNP-sklad                      SKSNP SNP16 MZK17 MZK50
+STT   4 MZK50 L stud. ST                       STT15 STU16 MZK17 MZK50
+STUD  4 MZK50 L Stud. humanitních vìd/4.patr   MZK15 STU16 MZK17 MZK50
 SNC   4 MZK50 L Stud. novin a èasop./2.patro   MZK15 STU16 MZK17 MZK50
-!SVN   4 MZK50 L Stud. novin a èasop./2.patro   MZK15 STU16 MZK17 MZK50
 HAMST 4 MZK50 L Hud. a multim. stud./4.patro   ZHR15 STU16 MZK17 MZK50
 AVM   1 MZK50 L AVM                            AVM15 AVM16 MZK17 MZK50
 AU1   1 MZK50 L Rakouská knihovna              ZHR15 AUS16 AUS17 MZK50
 GE1   1 MZK50 L Nìmecká knihovna               ZHR15 AUS16 AUS17 MZK50
 BC1   1 MZK50 L Anglická knihovna              ZHR15 BC116 AUS17 MZK50
-USA   1 MZK50 L Info USA                       ZHR15 BC116 AUS17 MZK50
+USA   1 MZK50 L Info USA/2.patro               ZHR15 BC116 AUS17 MZK50
+KLIC  1 MZK50 L Klice na skrinky               KLIC  KLIC  MZK17 MZK50 
 !AKVIZ 5 MZK50 L Akvizice                       MZK15 MZK16 MZK17 MZK50
 !AVM   1 MZK50 L AVM                            AVM15 AVM16 MZK17 AVM
 
