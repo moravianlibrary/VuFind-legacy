@@ -95,7 +95,7 @@ a.jt {
           <select id="volume" name="volume" onchange="document.forms['volume_filter'].submit()">
             <option value="">{translate text="all"}</option>
             {foreach from=$items_volumes item=volume}
-                <option {if $volume == $items_selected_volume}selected="true"{/if} value="{$volume|escape}">{$volume|escape}</option>
+              <option {if $volume == $items_selected_volume}selected="true"{/if} value="{$volume|escape}">{$volume|escape}</option>
             {/foreach}
           </select>
           {if $hide_loans}
@@ -108,19 +108,25 @@ a.jt {
       <td>
         <form id="hide_loans_filter" name="hide_loans_filter" method="get">
           {if $items_selected_year}
-          <input type="hidden" name="year" value="{$items_selected_year|escape}" />
+            <input type="hidden" name="year" value="{$items_selected_year|escape}" />
           {/if}
           {if $items_selected_volume}
-          <input type="hidden" name="volume" value="{$items_selected_volume|escape}" />
+            <input type="hidden" name="volume" value="{$items_selected_volume|escape}" />
           {/if}
-          <input type="checkbox" name="hide_loans" value="true" {if $hide_loans}checked="true"{/if} onchange="document.forms['hide_loans_filter'].submit()" />
-          <label for="hide_loans">{translate text="Hide loaned items"}</label>
+          {if !empty($holdings) or $hide_loans}
+            <input type="checkbox" name="hide_loans" value="true" {if $hide_loans}checked="true"{/if} onchange="document.forms['hide_loans_filter'].submit()" />
+            <label for="hide_loans">{translate text="Hide loaned items"}</label>
+          {/if}
           <noscript><input type="submit" value="{translate text='Set'}" /></noscript>
         </form>
       </td>
     </tr>
   </tbody>
 </table>
+
+{if empty($holdings)}
+  {translate text='No available items'}
+{/if}
 
 {foreach from=$holdings item=holding key=location}
 <h3>{translate text=$location}</h3>
