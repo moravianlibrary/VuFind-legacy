@@ -340,7 +340,7 @@ ul.menu li{
 }
 .result { &width: 100%; border-bottom: 1px solid #eee; padding: 15px 20px 12px 20px; position: relative; }
 
-.record { padding: 10px 20px; }
+.record { padding: 10px 20px; overflow: auto; }
 .record .resultscroller { margin: 0 0 20px 0; }
 .record .resultscroller .prev { margin-right: 10px; }
 .record .resultscroller .next { margin-left: 10px; }
