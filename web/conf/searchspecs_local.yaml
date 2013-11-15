@@ -40,7 +40,6 @@ UDC:
       - [preg_replace, "/:/", "\\:"]
       - [preg_replace, "/\\[/", "\\["]
       - [preg_replace, "/\\]/", "\\]"]
-      - [preg_replace, "/:/", "\\:"]
       - [preg_replace, "/\\(/", "\\("]
       - [preg_replace, "/\\)/", "\\)"]
       - [preg_replace, '/\\"/', "\\\""]
