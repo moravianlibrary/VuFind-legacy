@@ -128,6 +128,11 @@ class Solr implements IndexEngine
      * How should we cache the search specs?
      */
     private $_specCache = false;
+    
+    /**
+     * 
+     */
+    private $_fieldsToForceCustomMunge = array(); 
 
     /**
      * Constructor
@@ -200,6 +205,11 @@ class Solr implements IndexEngine
         // Deal with search spec cache setting:
         if (isset($searchSettings['Cache']['type'])) {
             $this->_specCache = $searchSettings['Cache']['type'];
+        }
+        
+        if (isset($searchSettings['Advanced_Settings']['fieldsToForceCustomMunge'])) {
+            $this->_fieldsToForceCustomMunge = 
+                explode(",", $searchSettings['Advanced_Settings']['fieldsToForceCustomMunge']); 
         }
 
         // Deal with session-based shard settings:
@@ -790,7 +800,11 @@ class Solr implements IndexEngine
                 // Basic Search
                 if (isset($params['lookfor']) && $params['lookfor'] != '') {
                     // Clean and validate input
-                    $lookfor = $this->validateInput($params['lookfor']);
+                    $lookfor = $params['lookfor'];
+                    $forceCustomMunge = in_array($params['field'], $this->_fieldsToForceCustomMunge); 
+                    if (!$forceCustomMunge) {
+                        $lookfor = $this->validateInput($lookfor);
+                    }
 
                     // Force boolean operators to uppercase if we are in a
                     // case-insensitive mode:
@@ -804,9 +818,15 @@ class Solr implements IndexEngine
 
                     if (isset($params['field']) && ($params['field'] != '')) {
                         if ($this->isAdvanced($lookfor)) {
-                            $query .= $this->_buildAdvancedQuery(
-                                $params['field'], $lookfor
-                            );
+                            if ($forceCustomMunge) {
+                                $query .= $this->_buildQueryComponent(
+                                    $params['field'], $lookfor
+                                );
+                            } else {
+                                $query .= $this->_buildAdvancedQuery(
+                                    $params['field'], $lookfor
+                                );
+                            }
                         } else {
                             $query .= $this->_buildQueryComponent(
                                 $params['field'], $lookfor

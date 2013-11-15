@@ -33,3 +33,19 @@ Callnumber:
     - callnumber:
       - [onephrase, 1000]
       - [location_fuzzy, ~]
+
+UDC:
+  CustomMunge:
+    escape:
+      - [preg_replace, "/:/", "\\:"]
+      - [preg_replace, "/\\[/", "\\["]
+      - [preg_replace, "/\\]/", "\\]"]
+      - [preg_replace, "/:/", "\\:"]
+      - [preg_replace, "/\\(/", "\\("]
+      - [preg_replace, "/\\)/", "\\)"]
+      - [preg_replace, '/\\"/', "\\\""]
+      - [preg_replace, '/$/m', "\""]
+      - [preg_replace, '/^/m', "\""]
+  QueryFields:
+    - udc_str_mv:
+      - [escape, ~]
