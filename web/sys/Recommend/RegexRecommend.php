@@ -101,7 +101,7 @@ class RegexRecommend implements RecommendationInterface
 
         $searchType = $this->searchObject->getSearchIndex();
         $searchTerms = $this->searchObject->getSearchTerms();
-        $query = $searchTerms[0]['lookfor'];
+        $query = trim($searchTerms[0]['lookfor']);
         $result = array();
         foreach ($this->recommendations as $type => $regex) {
             if (!is_null($searchType) && $searchType != $type && preg_match($regex, $query)) {
