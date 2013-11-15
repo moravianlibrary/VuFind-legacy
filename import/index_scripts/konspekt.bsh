@@ -1,0 +1,66 @@
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+
+public String getKonspektSubfield(Record record, char subfield) {
+    List fields = record.getVariableFields("072");
+    if (fields != null) {
+        Iterator fieldsIter = fields.iterator();
+        DataField field;
+        while (fieldsIter.hasNext()) {
+            field = (DataField) fieldsIter.next();
+            if (field != null && field.getSubfield('2') != null) {
+                String type = field.getSubfield('2').getData();
+                if (type.equals("Konspekt")) {
+                    if (field.getSubfield(subfield) != null) {
+                        return field.getSubfield(subfield).getData();
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
+
+public String getKonspektCategory(Record record) {
+    String category = getKonspektSubfield(record, '9');
+    if (category == null) {
+        return null;
+    }
+    int cat = Integer.valueOf(getKonspektSubfield(record, '9'));
+    switch (cat) {
+        case 1:  return "Antropologie, etnografie";
+        case 2:  return "Biologické vědy";
+        case 3:  return "Divadlo, film, tanec";
+        case 4:  return "Ekonomické vědy, obchod";
+        case 5:  return "Filozofie a náboženství";
+        case 6:  return "Fyzika a příbuzné vědy";
+        case 7:  return "Geografie. Geologie. Vědy o Zemi";
+        case 8:  return "Historie a pomocné historické vědy. Biografické studie";
+        case 9:  return "Hudba";
+        case 10: return "Chemie. Krystalografie. Mineralogické vědy";
+        case 11: return "Jazyk, lingvistika a literární věda";
+        case 12: return "Knihovnictví, informatika, všeobecné, referenční literatura";
+        case 13: return "Matematika";
+        case 14: return "Lékařství";
+        case 15: return "Politické vědy (Politologie, politika, veřejná správa, vojenství)";
+        case 16: return "Právo";
+        case 17: return "Psychologie";
+        case 18: return "Sociologie";
+        case 19: return "Technika, technologie, inženýrství";
+        case 20: return "Tělesná výchova a sport. Rekreace";
+        case 21: return "Umění, architektura";
+        case 22: return "Výchova a vzdělávání";
+        case 23: return "Výpočetní technika";
+        case 24: return "Zemědělství";
+        case 25: return "Beletrie";
+        case 26: return "Literatura pro děti a mládež";
+    }
+}
+
+public String getKonspektSubcategory(Record record) {
+    return getKonspektSubfield(record, 'x');
+}
+

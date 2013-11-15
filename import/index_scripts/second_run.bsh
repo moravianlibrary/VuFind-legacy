@@ -6,6 +6,7 @@ import java.util.*;
 
 org.solrmarc.index.SolrIndexer indexer = null;
 
+static int currentYear = 2013;
 static int count = 0;
 static String base = "";
 static Map records = new HashMap();
@@ -81,19 +82,27 @@ public String getItemLink(Record record) {
    }
 }
 
+/*
+public Set getPublishDate(Record record) {
+   Set years = getPublishDateTest(record);
+   String output = "";
+   for (Object year : years) {
+      output += "," +year;
+   }
+   System.out.println("years for " + getID(record) + " : " + output);
+   return years;
+}
+*/
+
 public Set getPublishDate(Record record) {
    Set yearsFromItems = indexer.getFieldList(record, "Z30a");
    if (yearsFromItems.size() > 0) {
       Set result = new HashSet();
       for (String year : yearsFromItems) {
-         if (isInteger(year)) {
+         if (isYear(year)) {
             result.add(year);
          } else if (year.contains("-")) {
-            String[] range = year.split("-");
-            if (range.length == 2) {
-               result.add(range[0]);
-               result.add(range[1]);
-            }
+            result.addAll(parseRangeToYears(year));
          }
       }
       return result;
@@ -133,10 +142,33 @@ public Set getPublishDate(Record record) {
       to = from;
    }
    for (int year = from; year <= to; year+=1) {
-       // result.add(Integer.toString(year));
        result.add(String.format("%04d", new Object[]{ year }));
    }
    System.err.println(getID(record) + " has span " + result.size() + " years");
+   return result;
+}
+
+public static Set parseRangeToYears(String year) {
+   Set result = new HashSet();
+   if (isYear(year)) {
+      result.add(year);
+   } else if (year.contains("-")) {
+      String[] range = year.split("-");
+      if (range.length == 2 && isYear(range[0]) && isInteger(range[1])) {
+         int from = Integer.parseInt(range[0]);
+         int to = Integer.parseInt(range[1]);
+         if (to > 0 && to < 10) { // 2005-10 -> 2005-2010
+            to = from - (from % 10) + to;
+         } if (to >= 10 && to < 100) { // 1924-84 -> 1924-1984
+            to = from - (from % 100) + to;
+         }
+         for (int year = from; year <= to; year+=1) {
+            result.add(String.format("%04d", new Object[]{ year }));
+         }
+      }
+   } else {
+      System.err.println("invalid range in z30a: " + range);
+   }
    return result;
 }
 
@@ -150,68 +182,15 @@ public static boolean isInteger(String s) {
     return true;
 }
 
-/*
- * Era
- */
-public Set getEra(Record record) {
-   Set result = new HashSet();
-   if (record == null) {
-      return result;
-   }
-   String val = indexer.getFirstFieldVal(record, "008");
-   if (val == null) {
-      return result;
-   }
-   // System.err.println(val);
-   // int year = Integer.parseInt(val.substring(val.indexOf('s')+1, val.indexOf(' ')));
-   String type = val.substring(6, 7);
-   int from = 0;
-   int to = 0;
+public static boolean isYear(String year) {
+   boolean isYear = false;
    try {
-      from = Integer.parseInt(val.substring(7, 11)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
-   } catch (java.lang.NumberFormatException nfe) {
+      int yearAsInt = Integer.parseInt(year);
+      isYear = (yearAsInt > 0 && yearAsInt <= currentYear);
+   } catch (NumberFormatException e) {
+      return false;
    }
-   try {
-      to = Integer.parseInt(val.substring(11, 15)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
-   } catch (java.lang.NumberFormatException nfe) {
-   }
-   if (from == 0 && to == 0) {
-      return result;
-   }
-   if (from == 0) {
-      from = to;
-   }
-   if (to == 0) {
-      to = from;
-   }
-   if (to > 2010) {
-      to = 2010;
-   }
-   if (type.equals("e")) {
-      to = from;
-   }
-   for (int year = from; year <= to; year+=5) {
-       String era = toEra(year);
-       result.add(era);
-   }
-   // System.err.print("years:");
-   // for (String str : result) {
-   //     System.err.print(str+" ");
-   // }
-   // System.err.println("");
-   return result;
-}
-
-public String toEra(int year) {
-   int round = 50;
-   if (year > 1900) {
-      round = 10;
-   } else if (year > 1800) {
-      round = 20;
-   }
-   int rem = year % round;
-   // System.out.println("year: "+year + " rem: "+rem);
-   return String.valueOf(year-rem) + "-" + String.valueOf(year-rem+round);
+   return isYear;
 }
 
 public String getFullRecord(Record record) {
@@ -226,7 +205,6 @@ public String getShortTitle(Record record) {
    String title = indexer.getFirstFieldVal(record, "245a");
    if (title != null) {
       title = title.replaceAll("[/: \\]]*$", "").replaceAll("^[\\[]", "");
-      System.out.println(title);
    }
    return title;
 }
@@ -384,8 +362,8 @@ public Set getScale(Record record) {
    return result;
 }
 
-public Set getBarcode(Record record) {
-   return indexer.getFieldList(record, "Z306");
+public String getSysno(Record record) {
+   return record.getControlNumber();
 }
 
 public String getAuthorAndTitle(Record record) {
