@@ -25,7 +25,7 @@
     <td>
       <select name="location">
         {foreach from=$locations key=val item=details}
-        <option value="{$val}">{$details|escape}</option>
+        <option value="{$val}">{$details|translate|escape}</option>
         {/foreach}
       </select>
     </td>
@@ -33,7 +33,6 @@
   <tr>
     <td>{translate text="Last interest date"}: </td>
     <td>
-      <!-- <input type="text" name="to" value="{$last_interest_date|escape}" id="calendar" autocomplete="off"> -->
       <input class="text" type="text" name="to" value="{$last_interest_date|escape}" id="calendar" autocomplete="off">
     </td>
   </tr>
