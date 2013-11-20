@@ -1,0 +1,773 @@
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+import org.marc4j.*;
+import org.marc4j.marc.*;
+import java.io.*;
+import java.util.*;
+import java.lang.reflect.*;
+import org.marc4j.converter.impl.AnselToUnicode;
+
+org.solrmarc.index.SolrIndexer indexer = null;
+
+static int count = 0;
+static String base = "";
+static Map tab15 = new HashMap();
+static Map libraries = new HashMap();
+static FileWriter ids = new FileWriter(new File("ids.txt"));
+/*
+String[] freeStackArray =  { "VV", "MZK", "STT", "STUD", "SNC",  "HAMST", "AVM", "AU1",
+    "GE1", "BC1", "USA", "STTX", "STUDX", "SNCX", "AVMX", "UK1" };
+static Set freeStack = new HashSet(Arrays.asList(freeStackArray));
+*/
+// "VV", "MZK", "STT", "STUD", "SNC", "HAMST", "AVM", "AU1", "GE1", "BC1", "USA", "STTX", "STUDX", "SNCX", "AVMX","UK1"
+
+public static init() {
+    BufferedReader br  = new BufferedReader(new FileReader("tab15.txt"));
+    while ((strLine = br.readLine()) != null)   {
+      String[] args = strLine.split(",");
+      // System.out.println(args[0]);
+      boolean displayInOpac = args[4].equals("Y");
+      String type = "hide";
+      if (displayInOpac) {
+         String desc = args[1]; // .substring(0, 6);
+         if (desc.equals("Vol.výb.-měs.") || desc.equals("Měsíc") || desc.equals("Týden") || desc.equals("7 dní") || desc.equals("14 dní")) {
+            type = "absent";
+         } else if (desc.equals("Příručka")) {
+            type = "reference shell";
+         } else if (desc.equals("Ve zpracování")) {
+            type = "processing";
+         } else {
+            type = "present";
+         }
+      }
+      tab15.put(args[0], type);
+      // System.out.println(args[0] + " -> " + type);
+    }
+    br.close();
+    BufferedReader br2  = new BufferedReader(new FileReader("libraries.txt"));
+    while ((strLine = br2.readLine()) != null)   {
+      String[] args = strLine.split(",");
+      try {
+        libraries.put(args[0], args[2]);
+      } catch (java.lang.ArrayIndexOutOfBoundsException aibe) {
+        System.err.println(strLine);
+        throw aibe;
+      }
+      //System.out.println(args[0] + " -> " + args[2]);
+    }
+    br2.close();
+    BufferedReader br3  = new BufferedReader(new FileReader("base.txt"));
+    base = br3.readLine().trim();
+    br3.close();
+}
+
+init();
+
+public String getField(Record record, String field) {
+   return (String) indexer.getFieldList(record, field).iterator().next();
+}
+
+public String getID(Record record) {
+   // System.err.println(record.toString());
+   // return base + "-" + record.getControlField("SYS").getData();
+   return (base +  "-" + record.getControlNumber());
+}
+
+public String getIDInit(Record record) {
+   recordStart(record);
+   return getID(record);
+}
+
+public String translate(slc, isc, ipsc) {
+   String tab15e = libraries.get(slc);
+   String findme = tab15e + "|" + isc + "|" + ipsc;
+   String result = tab15.get(findme);
+   if (result == null) {
+     findme = tab15e + "||" + ipsc;
+     result = tab15.get(findme);
+  }
+  return result;
+}
+
+/*
+ * Statuses
+ */
+public Set getStatuses(Record record) {
+   // System.out.println(record);
+   Set statuses = new HashSet();
+   Set foo = indexer.getFieldList(record, "Z30[1fp]");
+   for (String str : foo) {
+      String[] args = str.split(" ");
+      String result = null;
+      // System.out.println("\ndebug: " + getID(record) + " " + str);
+      if (args.length == 3) {
+          result = translate(args[0], args[1], args[2]);
+      } else {
+          result = translate(args[0], args[1], "");
+      }
+      if (!"hide".equals(result)) {
+           statuses.add(result);
+      }
+   }
+   // free stack
+   Set processStatuses = indexer.getFieldList(record, "Z30f");
+   for (String str : processStatuses) {
+      if (str.equals("67")) {
+           statuses.add("free-stack");
+      }
+   }
+   Set collections = indexer.getFieldList(record, "Z302");
+   for (String str : collections) {
+      if (str.startsWith("ZHR") || str.startsWith("VV")) {
+           statuses.add("free-stack");
+      }
+   }
+   //
+   Set result = new HashSet();
+   if (statuses.contains("free-stack")) {
+      result.add("free-stack");
+   }
+   if (statuses.contains("absent")) {
+      result.add("absent");
+      // result.add("present");
+   } else if (statuses.contains("present") || statuses.contains("reference shell")) {
+      result.add("present");
+   }
+   if (statuses.size() == 0) {
+      result.add("noitems");
+   }
+   /* EOD */
+   Set EOD = indexer.getFieldList(record, "EOD[a]");
+   for (String item : EOD) {
+      if (item.equals("Y")) {
+         result.add("available_for_eod");
+      }
+   }
+   /* Kramerius */
+   Set fulltextLinks = new HashSet();
+   fulltextLinks.addAll(indexer.getFieldList(record, "856[u]"));
+   fulltextLinks.addAll(indexer.getFieldList(record, "996[u]"));
+   for (String item : fulltextLinks) {
+      if (item.startsWith("http://kramerius.mzk.cz/") /*|| item.startsWith("http://aleph.mzk.cz:80/F?func=service")*/
+         || item.startsWith("http://imageserver.mzk.cz/")) {
+         result.add("available_online");
+      }
+   }
+   return result;
+   
+}
+
+public String process(Record record) {
+   try {
+      //System.err.println(record.toString()); 
+      System.err.print(getIDInit(record) + " ");
+      Set statuses = getStatuses(record);
+      System.err.print(toString(statuses, ",", "noitems"));
+      Set lkr = getLKR(record);
+      System.err.print(" ");
+      System.err.print(toString(lkr, ",", "none"));
+      System.err.println("");
+      ids.write(getID(record) + "\n");
+      //
+      Set result = getPublishDate(record);
+      if (result.size() != 0) {
+         System.out.print("years: ");
+         for (String year : result) {
+            System.out.print(year + " ");
+         }
+         System.out.println();
+      }
+      //
+      //System.out.println(indexer.getFirstFieldVal(record, "008"));
+      /*getVisible(record);
+      getAuthorBrowse(record);
+      getTitleBrowse(record);
+      getCallnumberBrowse(record);
+      getISBNBrowse(record);
+      getISSNBrowse(record);
+      getMDTBrowse(record);
+      getPublisherBrowse(record);*/
+   } catch (Exception ex) {
+      System.out.println("warning");
+      ex.printStackTrace();
+   }
+   return "done";
+}
+
+public String toString(Set set, String sep, String ifEmpty) {
+   if (set.size() == 0) {
+      return ifEmpty;
+   } 
+   String temp = "";
+   String result = "";
+   for (String status : set) {
+        result += temp + status;
+        temp = sep;
+   }
+   return result;
+}
+
+/*
+ * LKR
+ */
+public Set getLKR(Record record) {
+   Set set = indexer.getFieldList(record, "LKRabl");
+   Set result = new HashSet();
+   try {
+      for (String str : set) {
+         String[] args = str.split(" ");
+         if (args[0].equals("UP")) {
+            String id = args[2] + "-" + String.format("%09d", new Object[]{ Integer.parseInt((String) args[1]) });
+            result.add(id);
+         }
+      }
+   } catch (Exception aei) {
+      // System.err.println("error:"+getID(record));
+   }
+   return result;
+}
+
+/*
+ *
+*/
+public String getAdmNumber(Record record) {
+   try {
+      String result = "MZK50" + getField(record, "Z30w");
+      return result;
+   } catch (Exception ex) {
+      return "none";
+   }
+}
+
+/*
+ * Era
+ */
+public Set getEra(Record record) {
+   Set result = new HashSet();
+   String val = indexer.getFirstFieldVal(record, "008");
+   if (val == null) {
+      return result;
+   }
+   System.err.println(val);
+   // int year = Integer.parseInt(val.substring(val.indexOf('s')+1, val.indexOf(' ')));
+   String type = val.substring(6, 7);
+   int from = 0;
+   int to = 0;
+   try {
+      from = Integer.parseInt(val.substring(7, 11)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   try {
+      to = Integer.parseInt(val.substring(11, 15)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   if (from == 0 && to == 0) {
+      return result;
+   }
+   if (from == 0) {
+      from = to;
+   }
+   if (to == 0) {
+      to = from;
+   }
+   if (to > 2010) {
+      to = 2010;
+   }
+   if (type.equals("e")) {
+      to = from;
+   }
+   for (int year = from; year <= to; year+=5) {
+       String era = toEra(year);
+       result.add(era);
+   }
+   System.err.print("years:");
+   for (String str : result) {
+       System.err.print(str+" ");
+   }
+   System.err.println("");
+   return result;
+}
+
+public String toEra(int year) {
+   int round = 50;
+   if (year > 1900) {
+      round = 10;
+   } else if (year > 1800) {
+      round = 20;
+   }
+   int rem = year % round;
+   System.out.println("year: "+year + " rem: "+rem);
+   return String.valueOf(year-rem) + "-" + String.valueOf(year-rem+round);
+}
+
+public getControlField(Record record, String tag) {
+   for (ControlField cf : record.getControlFields()) {
+     if (cf.getTag().equals("FMT")) {
+       String result = new String(cf.getData());
+       return result.trim();
+     }
+   }
+   return null;
+}
+
+public String getVisible(Record record) {
+   String value = indexer.getFirstFieldVal(record, "MZKs");
+   String visible = "visible";
+   if (value != null && value.startsWith("SKRYTO")) {
+      visible = "hidden";
+      System.out.println("hidden: MZKs=SKRYTO");
+   }
+   String sta = getControlField(record, "STA");
+   if (sta != null && (sta.startsWith("SKRYTO") || sta.startsWith("DELETED"))) {
+      visible = "hidden";
+      System.out.println("hidden: STA=SKRYTO|DELETED");
+   }
+   String fmt = getControlField(record, "FMT");
+   if (fmt != null && fmt.equals("AZ")) {
+      visible = "hidden";
+      System.out.println("hidden: FMT=AZ");
+   }
+   String bas = getControlField(record, "BAS");
+   if (bas != null && bas.equals("AK")) {
+      visible = "hidden";
+      System.out.println("hidden: BAS=AK");
+   }
+   return visible;
+}
+
+public Set getAllSubfieldsWithIndicator(Record record, String spec, boolean split) {
+   Map dataFields = new HashMap();
+   for (DataField dataField : record.getDataFields()) {
+      String tag = dataField.getTag();
+      if (tag != null) {
+         if (!dataFields.containsKey(tag)) {
+            dataFields.put(tag, new ArrayList());
+         }
+         dataFields.get(tag).add(dataField);
+      }
+   }
+   Set result = new HashSet();
+   String[] fields = spec.split(":");
+   for (String fieldSpec : fields) {
+      String field = fieldSpec.substring(0, 3);
+      char ind1 = fieldSpec.substring(3, 4).charAt(0);
+      char ind2 = fieldSpec.substring(4, 5).charAt(0);
+      String subfieldSpec = fieldSpec.substring(5);
+      String condition = "";
+      String[] splitted = subfieldSpec.split("@");
+      subfieldSpec = splitted[0];
+      if (splitted.length > 1) {
+         condition = splitted[1];
+      }
+      String value = new String();
+      String sep = "";
+      if (dataFields.containsKey(field)) {
+         for (DataField dataField : dataFields.get(field)) {
+            if (!condition.equals("")) {
+               if (condition.startsWith("-") && dataField.getSubfield(condition.charAt(1)) == null) {
+                  break;
+               } else if (dataField.getSubfield(condition.charAt(0)) != null) {
+                  break;
+               }
+            }
+            if ((ind1 == '#' || dataField.getIndicator1() == ind1) && (ind2 == '#' || dataField.getIndicator2() == ind2)) {
+               for (char subfield : subfieldSpec.toCharArray()) {
+                  if (dataField.getSubfield((char) subfield) != null) {
+                     if (split) {
+                        value += sep + new String(dataField.getSubfield(subfield).getData());
+                        sep = " ";
+                     } else {
+                        value = new String(dataField.getSubfield(subfield).getData());
+                        result.add(value);
+                     }
+                  }
+               }
+               if (split) {
+                  result.add(value);
+                  value = new String();
+               }
+            }
+         }
+      }
+   }
+   for (String foo : result) {
+      System.out.println("debug:" + foo);
+   }
+   return result;
+}
+
+/*
+public Set generateBrowse(Record record, String spec, String type) {
+   Set result = getAllSubfieldsWithIndicator(record,  spec, true);
+   try {
+      String sep = "|";
+      String id = getID(record);
+      for (String key : result) {
+         browse.write(id + "|"  + text + "|" + text + "|" + type + "\n");
+         // System.out.println("Browse OK\n");
+      }
+   } catch(Exception ex) { System.out.println(ex); }
+}
+*/
+
+/*
+ *
+ * Browse
+ *
+ */
+
+//static FileWriter browse = new FileWriter(new File("browse.txt"));
+
+public class SpecIndex {
+   public String field;
+   public char ind1;
+   public char ind2;
+   public String cond;
+   public String index;
+   public String display;
+   public int substring = -1;
+   public String toString() {
+     return field + ind1 + ind2 + "\t" + cond + "\t" + index + "\t" + display;
+   }
+}
+
+public class Pair {
+   String first;
+   String second;
+}
+
+Map browseFields = new HashMap();
+
+public static void initBrowse() {
+   String[] types = new String[]{ "author", "title", "callnumber", "ISBN", "ISSN", "MDT", "publisher" };
+   for (String type : types) {
+      System.out.println(type);
+      ArrayList fields = initBrowse(type);
+      browseFields.put(type, fields);
+   }
+}
+
+public static ArrayList initBrowse(String type) {
+   int line = 0;
+   BufferedReader br  = new BufferedReader(new FileReader("browse/" + type + ".txt"));
+   String strLine = null;
+   ArrayList fields = new ArrayList();
+   String all = "abcdefghijklmnopqrstuvwxyz0123456789";
+   while ((strLine = br.readLine()) != null)   {
+      if (line > 0) {
+         String[] items = strLine.split("\t");
+         SpecIndex spec = new SpecIndex();
+         spec.field = items[0].substring(0, 3);
+         spec.ind1 = items[0].charAt(3);
+         spec.ind2 = items[0].charAt(4);
+         spec.cond = items[1];
+         //spec.type = items[2];
+         spec.index = items[3];
+         if (spec.index.equals(all)) {
+             spec.index = all;
+         }
+         String first = "";
+         String exclude = "";
+         String substring = "";
+         if (items.length >= 5) {
+            first = items[4];
+         }
+         if (items.length >= 6) {
+            exclude = items[5];
+         }
+         if (items.length >= 7 && !items[6].equals("")) {
+            spec.substring = Integer.parseInt(items[6]);
+         }
+         System.out.println("debug:" + first + " " + exclude);
+         String display = first;
+         for (char c : spec.index.toCharArray()) {
+            if (first.indexOf(c) == -1 && exclude.indexOf(c) == -1) {
+                display += c;
+            }
+         }
+         spec.display = display;
+         fields.add(spec);
+         System.out.println("debug:"+spec.toString());
+      }
+      line++;
+   }
+   return fields;
+}
+
+initBrowse();
+
+public Set filterBrowseResult(Set set) {
+   Set result = new HashSet();
+   for (Pair item : set) {
+      result.add(item.first);
+   }
+   return result;
+}
+
+public Set getAuthorBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("author"), "author");
+   return filterBrowseResult(result);
+}
+
+public Set getTitleBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("title"), "title");
+   return filterBrowseResult(result);
+}
+
+public Set getCallnumberBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("callnumber"), "callnumber");
+   return filterBrowseResult(result);
+}
+
+public Set getISBNBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("ISBN"), "ISBN");
+   return filterBrowseResult(result);
+}
+
+public Set getISSNBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("ISSN"), "ISSN");
+   return filterBrowseResult(result);
+}
+
+public Set getMDTBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("MDT"), "MDT");
+   return filterBrowseResult(result);
+}
+
+public Set getPublisherBrowse(Record record) {
+   Set result = new HashSet();
+   this.getAllSubfieldsBySpec(record, browseFields.get("publisher"), "publisher");
+   return filterBrowseResult(result);
+}
+
+Map dataFields = new HashMap();
+
+public void recordStart(record) {
+   dataFields = new HashMap();
+   for (DataField dataField : record.getDataFields()) {
+      String tag = dataField.getTag();
+      if (tag != null) {
+         if (!dataFields.containsKey(tag)) {
+            dataFields.put(tag, new ArrayList());
+         }
+         dataFields.get(tag).add(dataField);
+      }
+   }
+}
+
+public Set getAllSubfieldsBySpec(Record record, ArrayList specs, String type) {
+   Set result = new HashSet();
+   for (SpecIndex spec : specs) {
+      if (dataFields.containsKey(spec.field)) {
+         for (DataField dataField : dataFields.get(spec.field)) {
+            if (!spec.cond.equals("")) {
+               if (spec.cond.startsWith("-") && dataField.getSubfield(spec.cond.charAt(1)) == null) {
+                  break;
+               } else if (dataField.getSubfield(spec.cond.charAt(0)) == null) {
+                  break;
+               }
+            }
+            if ((spec.ind1 == '#' || dataField.getIndicator1() == spec.ind1) && (spec.ind2 == '#' || dataField.getIndicator2() == spec.ind2)) {
+               String display = parseFields(dataField, spec.display, -1).trim();
+               String index = parseFields(dataField, spec.index, spec.substring).trim();
+               if (!(display.equals("") || index.equals(""))) {
+                  Pair pair = new Pair();
+                  pair.first = display.trim();
+                  pair.second = index.trim();
+                  result.add(pair);
+               }
+            }
+         }
+      }
+   }
+   String sep = "|";
+   String id = getID(record);
+   if (type.equals("title") && result.size() == 0) {
+      System.out.println("no title for:" + id);
+   }
+   for (Pair pair : result) {
+      browse.write(id + "|"  + pair.first + "|" + pair.second + "|" + type + "\n");
+   }  
+   return result;
+}
+
+public String parseFields(DataField dataField, String fields, int indicator) {
+   String value = "";
+   String sep = "";
+   int start = 0;
+   if (indicator == 1) {
+      start = Integer.parseInt(Character.toString(dataField.getIndicator1()));
+   } else if (indicator == 2) {
+      start = Integer.parseInt(Character.toString(dataField.getIndicator2()));
+   }
+   for (char subfield : fields.toCharArray()) {
+      if (dataField.getSubfield((char) subfield) != null) {
+         if (subfield == 'a') {
+            value += sep + new String(dataField.getSubfield(subfield).getData()).substring(start);
+         } else {
+            value += sep + new String(dataField.getSubfield(subfield).getData());
+         }
+         sep = " ";
+      }
+   }
+   return value;
+}
+
+/*
+public Set getPublishDate(Record record) {
+   Set result = new HashSet();
+   if (record == null) {
+      return result;
+   }
+   String val = indexer.getFirstFieldVal(record, "008");
+   if (val == null) {
+      return result;
+   }
+   String type = val.substring(6, 7);
+   int from = 0;
+   int to = 0;
+   try {
+      from = Integer.parseInt(val.substring(7, 11)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   try {
+      to = Integer.parseInt(val.substring(11, 15)); // .replace(" ", "0").replace("u", "0").replace("?", "0"));
+   } catch (java.lang.NumberFormatException nfe) {
+   }
+   if (from == 0 && to == 0) {
+      return result;
+   }
+   if (from == 0) {
+      from = to;
+   }
+   if (to == 0) {
+      to = from;
+   }
+   if (to > 2012) {
+      to = 2012;
+   }
+   if (type.equals("e")) {
+      to = from;
+   }
+   for (int year = from; year <= to; year+=1) {
+       // result.add(Integer.toString(year));
+       result.add(String.format("%04d", new Object[]{ year }));
+   }
+   System.err.println(getID(record) + " has span " + result.size() + " years");
+   return result;
+}
+*/
+
+public Set getPublishDate(Record record) {
+   Set result = new HashSet();
+   /*for (String range : indexer.getFieldList(record, "Z30a")) {
+      parseRange(range, result);
+   }*/
+   for (String range : indexer.getFieldList(record, "260c")) {
+      parseRange260c(range, result);
+   }
+   return result;
+}
+
+public Set parseRange260c(String range, Set result) {
+   range = range.replaceAll(" ", "");
+   // Range, ie. [2000]-[201-]
+   Pattern pattern = Pattern.compile("[\\[]{0,1}([\\d-?]{4})[?]{0,1}[\\]]{0,1}-[\\[]{0,1}([\\d-?]{4}|[\\^]{4,10})[\\]]{0,1}");
+   Matcher matcher = pattern.matcher(range);
+   String sfrom = null;
+   String sto = null;
+   if (matcher.find()) {
+      try {
+         sfrom = normalizeForRange(matcher.group(1), "0");
+         sto = normalizeForRange(matcher.group(2), "9"); 
+         int from = Integer.parseInt(sfrom);
+         int to = Integer.parseInt(sto);
+         System.out.println("debug 260c: " + from + "-" + to + " ('" + range + "')");
+         return rangeToList(result, from, to);
+      } catch (java.lang.NumberFormatException ex) {
+         System.out.println("range 260c: " + sfrom + "-" + sto + " ('" +  range + "') not matched (not integer)!");
+      } catch (Exception ex) {
+         System.out.println("range 260c: " + sfrom + "-" + sto + " ('" +  range + "') not matched (other error)!");
+      }
+   }
+   // Single year, ie. [2000]
+   pattern = Pattern.compile("[\\[]{0,1}([\\d\\.\\-\\?]{4})[\\]]{0,1}");
+   matcher = pattern.matcher(range);
+   if (matcher.find()) {
+      year = matcher.group(1);
+      try {
+         return singleYearToRange(result, year);
+      } catch (java.lang.NumberFormatException ex) {
+         System.out.println("single year 260c: " + year + " ('" +  range + "') not matched (not integer)!");
+      } catch (Exception ex) {
+         System.out.println("single year 260c: " + year + " ('" +  range + "') not matched (other error)!");
+      }
+   }
+   System.out.println("range: '" + range + "' not matched!");
+   return result;
+}
+
+public Set singleYearToRange(Set result, String year) {
+   if (year.contains("-") || year.contains("?") || year.contains(".")) {
+      int from = Integer.parseInt(normalizeForRange(year, "0"));
+      int to = Integer.parseInt(normalizeForRange(year, "9"));
+      return rangeToList(result, from, to);
+   } else {
+      int from = Integer.parseInt(year);
+      int to = from;
+      return rangeToList(result, from, to);
+   }
+}
+
+public String normalizeForRange(String fixme, String pad) {
+   if (fixme.contains("^")) {
+      return "2012";
+   }
+   fixme = fixme.replaceAll("\\-", pad);
+   fixme = fixme.replaceAll("\\?", pad);
+   fixme = fixme.replaceAll("\\.", pad);
+   return fixme;
+}
+
+public Set parseRangeZ30(String range, Set result) {
+   // "2001-2009"
+   Pattern pattern = Pattern.compile("([\\d]{4})-([\\d]{4})");
+   Matcher matcher = pattern.matcher(range);
+   if (matcher.find()) {
+      int from = Integer.parseInt(matcher.group(1));
+      int to = Integer.parseInt(matcher.group(2));
+      return rangeToList(result, from, to);
+   }
+   // "2001,2002,2005"
+   pattern = Pattern.compile("[\\d]{4}(,[\\d]{4})*");
+   matcher = pattern.matcher(range);
+   if (matcher.find()) {
+      String[] years = range.split(",");
+      for (String year : years) {
+         result.add(formatNumber(Integer.parseInt(year)));
+      }
+      return result;
+   }
+   System.out.println("range: '" + range + "' not matched!");
+   return result;
+}
+
+public Set rangeToList(Set result, int from, int to) {
+   for (int year = from; year <= to; year+=1) {
+       result.add(formatNumber(year));
+   }
+   return result;
+}
+
+public String formatNumber(int number) {
+   return String.format("%04d", new Object[]{ number });
+}
