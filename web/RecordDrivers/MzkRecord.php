@@ -17,6 +17,7 @@ class MzkRecord extends MarcRecord
         $result = parent::getCoreMetadata();
         $interface->assign('itemLink', $this->fields['itemlink']);
         $interface->assign('EOD', $this->getEOD());
+        $interface->assign('EODLink', $this->getEODLink());
         $interface->assign('callNumber', $this->getCallNumber());
         $interface->assign('physical', $this->getPhysicalDescriptions());
         $interface->assign('id', $this->getUniqueID());
@@ -29,33 +30,23 @@ class MzkRecord extends MarcRecord
     {
         global $interface;
         global $configArray;
-        $z30s = $this->marcRecord->getFields("Z30");
         $years = array();
-        $volumes = array(); 
-        foreach ($z30s as $item) {
-            $s = $item->getSubfield('s');
-            $p = $item->getSubfield('p');
-            $visible = true;
-            if (($s && $s->getData() == 'Archiv') || ($p && $p->getData() == 'NA')) {
-                $visible = false;
+        $volumes = array();
+        $id = $this->getUniqueID();
+        $catalog = ConnectionManager::connectToCatalog();
+        if ($catalog && $catalog->status) {
+            $result = $catalog->getHoldingFilter($id);
+            if (PEAR::isError($result)) {
+                PEAR::raiseError($result);
             }
-            if ($visible) {
-                $a = $item->getSubfield('a');
-                if ($a) {
-                    $years[] = $a->getData();
-                }
-                $b = $item->getSubfield('b');
-                if ($b) {
-                    $volumes[] = $b->getData();
-                }
-            }
+            $years = $result['years'];
+            $volumes = $result['volumes'];
         }
-        $years = array_unique($years);
-        sort($years, SORT_NUMERIC );
+        sort($years, SORT_NUMERIC);
         $years = array_reverse($years);
-        $volumes = array_unique($volumes);
-        sort($volumes, SORT_NUMERIC );
+        sort($volumes, SORT_NUMERIC);
         $volumes = array_reverse($volumes);
+        $z30s = $this->marcRecord->getFields("Z30");
         $interface->assign('id', $this->getUniqueID());
         $interface->assign('items_years', $years);
         $interface->assign('items_volumes', $volumes);
@@ -234,6 +225,16 @@ class MzkRecord extends MarcRecord
     {
         $eod = $this->_getFirstFieldValue('EOD', array('a'));
         return ($eod == 'Y')?true:false;
+    }
+    
+    protected function getEODLink()
+    {
+        $link = "http://books2ebooks.eu/odm/orderformular.do?formular_id=133&sys_id=";
+        if (strpos($this->getUniqueID(), "MZK03-") === 0) {
+            $link = "http://books2ebooks.eu/odm/orderformular.do?formular_id=131&sys_id=";
+        }
+        $link .=  $this->fields['sysno'];
+        return $link;
     }
     
     protected function getProvenience() {
