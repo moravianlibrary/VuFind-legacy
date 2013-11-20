@@ -634,6 +634,31 @@ class Aleph implements DriverInterface
         return $holding;
     }
 
+    public function getHoldingFilter($bibId) {
+        list($bib, $sys_no) = $this->parseId($bibId);
+        $resource = $bib . $sys_no;
+        $years = array();
+        $volumes = array();
+        try {
+            $xml = $this->doRestDLFRequest(array('record', $resource, 'filters'));
+        } catch (Exception $ex) {
+            return array();
+        }
+        if (isset($xml->{'record-filters'})) {
+            if (isset($xml->{'record-filters'}->{'years'})) {
+                foreach ($xml->{'record-filters'}->{'years'}->{'year'} as $year) {
+                    $years[] = $year;
+                }
+            }
+            if (isset($xml->{'record-filters'}->{'volumes'})) {
+                foreach ($xml->{'record-filters'}->{'volumes'}->{'volume'} as $volume) {
+                    $volumes[] = $volume;
+                }
+            }
+        }
+        return array('years' => $years, 'volumes' => $volumes);
+    }
+
     public function unescapeXMLText($text) {
         $text = str_replace(array('&#38;', '&apos;'), array('&', "'"), $text);
         return html_entity_decode($text);
