@@ -166,6 +166,7 @@ ISN:
     - isbn:
       - [and, 100]
       - [or, ~]
+  FilterQuery: "mzk_visible_str_ns:visible"
 
 Subject:
   DismaxFields:
