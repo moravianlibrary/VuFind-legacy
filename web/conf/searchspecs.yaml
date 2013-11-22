@@ -487,6 +487,9 @@ language:
 
 toc:
   QueryFields:
+    - fulltext:
+      - [and, 100]
+      - [or, ~]
     - contents:
       - [and, 100]
       - [or, ~]
