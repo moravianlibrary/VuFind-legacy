@@ -315,7 +315,7 @@ AllFields:
     - allfields
     - fulltext
   DismaxParams:
-    - [bq, "relevancy:default^2"]
+    - [bq, "relevancy:default^50000"]
   QueryFields:
     - 
       - [OR, 50]
