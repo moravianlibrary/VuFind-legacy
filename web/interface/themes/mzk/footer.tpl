@@ -15,7 +15,7 @@
 		<li><a href="{$path}/AlphaBrowse/Home">{translate text='Browse Alphabetically'}</a></li>
 		<li><a href="https://listky.mzk.cz/">{translate text='Card Catalogues'}</a></li>
 		{if $userLang == "cz"}
-		<li><a href="http://www.mzk.cz/sluzby/pujcovani/meziknihovni-sluzby">{translate text='Interlibrary loan'}</a></li>
+		<li><a href="https://www.mzk.cz/meziknihovni-vypujcni-sluzba">{translate text='Interlibrary loan'}</a></li>
 		{/if}
 		{if $userLang == "en"}
 		<li><a href="http://www.mzk.cz/en/services/borrowing/international-interlibrary-loan-service">{translate text='Interlibrary loan'}</a></li>

@@ -224,9 +224,6 @@ class InterlibraryLoans extends MyResearch
     }
 
     protected function setDefaults($form) {
-        $form->addDataSource(new HTML_QuickForm2_DataSource_Array(array(
-            'last-interest-date' => date('j.n.Y', strtotime('+1 month'))
-        )));
     }
 
     protected function getHMAC() {

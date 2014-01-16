@@ -10,12 +10,16 @@
               <p class="info">{translate text=$illMessage} {translate text='Req No.'}: {$illNewReqId|escape}</p>
             {/if}
             
-            {translate text='Create new ILL request for'}:
-            <a href="{$path}/MyResearch/InterlibraryLoans?new=monography">{translate text='Book'}</a>&nbsp;|&nbsp;
-            <a href="{$path}/MyResearch/InterlibraryLoans?new=serial">{translate text='Journal/Article'}</a>
+            <p>
+              <b>{translate text='Create new ILL request for'}:</b>
+              <a href="{$path}/MyResearch/InterlibraryLoans?new=monography">{translate text='Book'}</a>&nbsp;|&nbsp;
+              <a href="{$path}/MyResearch/InterlibraryLoans?new=serial">{translate text='Journal/Article'}</a>
+            </p>
+           
+           {include file="MyResearch/ills_note_cz.tpl"}
             
+            <h3>{translate text='Your interlibrary loan requests'}</h3>
             {if $ills}
-
               <ul class="filters">
               {foreach from=$ills item=resource name="recordLoop"}
                 {if ($smarty.foreach.recordLoop.iteration % 2) == 0}
@@ -50,9 +54,9 @@
               {/foreach}
               </ul>
             {else}
-              <ul class="filters">
+              <p>
               {translate text='You do not have any interlibrary loans'}.
-              </ul>
+              </p>
             {/if}
         {else}
           <div class="page">

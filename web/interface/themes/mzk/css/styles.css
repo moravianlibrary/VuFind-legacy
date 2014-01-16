@@ -1613,18 +1613,23 @@ span.recordNumber {
 
 #ill legend {
   font-size: 17px;
-  font-weight:bold;
-  margin-bottom:.5em;
-  color:#21BDC6;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  color: #21BDC6;
+  white-space: normal;
+  display: table;
 }
 
 #ill .label {
   display: inline-block;
   width: 120px;
+  *display: inline;
 }
  
 #ill .element {
   display: inline-block;
+  zoom: 1;
+  *display: inline;
 }
 
 .quickform .reqnote {
