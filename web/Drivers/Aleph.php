@@ -220,7 +220,7 @@ class Aleph implements DriverInterface
         } else {
             $this->translator = false;
         }
-        $this->ill_fields = $configArray['ILL'];
+        $this->ill_hidden_statuses = explode(',', $configArray['ILL']['hidden_statuses']);
         $this->statuses_limit = 50;
         if (isset($configArray['Catalog']['statuses_limit'])) {
             $this->statuses_limit = $configArray['Catalog']['statuses_limit'];
@@ -1301,7 +1301,7 @@ class Aleph implements DriverInterface
             $loan = array();
             $z13 = $item->z13;
             $status = (string) $item->z410->{'z410-status'};
-            if ($status != 'Closed' && $status != 'Deleted') {
+            if (!in_array($status, $this->ill_hidden_statuses)) {
                 $loan['docno'] = (string) $z13->{'z13-doc-number'};
                 $loan['author'] = (string) $z13->{'z13-author'};
                 $loan['title'] = (string) $z13->{'z13-title'};
