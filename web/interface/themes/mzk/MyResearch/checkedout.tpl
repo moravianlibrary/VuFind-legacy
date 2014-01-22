@@ -12,19 +12,19 @@
           {/if}
           
           {if $patron.checkedout_message}
-             <p class="error">{$patron.checkedout_message|translate}</p>
+            <p class="error">{$patron.checkedout_message|translate}</p>
           {/if}
           {if $transList}
-            {if $renewForm}
             <form name="renewals" action="{$url}/MyResearch/CheckedOut" method="post" id="renewals">
               <div class="toolbar">
                 <ul>
-                  <li><input type="submit" class="button renew" name="renewSelected" value="{translate text="renew_selected"}" /></li>
-                  <li><input type="submit" class="button renewAll" name="renewAll" value="{translate text='renew_all'}" /></li>
+                  {if $renewForm}
+                    <li><input type="submit" class="button renew" name="renewSelected" value="{translate text="renew_selected"}" /></li>
+                    <li><input type="submit" class="button renewAll" name="renewAll" value="{translate text='renew_all'}" /></li>
+                  {/if}
                   <li>&nbsp;&nbsp;{include file="MyResearch/switcher.tpl"}</li>
                 </ul>
               </div>
-            {/if}
 
             {if $errorMsg}
               <p class="error">{translate text=$errorMsg}</p>
@@ -34,9 +34,7 @@
               {else}
                 {include file="MyResearch/checkedout-list.tpl"}
               {/if}
-            {if $renewForm}
-              </form>
-            {/if}
+            </form>
           {else}
             {translate text='You do not have any items checked out'}.
           {/if}
