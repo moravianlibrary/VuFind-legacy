@@ -835,17 +835,15 @@ class Aleph implements DriverInterface
                 $expire = (string) $z37->{'z37-end-request-date'};
                 $create = (string) $z37->{'z37-open-date'};
                 $holddate = (string) $z37->{'z37-hold-date'};
+                $holddate = ($holddate == "00000000") ? null : $this->parseDate($holddate); 
                 $title = (string) $z13->{'z13-title'};
                 $author = (string) $z13->{'z13-author'};
                 $isbn = (string) $z13->{'z13-isbn-issn'};
                 $barcode = (string) $z30->{'z30-barcode'};
                 $description = (string) $z30->{'z30-description'};
                 $status = (string) $z37->{'z37-status'};
-                if ($holddate == "00000000") {
-                    $holddate = null;
-                } else {
-                    $holddate = $this->parseDate($holddate);
-                }
+                $on_hold_until = (string) $z37->{'z37-end-hold-date'};
+                $on_hold_until = ($on_hold_until == "00000000") ? null : $this->parseDate($on_hold_until);
                 $delete = ($delete[0] == "Y");
                 $holdList[] = array('type' => $type,
                                     'item_id' => $item_id,
@@ -858,6 +856,7 @@ class Aleph implements DriverInterface
                                     'id' => $this->barcodeToID($barcode), 
                                     'expire' => $this->parseDate($expire),
                                     'holddate' => $holddate,
+                                    'on_hold_until' => $on_hold_until,
                                     'delete' => $delete,
                                     'create' => $this->parseDate($create),
                                     'status' => $status,

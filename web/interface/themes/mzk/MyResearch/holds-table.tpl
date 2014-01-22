@@ -46,7 +46,11 @@
     
     <td>
       <strong>{translate text='Created'}:</strong> {$resource.ils_details.create|escape} <br />
-      <strong>{translate text='Expires'}:</strong> {$resource.ils_details.expire|escape} <br />
+      {if $resource.ils_details.on_hold_until}
+        <strong>{translate text='On hold until'}:</strong> {$resource.ils_details.on_hold_until|escape} <br />
+      {else}
+        <strong>{translate text='Expires'}:</strong> {$resource.ils_details.expire|escape} <br />
+      {/if}
       <strong>{translate text='Status'}:</strong> {$resource.ils_details.status|cat:_status|escape|translate} <br />
       <strong>{translate text='Delivery location'}:</strong> {translate text=$resource.ils_details.location|escape} <br />
       
