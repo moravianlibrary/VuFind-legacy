@@ -44,7 +44,7 @@
 					</p>
 					{else}
 					<p>
-						{translate text='by'} <a
+						{translate text='by'}: <a
 							href="{$url}/Author/Home?author={$resource.ils_details.author|escape:"url"}">{$resource.ils_details.author|escape}</a>
 					</p>
 					{/if} {if $resource.tags} {translate text='Your Tags'}: {foreach

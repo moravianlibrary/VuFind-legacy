@@ -29,7 +29,7 @@
           {/if}
         
           {if $resource.author}
-            <p>{translate text='by'} <a href="{$url}/Author/Home?author={$resource.author|escape:"url"}">{$resource.author|escape}</a></p>
+            <p>{translate text='by'}: <a href="{$url}/Author/Home?author={$resource.author|escape:"url"}">{$resource.author|escape}</a></p>
           {/if}
           {if $resource.tags}
             {translate text='Your Tags'}:
