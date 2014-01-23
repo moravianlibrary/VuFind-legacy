@@ -5,11 +5,11 @@ Location:
   CustomMunge:
     location_fuzzy:
       - [uppercase]
-      - [preg_replace, '/[\s]+/m', ""]
+      - [preg_replace, '/[\s]+/m', "|"]
+      - [preg_replace, '/\(/m', "\("]
+      - [preg_replace, '/\)/m', "\)"]
       - [preg_replace, '/\*/m', ""]
-      #- [preg_replace, '/[\"]/m', ""]
-      #- [preg_replace, "/^(.*)\$/", '\"\$1']
-      #- [append, "*\""]
+      - [preg_replace, '/\*/m', ""]
       - [append, "* "]
   QueryFields:
     - callnumber_second:

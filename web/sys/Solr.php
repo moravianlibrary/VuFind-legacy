@@ -599,7 +599,7 @@ class Solr implements IndexEngine
                 $values[$mungeName] = $lookfor;
 
                 // Skip munging of advanced queries:
-                if ($basic) {
+                if ($basic || in_array($field, $this->_fieldsToForceCustomMunge)) {
                     foreach ($mungeOps as $operation) {
                         switch($operation[0]) {
                         case 'append':
