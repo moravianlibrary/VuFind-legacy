@@ -378,7 +378,6 @@ public String getAuthorAndTitle(Record record) {
 public Set getSecondCallNumber(Record record) {
    Set result = new HashSet();
    for (String callnumber : indexer.getFieldList(record, "Z309")) {
-      callnumber = "913(437) DAV";
       callnumber = callnumber.replace(" ", "|");
       result.add(callnumber);
    }
