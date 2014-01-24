@@ -1635,3 +1635,16 @@ span.recordNumber {
 .quickform .reqnote {
   visibility: hidden;
 }
+
+.holdingsLink {
+  background: transparent url("/images/mzk/btn-submit.png") repeat-x left top;
+  text-transform: uppercase;
+  font-family: 'Arial';
+  font-size: 11px;
+  font-weight: bold;  
+  color: #fff;
+  padding:.5em .5em .5em .5em;
+  margin-right: 0;
+  position: absolute; right: 20px; bottom: 20px;
+  text-decoration: none;
+}

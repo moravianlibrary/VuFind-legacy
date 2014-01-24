@@ -10,8 +10,10 @@
         <input type="hidden" name="idsAll[]" value="{$summId|escape}" />&nbsp;
       {/if}
     </td>
-    <td id="obalka_{$summId}">
-      {image id="obalka_`$summId`_format" src="formats/`$summFormats[0]`.png" title="$summFormats[0]"|translate align="left"}
+    <td>
+      <a href="{$url}/Record/{$summId|escape:"url"}#bd" id="obalka_{$summId}_format">
+      {image src="formats/`$summFormats[0]`.png" title="$summFormats[0]"|translate align="left"}
+      </a>
     </td>
     </tr>
     <tr>
@@ -25,7 +27,7 @@
     {* Begin of modifications for Obalky knih *}
       <script>
         $(document).ready(function() {ldelim}
-          obalky.process("obalky_display_thumbnail", "obalka_{$summId}", "{$obalkyknih_permalink}", {$obalkyknih_bibinfo});
+          obalky.process("obalky_display_thumbnail", "obalka_{$summId}_format", "{$obalkyknih_permalink}", {$obalkyknih_bibinfo});
         {rdelim});
       </script>
     {* End of modifications for Obalky knih *}
@@ -90,6 +92,9 @@
       <script language="JavaScript" type="text/javascript">
         getSaveStatuses('{$summId|escape:"javascript"}');
       </script>
+    </div>
+    <div>
+      <a href="{$url}/Record/{$summId|escape:"url"}/Holdings#tabnav" class="holdingsLink">{translate text='Holdings'}</a>
     </div>
     {if $showPreviews}
       {if (!empty($summLCCN)|!empty($summISBN)|!empty($summOCLC))}
