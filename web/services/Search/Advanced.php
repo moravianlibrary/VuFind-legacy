@@ -202,6 +202,7 @@ class Advanced extends Action
     private function _loadSavedSearch()
     {
         global $interface;
+        global $user;
 
         // Are we editing an existing search?
         if (isset($_REQUEST['edit'])) {
