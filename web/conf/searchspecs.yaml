@@ -470,6 +470,8 @@ publisher:
   FilterQuery: "mzk_visible_str_ns:visible"
 
 year:
+  DismaxFields:
+    - publishDateFacet^50
   QueryFields:
     - publishDate:
       - [and, 100]
