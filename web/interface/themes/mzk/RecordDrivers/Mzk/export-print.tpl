@@ -1,7 +1,7 @@
 {* author, title, ... *}
 {translate text='Main Author'}: {if $coreMainAuthor} {$coreMainAuthor}{/if}{$rn}
 {translate text='Title'}: {$coreShortTitle}{if $coreSubtitle} {$coreSubtitle}{/if} {if $coreTitleSection}{$coreTitleSection}{/if}{$rn}
-{if !$full && $coreLocations}
+{if $coreLocations}
 {translate text='Location'}:{$rn}
 {foreach from=$coreLocations item=coreLocation}
   {$coreLocation}{$rn}

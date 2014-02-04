@@ -291,28 +291,30 @@ class MzkRecord extends MarcRecord
     {
         global $interface;
         
+        if (strtolower($format) == 'printshort' || strtolower($format) == 'printfull') {
+            $locations = array();
+            $holdings = $this->marcRecord->getFields('Z30');
+            if ($holdings) {
+                foreach ($holdings as $holding) {
+                    $location = $holding->getSubfield('9');
+                    if ($location) {
+                        $locations[$location->getData()] = true;
+                    }
+                }
+            }
+            $locations = array_keys($locations);
+            $interface->assign("coreLocations", $locations);
+            $interface->assign("rn", "\r");
+        }
+        
         switch(strtolower($format)) {
             case 'printshort':
                 $this->getCoreMetadata();
                 $interface->assign("full", false);
-                $interface->assign("rn", "\r");
-                $locations = array();
-                $holdings = $this->marcRecord->getFields('Z30');
-                if ($holdings) {
-                    foreach ($holdings as $holding) {
-                        $location = $holding->getSubfield('9');
-                        if ($location) {
-                            $locations[$location->getData()] = true;
-                        }
-                    }                    
-                }
-                $locations = array_keys($locations);
-                $interface->assign("coreLocations", $locations);
                 return 'RecordDrivers/Mzk/export-print.tpl';
             case 'printfull':
                 $this->getCoreMetadata();
                 $interface->assign("full", true);
-                $interface->assign("rn", "\r");
                 return 'RecordDrivers/Mzk/export-print.tpl';
             default:
                 return parent::getExport($format);
