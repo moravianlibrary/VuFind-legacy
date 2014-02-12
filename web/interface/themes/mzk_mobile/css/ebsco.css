@@ -1,0 +1,27 @@
+@CHARSET "UTF-8";
+
+li.result div.data a {
+	display: inline;
+}
+li.result img {
+	height: 32px;
+	margin: 20px 0 0 5px;
+	float: left;
+}
+li.result a {
+	text-decoration: underline;
+	color: blue;
+}
+li.result a.noeffect {
+	text-decoration: none;
+}
+.graytitle {
+	margin: 5px 5px 5px 5px;
+}
+
+table.details {
+	margin: 5px 5px 5px 7px;
+}
+table.details th {
+	text-align: left;
+}

@@ -1,0 +1,35 @@
+<?php Header ("Content-type: text/css"); ?>
+/* Pagination */
+
+.pagination {
+  font-size:90%;
+  padding:10px 0 10px 0;
+  margin:10px 0;
+  text-align:center;
+  border-top: 1px solid #eee;
+}
+.pagination a {
+  padding: 1px;
+  border: 1px solid #fff;
+}
+.pagination a:hover {
+  border: 1px solid #cccccc;
+}
+.pagination span {
+  padding: 1px;
+  font-weight:bold;
+}
+
+.sysInfo {
+    margin: 5px;
+    padding: 1em;
+    background-color: #FFEF8F;
+    border: 2px solid #F9DD34;   
+    border-radius: 5px 5px 5px 5px;
+}
+.message {
+	margin: 0px 10px 10px 10px;
+}
+li.menuAutoHeight {
+	height: auto;
+}
