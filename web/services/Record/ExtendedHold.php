@@ -63,9 +63,15 @@ class ExtendedHold extends Record
             }
             exit();
         }
-
+ 
         if (isset($_POST['submit'])) {
-            $result = $this->placeHold();
+            $type = $_POST['type'];
+            $result = null;
+            if ($type == 'short') {
+                $result = $this->placeShortLoanRequest();
+            } else {
+                $result = $this->placeHold();
+            }
             if (!$result['success']) {
                 $interface->assign('error', true);
                 $interface->assign('error_str', $result['sysMessage']);
@@ -102,27 +108,28 @@ class ExtendedHold extends Record
         $patron = $catalog->patronLogin($this->userInfo->cat_username, $this->userInfo->cat_password);
         try {
            $info = $catalog->getHoldingInfoForItem($patron['id'], $id, $group);
-           $interface->assign('order', $info['order']);
-           $interface->assign('duedate', $info['duedate']);
-           $interface->assign('locations', $info['pickup-locations']);
-           $interface->assign('last_interest_date', $info['last-interest-date']);
+           if ($info['type'] == 'hold') {
+               $interface->assign('type', 'hold');
+               $interface->assign('order', $info['order']);
+               $interface->assign('duedate', $info['duedate']);
+               $interface->assign('locations', $info['pickup-locations']);
+               $interface->assign('last_interest_date', $info['last-interest-date']);
+               $interface->assign('subTemplate', 'extended-hold.tpl');
+           } else if ($info['type'] == 'short') {
+               $interface->assign('type', 'short');
+               $interface->assign('slots', $info['slots']);
+               $interface->assign('subTemplate', 'extended-short-loan.tpl');
+           }
         } catch (Exception $e) {
            $interface->assign('error', "You have no rights to place holds");
         }
-        $interface->assign('item', $group); // interface->assign('item', $_GET['barcode']);
+        $interface->assign('item', $group);
         $interface->assign('formTargetPath',
             '/Record/' . urlencode($id) . '/ExtendedHold?barcode=' . urlencode($group));
-        if (isset($_GET['lightbox'])) {
-            // Use for lightbox
-            $interface->assign('title', $_GET['message']);
-            return $interface->fetch('Record/extended-hold.tpl');
-        } else {
-            // Display Page
-            $interface->setPageTitle('Hold');
-            $interface->assign('subTemplate', 'extended-hold.tpl');
-            $interface->setTemplate('view-alt.tpl');
-            $interface->display('layout.tpl', 'RecordExtendedHold' . $_GET['id']);
-        }
+        // Display Page
+        $interface->setPageTitle('Hold');
+        $interface->setTemplate('view-alt.tpl');
+        $interface->display('layout.tpl', 'RecordExtendedHold' . $_GET['id']);
     }
 
     function placeHold() {
@@ -152,5 +159,28 @@ class ExtendedHold extends Record
             return new PEAR_Error('Cannot connect to ILS');
         }
     }
+
+    function placeShortLoanRequest() {
+        global $configArray;
+        global $interface;
+        $id = $_REQUEST['id'];
+        $slot = $_REQUEST['slot'];
+        $item = $_REQUEST['item'];
+        try {
+            $catalog = new Aleph(); // CatalogConnection($configArray['Catalog']['driver']);
+        } catch (PDOException $e) {
+            return new PEAR_Error('Cannot connect to ILS');
+        }
+        if ($id && $slot) {
+            $patron = $catalog->patronLogin($this->userInfo->cat_username, $this->userInfo->cat_password);
+            $requiredBy = $month . "-" . $day . "-" . $year;
+            $details = array( "id" => $id, "patron" => $patron, "item_id" => $item, "slot" => $slot);
+            $result = $catalog->placeShortLoanRequest($details);
+            return $result;
+        } else {
+            return new PEAR_Error('Cannot connect to ILS');
+        }
+    }
+
 }
 ?>

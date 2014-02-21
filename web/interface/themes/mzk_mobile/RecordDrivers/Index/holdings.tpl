@@ -50,12 +50,6 @@
         {/if}
   	</td>
   </tr>
-  {if $row.sub_lib_desc}
-  <tr>
-  	<th>{translate text='sublibrary'}</th>
-  	<td>{$row.sub_lib_desc|escape}</td>
-  </tr>
-  {/if}
   {if $row.collection_desc}
   <tr>
   	<th>{translate text='collection'}</th>

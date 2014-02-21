@@ -596,6 +596,9 @@ class Aleph implements DriverInterface
            }
            if ($patron) {
               $hold_request = $item->xpath('info[@type="HoldRequest"]/@allowed');
+              if ($hold_request[0] == 'N') {
+                  $hold_request = $item->xpath('info[@type="ShortLoan"]/@allowed');
+              }
               $reserve = ($hold_request[0] == 'Y')?'N':'Y';
            }
            $matches = array();
@@ -1145,51 +1148,88 @@ class Aleph implements DriverInterface
         list($bib, $sys_no) = $this->parseId($id);
         $resource = $bib . $sys_no;
         $xml = $this->doRestDLFRequest(array('patron', $patronId, 'record', $resource, 'items', $group));
+        $holdRequestAllowed = $xml->xpath("//item/info[@type='HoldRequest']/@allowed");
+        $holdRequestAllowed = $holdRequestAllowed[0] == 'Y';
+        if ($holdRequestAllowed) {
+            return $this->extractHoldingInfoForItem($xml);
+        }
+        $shortLoanAllowed = $xml->xpath("//item/info[@type='ShortLoan']/@allowed");
+        $shortLoanAllowed = $shortLoanAllowed[0] == 'Y';
+        if ($shortLoanAllowed) {
+            return $this->extractShortLoanInfoForItem($xml);
+        }
+    }
+    
+    private function extractHoldingInfoForItem($xml) {
         $locations = array();
         $status = $xml->xpath('//status/text()');
         $status = (string) $status[0];
         $availability = true;
         $duedate = null;
         if (!in_array($status, $this->available_statuses)) {
-           $availability = false;
-           $matches = array();
-           if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*);([a-zA-Z ]*)/", $status, &$matches)) {
-              $duedate = $this->parseDate($matches[1]);
-           } else if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*)/", $status, &$matches)) {
-              $duedate = $this->parseDate($matches[1]);
-           } else {
-              $duedate = null;
-           }
+            $availability = false;
+            $matches = array();
+            if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*);([a-zA-Z ]*)/", $status, &$matches)) {
+                $duedate = $this->parseDate($matches[1]);
+            } else if (preg_match("/([0-9]*\\/[a-zA-Z]*\\/[0-9]*)/", $status, &$matches)) {
+                $duedate = $this->parseDate($matches[1]);
+            } else {
+                $duedate = null;
+            }
         }
         $part = $xml->xpath('//pickup-locations');
         if ($part) {
-           foreach ($part[0]->children() as $node) {
-              $arr = $node->attributes();
-              $code = (string) $arr['code'];
-              $loc_name = (string) $node;
-              $locations[$code] = $loc_name;
-           }
+            foreach ($part[0]->children() as $node) {
+                $arr = $node->attributes();
+                $code = (string) $arr['code'];
+                $loc_name = (string) $node;
+                $locations[$code] = $loc_name;
+            }
         } else {
-           throw new Exception('No pickup locations');
+            throw new Exception('No pickup locations');
         }
         $str = $xml->xpath('//item/queue/text()');
         list($requests, $other) = split(' ', trim($str[0]));
         if ($requests == null) {
-           $requests = 0;
+            $requests = 0;
         }
         $date = $xml->xpath('//last-interest-date/text()');
         $date = $date[0];
         $date = "" . substr($date, 6, 2) . "." . substr($date, 4, 2) . "." . substr($date, 0, 4);
         $result = array(
-           'pickup-locations' => $locations,
-           'last-interest-date' => $date,
-           'order' => $requests + 1,
-           'duedate' => $duedate,
+            'type' => 'hold',
+            'pickup-locations' => $locations,
+            'last-interest-date' => $date,
+            'order' => $requests + 1,
+            'duedate' => $duedate,
+        );
+        return $result;
+    }
+    
+    private function extractShortLoanInfoForItem($xml) {
+        $shortLoanInfo = $xml->xpath("//item/info[@type='ShortLoan']");
+        $slots = array();
+        foreach ($shortLoanInfo[0]->{'short-loan'}->{'slot'} as $slot) {
+            $start_date = $slot->{'start'}->{'date'};
+            $start_time = $slot->{'start'}->{'hour'};
+            $end_date = $slot->{'end'}->{'date'};
+            $end_time = $slot->{'end'}->{'hour'};
+            $time = substr($start_date, 6, 2) . "." . substr($start_date, 4, 2) . "." 
+                . substr($start_date, 0, 4) . " " . substr($start_time, 0, 2) . ":" 
+                . substr($start_time, 2, 2) . " - " . substr($end_time, 0, 2) . ":"
+                . substr($start_time, 2, 2);
+            $id = $slot->attributes()->id;
+            $id = (string) $id[0];
+            $slots[$id] = $time;
+        }
+        $result = array(
+            'type'  => 'short',
+            'slots' => $slots,
         );
         return $result;
     }
 
-    function placeHold($details)
+    public function placeHold($details)
     {
         list($bib, $sys_no) = $this->parseId($details['id']);
         $recordId = $bib . $sys_no;
@@ -1218,6 +1258,28 @@ class Aleph implements DriverInterface
             $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $recordId, 'items', $itemId, 'hold'), null, HTTP_REQUEST_METHOD_PUT, $data);
         } catch (Exception $ex) {
            return array('success' => false, 'sysMessage' => $ex->getMessage()); 
+        }
+        return array('success' => true);
+    }
+    
+    public function placeShortLoanRequest($details) {
+        list($bib, $sys_no) = $this->parseId($details['id']);
+        $recordId = $bib . $sys_no;
+        $slot = $details['slot'];
+        $itemId = $details['item_id'];
+        $patron = $details['patron'];
+        $patronId = $patron['id'];
+        $body = new SimpleXMLElement(
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<short-loan-parameters></short-loan-parameters>'
+        );
+        $body->addChild('request-slot', $slot);
+        $data = 'post_xml=' . $body->asXML();
+        try {
+            $result = $this->doRestDLFRequest(array('patron', $patronId, 'record', $recordId,
+                'items', $itemId, 'shortLoan'), null, HTTP_REQUEST_METHOD_PUT, $data);
+        } catch (Exception $ex) {
+            return array('success' => false, 'sysMessage' => $ex->getMessage());
         }
         return array('success' => true);
     }
