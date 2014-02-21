@@ -9,16 +9,9 @@
 {if $error}
     <div class="error">{translate text=$error}</div>
 {else}
-<form class="std" method="post" action="{$url}{$formTargetPath|escape}" name="popupForm" id="puthold"
-      onSubmit='PutHold(&quot;{$id|escape}&quot;, this.elements[&quot;to&quot;].value,
-                this.elements[&quot;comment&quot;].value, this.elements[&quot;item&quot;].value,
-                this.elements[&quot;location&quot;][this.elements[&quot;location&quot;].selectedIndex].value,
-                {* Pass translated strings to Javascript -- ugly but necessary: *}
-                {literal}{{/literal}sending: &quot;{translate text='sms_sending'}&quot;, 
-                 success: &quot;{translate text='hold_success'}&quot;,
-                 failure: &quot;{translate text='hold_failure'}&quot;{literal}}{/literal}
-                ); return false;'>
+<form class="std" method="post" action="{$url}{$formTargetPath|escape}" name="popupForm" id="puthold">
   <input type="hidden" name="item" value="{$item|escape}">
+  <input type="hidden" name="type" value="hold" />
   <table>
   <tr>
     <td>{translate text="Delivery location"}: </td>
