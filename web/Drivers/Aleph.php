@@ -1217,7 +1217,7 @@ class Aleph implements DriverInterface
             $time = substr($start_date, 6, 2) . "." . substr($start_date, 4, 2) . "." 
                 . substr($start_date, 0, 4) . " " . substr($start_time, 0, 2) . ":" 
                 . substr($start_time, 2, 2) . " - " . substr($end_time, 0, 2) . ":"
-                . substr($start_time, 2, 2);
+                . substr($end_time, 2, 2);
             $id = $slot->attributes()->id;
             $id = (string) $id[0];
             $slots[$id] = $time;
