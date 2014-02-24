@@ -1210,6 +1210,12 @@ class Aleph implements DriverInterface
         $shortLoanInfo = $xml->xpath("//item/info[@type='ShortLoan']");
         $slots = array();
         foreach ($shortLoanInfo[0]->{'short-loan'}->{'slot'} as $slot) {
+            $numOfItems = (int) $slot->{'num-of-items'};
+            $numOfOccupied = (int) $slot->{'num-of-occupied'};
+            $available = $numOfItems - $numOfOccupied;
+            if ($available <= 0) {
+                continue;
+            }
             $start_date = $slot->{'start'}->{'date'};
             $start_time = $slot->{'start'}->{'hour'};
             $end_date = $slot->{'end'}->{'date'};

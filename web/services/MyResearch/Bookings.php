@@ -66,8 +66,12 @@ class Bookings extends MyResearch
             }
             
             $bookingsList = array();
+            $deleteForm = false;
             foreach ($bookings as $data) {
                 $current = array('ils_details' => $data);
+                if ($data['delete']) {
+                    $deleteForm = true;
+                }
                 if ($record = $this->db->getRecord($data['id'])) {
                     $current += array(
                         'id' => $record['id'],
@@ -78,9 +82,9 @@ class Bookings extends MyResearch
             }
             //var_export($bookingsList);
             $interface->assign('bookings', $bookingsList);
-            $interface->assign('deleteForm', true);
+            $interface->assign('deleteForm', $deleteForm);
             $interface->setTemplate('bookings.tpl');
-            $interface->setPageTitle('Checked Out Items');
+            $interface->setPageTitle('Bookings');
             $interface->display('layout.tpl');
         }
     }
