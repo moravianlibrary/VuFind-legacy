@@ -11,6 +11,7 @@
       <li{if $pageTemplate=="acq.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/AcquisitionRequests">{translate text='Acquisition requests'}</a></li>
       <li{if $pageTemplate=="profile.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Profile">{translate text='Profile'}</a></li>
       <li{if $pageTemplate=="favorites.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Favorites">{translate text='Favorites'}</a></li>
+      <li{if $pageTemplate=="bookings.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/MyResearch/Bookings">{translate text='Bookings'}</a></li>
       {* Only highlight saved searches as active if user is logged in: *}
       <li{if $user && $pageTemplate=="history.tpl"} class="active"{/if} style="float: none;"><a href="{$url}/Search/History?require_login">{translate text='history_saved_searches'}</a></li>
     </ul>

@@ -1462,6 +1462,56 @@ class Aleph implements DriverInterface
         return $result;
     }
     
+    public function getMyBookings($patron) {
+        $xml = $this->doRestDLFRequest(array('patron', $patron['id'], 'circulationActions',
+            'requests', 'bookings'), array("view" => "full"));
+        $result = array();
+        foreach ($xml->xpath('//booking-request') as $item) {
+            $delete = $item->xpath('@delete');
+            $href = $item->xpath('@href');
+            $item_id = substr($href[0], strrpos($href[0], '/') + 1);
+            $z37 = $item->z37;
+            $z30 = $item->z30;
+            $barcode = (string) $z30->{'z30-barcode'};
+            $startDate = $z37->{'z37-booking-start-date'};
+            $startTime = $z37->{'z37-booking-start-hour'};
+            $endDate = $z37->{'z37-booking-end-date'};
+            $endTime = $z37->{'z37-booking-end-hour'};
+            $start = substr($startDate[0], 6, 2) . '. ' . substr($startDate[0], 4, 2) . '. ' . substr($startDate[0], 0, 4)
+                . ' ' . substr($startTime[0], 0, 2) . ':' .  substr($startTime[0], 2, 2);
+            $end = substr($endDate[0], 6, 2) . '. ' . substr($endDate[0], 4, 2) . '. ' . substr($endDate[0], 0, 4)
+                . ' ' . substr($endTime[0], 0, 2) . ':' .  substr($endTime[0], 2, 2);
+            $delete = ($delete[0] == "Y");
+            $result[] = array(
+                'id'      => $this->barcodeToID($barcode),
+                'start'   => $start,
+                'end'     => $end,
+                'delete'  => $delete,
+                'item_id' => $item_id,
+            );
+        }
+        return $result;
+    }
+    
+    public function deleteMyBookings($details) {
+        $patron = $details['patron'];
+        $patronId = $patron['id'];
+        $count = 0;
+        $statuses = array();
+        foreach ($details['details'] as $id) {
+            try {
+                $result = $this->doRestDLFRequest(array('patron', $patronId, 'circulationActions',
+                    'requests', 'bookings', $id), null, HTTP_REQUEST_METHOD_DELETE);
+            } catch (Exception $ex) {
+                $statuses[$id] = array('success' => false, 'status' => 'cancel_hold_failed', 'sysMessage' => (string) $ex->getMessage());
+            }
+            $count++;
+            $statuses[$id] = array('success' => true, 'status' => 'cancel_hold_ok');
+        }
+        $statuses['count'] = $count;
+        return $statuses;
+    }
+    
     public function getUserNickname($patron) {
         $params = array(
             'op'           => 'get_nickname',
