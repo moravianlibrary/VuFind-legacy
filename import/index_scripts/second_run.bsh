@@ -112,7 +112,7 @@ public Set getPublishDate(Record record) {
       return result;
    }
    String val = indexer.getFirstFieldVal(record, "008");
-   if (val == null) {
+   if (val == null || val.length() < 16) {
       return result;
    }
    String type = val.substring(6, 7);
@@ -268,19 +268,34 @@ public String getRelevancy(Record record) {
    if (pse != null && pse.equals(currentYearTwoDigits)) {
       relevancy = "live_periodical";
    }
+   // hovadiny
+   String sig = indexer.getFirstFieldVal(record, "910b");
+   if (sig != null && sig.startsWith("UP")) {
+      relevancy = "rubbish";
+   }
    return relevancy;
 }
 
 public String getAcquisitionDate(Record record) {
    String nov = indexer.getFirstFieldVal(record, "MZKc");
-   if (nov != null && nov.startsWith("NOV")) {
-      String result = indexer.getFirstFieldVal(record, "MZKb");
-      if (result.length() > 6) {
-         result = result.substring(6);
-      }
-      return result;
+   String date = indexer.getFirstFieldVal(record, "MZKb");
+   if (date != null && date.length() > 6) {
+      date = date.substring(6);
    }
-   return null;
+   String result = null;
+   if (nov != null && nov.startsWith("NOV")) {
+      result = date;
+   }
+   return result;
+   /*
+   for (String note : indexer.getFieldList(record, "PRUa")) {
+      System.err.println(note);
+      if (note.toLowerCase().startsWith("retro")) {
+         date = null;
+      }
+   }
+   return date;
+   */
 }
 
 /*
