@@ -152,10 +152,10 @@ a.jt {
       {/if}
       {if $row.link}
         <a class="request" href="{$url}/Record/{$id|escape:'url'}/ExtendedHold?barcode={$row.item_id|escape:'url'}">
-           {if $row.availability}
-           {translate text="Order from stock"} 
+           {if $row.availability and $row.sub_lib_desc != "Klíče"}
+             {translate text="Order from stock"}   
            {else}
-           {translate text="Reserve"}
+             {translate text="Reserve"}
            {/if}
         </a>
       {/if}
