@@ -1488,7 +1488,8 @@ class Aleph implements DriverInterface
             $end = substr($endDate[0], 6, 2) . '. ' . substr($endDate[0], 4, 2) . '. ' . substr($endDate[0], 0, 4)
                 . ' ' . substr($endTime[0], 0, 2) . ':' .  substr($endTime[0], 2, 2);
             $delete = ($delete[0] == "Y");
-            $result[] = array(
+            $sortKey = (string) $startDate[0] . $item_id; 
+            $result[$sortKey] = array(
                 'id'      => $this->barcodeToID($barcode),
                 'start'   => $start,
                 'end'     => $end,
@@ -1496,7 +1497,8 @@ class Aleph implements DriverInterface
                 'item_id' => $item_id,
             );
         }
-        return $result;
+        ksort($result);
+        return array_values($result);
     }
     
     public function deleteMyBookings($details) {
