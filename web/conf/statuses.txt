@@ -2,7 +2,7 @@ Měsíc | cz | Lze půjčit domů na měsíc. Objednávejte kliknutím na Požad
 Studovna | cz | Lze studovat pouze v knihovně. Kniha je umístěna ve studovně /upřesněno v poli "Sbírka/Doba vyhledání"/, v regálech hledejte knihy podle UMÍSTĚNÍ.
 Příručka | cz | Lze studovat pouze v knihovně. Kniha je v příruční knihovně určitého pracoviště. Obraťte se na Informace / přízemí.
 Jen do studovny | cz | Prezenční půjčování pouze na studovnu, vyzvedávejte v půjčovně v přízemí. Požadavky se zadávají elektronickou cestou. Noviny a časopisy se vyzvedávají ve Studovně novin a časopisů / 2. patro. Aktuální ročník novin a časopisů nelze objednat elektronicky, je dostupný u pultu ve Studovně novin a časopisů.
-Vol.výb.-měs. | cz | Lze půjčit domů na měsíc. Knihy hledejte v regálech ve Volném výběru (přízemí a 1. patro) podle pole <b>Umístění</b>. Půjčujte u výpůjčního pultu. Lze objednávat, pouze pokud jsou půjčené. 
+Vol.výb.-měs. | cz | Lze půjčit domů na měsíc. Knihy hledejte v regálech podle polí Sbírka/Doba vyhledání (patro) a Umístění (konkrétní umístění na regále). Půjčujte u výpůjčního pultu v přízemí. Pokud je kniha půjčena, lze ji rezervovat.
 Ve zpracování | cz | Jde o novou publikaci, která se právě zpracovává, možnost půjčení bude určena až poté.
 Retro | cz | Jde o starší publikaci, do katalogu byl vytvořen pouze velmi stručný záznam, možnost půjčení bude určena po požádání. Objednávejte kliknutím na <b>Požadavek</b> (po přihlášení).
 EOD | cz | EOD (eBooks on Demand) - autorsky volné elektronické knihy na objednávku, více informací na <a href="http://www.mzk.cz/eod">www.mzk.cz/eod</a>.
