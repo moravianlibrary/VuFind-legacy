@@ -59,7 +59,7 @@
 {* Display Title *}
 <div itemscope itemtype="http://schema.org/Book">
 <h1 itemprop="name">{$coreShortTitle|escape}
-{if $coreSubtitle}{$coreSubtitle|escape}{/if}
+{if $coreSubtitle} : {$coreSubtitle|escape}{/if}
 &nbsp;{if $coreTitleSection}{$coreTitleSection|escape}{/if}
 {* {if $coreTitleStatement}{$coreTitleStatement|escape}{/if} *}
 </h1>
