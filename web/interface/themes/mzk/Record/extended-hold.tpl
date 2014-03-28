@@ -5,6 +5,9 @@
 {if $duedate}
     <div class="error">{translate text="On loan until"}: {$duedate|escape}</div>
 {/if}
+{if $duedate || $order > 1 }
+    <div class="error">{translate text="reservation_item_caution"}</div>
+{/if}
 <div class="yui-skin-sam">
 {if $error}
     <div class="error">{translate text=$error}</div>
