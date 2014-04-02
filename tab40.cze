@@ -39,12 +39,24 @@
 ! 1     2   3     4
 !!!!!-!!!!!-!-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
 SKL   ##### L Sklad / do 1 hodiny
-VV    ##### L Volný výbìr
+VV    ##### L Volný výbìr / 1. patro a pøízemí
+VV0   ##### L Pùjèovna - pøízemí
+VV1   ##### L Studovna sociálních vìd - 1. patro
+VV4   ##### L Studovna humanitních vìd - 4. patro
+VV5   ##### L Studovna humanitních vìd - 5. patro
 DEN   ##### L Sklad / do 24 hodin
 VVB   ##### L Volný výbìr beletrie / 3. patro
-HSS   ##### L Humanitní studovna
-STM   ##### L Studovna pøír. a technických vìd / 6.patro
-SNP   ##### L Stud. norem a patentù / 7.patro
+VV6   ##### L Studovna pøír. a technických vìd - 6. patro
+VV7   ##### L Studovna pøír. a technických vìd - 7. patro
+HSS   ##### L Studovna humanitních vìd / 4. patro
+HSS0  ##### L Pùjèovna - pøízemí
+HSS1  ##### L Studovna sociálních vìd - 1. patro
+HSS4  ##### L Studovna humanitních vìd - 4. patro
+HSS5  ##### L Studovna humanitních vìd - 5. patro
+STM   ##### L Studovna pøír. a technických vìd / 6. patro
+STM6  ##### L Studovna pøír. a technických vìd / 6. patro
+STM7  ##### L Studovna pøír. a technických vìd / 7. patro
+SNP   ##### L Stud. norem a patentù / 7. patro
 PST   ##### L PST
 !PAK   ##### L Pøíruèka AK
 !PNK   ##### L Pøíruèka NK
