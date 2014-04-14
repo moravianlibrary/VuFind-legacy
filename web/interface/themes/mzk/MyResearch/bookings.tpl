@@ -8,6 +8,8 @@
         {if $errorMsg}
           <p class="error">{$errorMsg|translate}</p>
         {/if}
+        <p><a href="/Record/MZK01-000680702#bd">{translate text="Individual study room reservation"}</a></p>
+        <p><a href="/Record/MZK01-000680703#bd">{translate text="Group study room reservation"}</a></p>
         <div class="recordsubcontent">
           {if $bookings}
           <form name="renewals" action="{$url}/MyResearch/Bookings" method="post" id="renewals">
