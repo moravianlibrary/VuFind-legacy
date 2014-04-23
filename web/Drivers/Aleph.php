@@ -933,7 +933,10 @@ class Aleph implements DriverInterface
             $id = (string) $z13->{'z13-doc-number'};
             $barcode = (string) $z30->{'z30-barcode'};
             $checkout = (string) $z31->{'z31-date'};
-            $id = $this->barcodeToID($barcode);
+            $id = null;
+            if ($barcode != null) {
+                $id = $this->barcodeToID($barcode);
+            }
             if($transactiontype=="Debit")
                 $mult=-100;
             elseif($transactiontype=="Credit")
