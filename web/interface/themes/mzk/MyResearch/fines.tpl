@@ -9,6 +9,13 @@
       {else}
         <div class="resulthead"><h3>{translate text='Your Fines'}</h3></div>
         <div class="page">
+        
+        <p>
+          {if $finesPaymentUrl}
+            <a href="{$finesPaymentUrl}">{translate text='Online payment of fines'}</a>
+          {/if}
+        </p>
+        
         <table class="datagrid fines" summary="{translate text='Your Fines'}">
         <tr>
           <th>{translate text='Title'}</th>
@@ -37,6 +44,7 @@
           </tr>
         {/foreach}
         </table>
+        
       {/if}
     {else}
       <div class="page">

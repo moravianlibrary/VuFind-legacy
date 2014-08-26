@@ -95,4 +95,20 @@ class AlephMzk extends Aleph
         }
         return $holdings;
     }
+    
+    public function getPaymentURL($user, $fine)
+    {
+        $base = 'https://aleph.mzk.cz/cgi-bin/c-gpe1-vufind.pl';
+        $query = http_build_query(
+            array (
+                'id'     => $user['id'],
+                'adm'    => $this->useradm,
+                'amount' => $fine,
+                'time'   => time(),
+            )
+        );
+        $url = $base . '?' . $query;
+        return $url;
+    }
+
 }

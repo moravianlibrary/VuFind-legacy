@@ -67,6 +67,16 @@ class Fines extends MyResearch
                     $row['title'] = $record ? $record['title_short'] : null;
                 }
                 $interface->assign('rawFinesData', $result);
+
+                $balance = 0;
+                if (count($result) > 0) {
+                    $balance = $result[count($result) - 1]['balance'];
+                }
+                if ($balance < 0) {
+                    $debt = 0 - $balance;
+                    $interface->assign('finesPaymentUrl', $this->catalog->getPaymentURL($patron, $debt));
+                }
+
             }
         }
 
